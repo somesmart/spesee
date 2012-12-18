@@ -1,0 +1,47 @@
+{% extends "nature/base_detail.html" %}
+{% block title %}Observations{% endblock %}
+{% block content %}
+<h2>Observations:</h2>
+    <small>
+    {% if observation_list %}
+        <dl>
+        {% for observation in observation_list %}
+            <dt><a href="{{ observation.get_absolute_url }}">{{ observation.organism }}</a></dt>
+            <dd>{{ observation.observation_date}} - Type: {{ observation.organism.type }} <a class="btn btn-mini" href="{{ observation.get_edit_url }}"><i class="icon-wrench">Edit</a></dd>
+        {% endfor %}
+        </dl>
+    {% else %}
+        <p>No observations are available.</p>
+    {% endif %}
+    </small>
+    <p><a class="btn btn-primary" href="{% url add-observation %}"><i class="icon-plus icon-white"></i> New Observation</a></p>
+{% endblock content %}
+{% block right-content %}
+    <div class="span10 offset1">
+        {% if observation_list %}
+            <p class="alert alert-info">Observation Map</p>
+        {% endif %}
+    </div>
+    <div id="map" class="span11" ></div>
+{% endblock right-content %}
+<div style="display:none">{% block mapurl %}{% url map-data search_by.search_by search_by.value %}{% endblock mapurl %}</div>
+{% block loadmap %}
+    {% if observation_list %}
+        <body onload="load()" onunload="GUnload()">
+        </body>
+    {% endif %}
+{% endblock loadmap %}
+{% comment %}
+{% regroup observation_list by observation.organism.type as org_type_list %}
+<ul>
+    {% for type in org_type_list %}
+    <li>{{ type.grouper }}
+        <ul>
+            {% for observation in type.list %}
+                <li>{{ observation.organism }}</li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+{% endcomment %}

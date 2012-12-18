@@ -1,0 +1,45 @@
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_KEY }}" type="text/javascript"></script>
+<script type="text/javascript">
+    function loadMap(){
+      var map = new GMap2(document.getElementById("map"));
+      map.addControl(new GLargeMapControl());
+      map.addControl(new GMapTypeControl());
+      //set map center (vienna)
+      map.enableScrollWheelZoom();
+      //var zipcode = {{ request.user.get_profile.zipcode }};
+      //alert(zipcode);
+      {% if lat_lng %}
+      var lat_center = {{ lat_lng.latitude }}
+      var lng_center = {{ lat_lng.longitude }}
+      {% else %}
+      var lat_center = 29.725188000
+      var lng_center = -95.763112000
+      {% endif %}
+      map.setCenter(new GLatLng(lat_center, lng_center), 12); 
+      GEvent.addListener(map, "click", function(overlay, point){
+        map.clearOverlays();
+        if (point) {
+          map.addOverlay(new GMarker(point));
+          map.panTo(point);
+          msg = "Latitude: "+point.lat()+"<br />"+"Longitude: "+point.lng();
+          latmsg = point.lat();//they are numbers
+          lngmsg = point.lng();
+          //alert(latmsg.toFixed(9));
+          document.getElementById("id_latitude").value = latmsg.toFixed(9);
+          document.getElementById("id_longitude").value = lngmsg.toFixed(9);
+          }
+          });
+    }
+
+      // arrange for our onload handler to 'listen' for onload events
+      if (window.attachEvent) {
+        window.attachEvent("onload", function() {
+        loadMap();  // Internet Explorer
+        });
+      } else {
+        window.addEventListener("load", function() {
+        loadMap(); // Firefox and standard browsers
+        }, false);
+      }
+</script>
+<body onLoad="loadMap()">

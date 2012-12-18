@@ -1,0 +1,19 @@
+{% extends "nature/base.html" %}
+{% block title %}Stats{% endblock %}
+{% block content %}
+<h2>Global Stats:</h2>
+{% if stats_list %}
+    <ul class="large_list">
+        <li>{{ stats_list.id__count }} Total Lists</li>
+        {% if orgs_found %}
+        <li>{{ orgs_found.total_found }} Organisms Found</li>
+        {% endif %}
+    </ul>
+{% else %}
+    <p>No Lists!</p>
+{% endif %}
+{% if user.is_authenticated %}
+    <h2>My Stats:</h2>
+    <p>Not set up yet.</p>
+{% endif %}
+{% endblock content %}

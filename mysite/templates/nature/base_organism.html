@@ -1,0 +1,206 @@
+{% extends "nature/base_detail.html" %}
+{% block app.css %}
+<link rel="stylesheet" href="{{ STATIC_URL }}nature/css/colorbox/colorbox.css">
+{% endblock %}
+{% block title %}{{ organism.common_name }}{% endblock %}
+{% block app.scripts %}
+<script src="{{ MEDIA_URL }}jquery.formset.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/colorbox/jquery.colorbox-min.js"></script>
+  <!-- Source -->
+  <script type="text/javascript" src="{{ MEDIA_URL }}js/tiny_mce/tiny_mce.js"></script>
+  <script>
+  function setup() {
+  tinyMCE.init({
+    mode: "exact",
+    elements: "identification",
+    theme: "advanced",
+    plugins: "advlink, advimage",
+    theme_advanced_buttons1 : "bold,italic,underline,separator,formatselect,justifyleft,justifycenter,justifyright,justifyfull,bullist,numlist,undo,redo,link,unlink,image",
+    theme_advanced_buttons2 : "",
+    theme_advanced_buttons3 : "",
+    theme_advanced_toolbar_location : "top",
+    theme_advanced_toolbar_align : "left",
+    theme_advanced_statusbar_location : "bottom",
+    theme_advanced_resizing : true,
+    cleanup: true,
+    valid_elements :"p,h1,h2,h3,ol,ul,li,a,strong,b,em,i",
+    extended_valid_elements : "img[class|src|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style]"
+  });
+}
+  function get_image_list(organism){
+  $.ajax({
+      type: "GET",
+      url: "/organism/image/" + organism + "/",
+      success: function(data){
+            $('#image-gallery').empty();
+            $('#image-gallery').append("<h3>Uploaded Images</h3>");
+            $('#image-gallery').show();
+            $('#image-gallery').append(data);
+          }
+      });
+  }
+    $(function() {
+      $("#image-gallery").on("click", '.image', function() {
+        var image = $(this).attr("rel");
+        $('#image').hide();
+        $('#image').fadeIn('slow');
+        $('#image').html('<img src="' + image + '"/>');
+        return false;
+      });
+
+      $('.edit').click(function() {
+        $('.edit').hide();
+        $('.save').show();
+        $('.cancel').show();
+        $('.upload').show();
+        get_image_list({% if new_ident %}{{ new_ident.org }}{% else %}{{ organism.id }}{% endif %});
+      });
+      
+      $('.save').click(function() {
+        var ed = tinymce.get('identification');
+        var identification = ed.getContent();
+        var org = '{{ organism.id }}';
+        $.ajax({
+          url: '{% url save-org-ident %}',
+          type: 'POST',
+          data: {
+            org: org,
+            identification: identification,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success:function (data) {
+            if (data == '1')
+            {
+              $("#status")
+              .addClass("success")
+              .html("<div class='alert alert-success'>Thank you! Your changes will not be visible until they have been approved by a moderator. <a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
+            }
+            else
+            {
+              $("#status").addClass("error").html("Error, data could not be saved <a href='#'' class='close' data-dismiss='alert'>×</a>").fadeIn('slow');
+            }
+          }
+        });
+        tinymce.execCommand('mceRemoveControl',true,'identification');
+        $('.edit').show();
+        $('.save').hide();
+        $('.cancel').hide();
+        $('.upload').hide();
+        $('#image-gallery').hide();
+      });
+      $('.cancel').click(function() {
+        tinymce.execCommand('mceRemoveControl',true,'identification');
+        $('.edit').show();
+        $('.save').hide();
+        $('.cancel').hide();
+        $('.upload').hide();
+        $('#image-gallery').hide();
+      })
+      $(".ajax").colorbox({height:"350px", width:"400px", iframe:true, onClosed:function(){ get_image_list({% if new_ident %}{{ new_ident.org }}{% else %}{{ organism.id }}{% endif %}); } });
+    });
+  </script>
+{% endblock %}
+{% block content %}
+  <h2>{{ organism.common_name }}</h2>
+  {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+  <!--the csrf_token prevents Cross Site Request Forgeries -->
+  {% csrf_token %}
+  <p>{{ organism.latin_name }} - {{ organism.type }}</p>
+  <div class="tool-box">
+    {% if perms.nature.add_orgidentification %}
+      <div class="well well-small">The content below is entirely editable.</div>
+      <div id="status"></div>
+      <div class="pull-right">
+        <a class="edit btn" href="javascript:setup();"><i class="icon-wrench"></i> Edit Identification</a>
+        <a class="save btn btn-success" style="display:none">Save</a>
+        <a class="cancel btn btn-danger" style="display:none">Cancel</a>
+      </div>
+    {% else %}
+      <span>Please <a href="{% url account-login %}">login</a> to edit the content below</a></span>
+    {% endif %}
+  </div>
+  <div id="tools"></div>
+  <div id="identification" class="content">
+    {% if organism.org_ident.all %}
+      {% for id in organism.org_ident.all %}
+        {{ id.identification|safe }}
+      {% endfor %}
+    {% else %}
+      Enter new identification information here.
+    {% endif %}
+  </div>
+  <div class="pull-right">
+    {% if perms.nature.add_images %}
+      {% if new_ident %}
+      <a id="uploader" class="ajax cboxElement upload btn btn-primary" style="display:none" href="{% url image-upload new_ident.org %}">Upload an Image</a>
+      {% else %}
+      <a id="uploader" class="ajax cboxElement upload btn btn-primary" style="display:none" href="{% url image-upload organism.id %}">Upload an Image</a>
+      {% endif %}
+    {% endif %}
+  </div>
+  <div id="image-gallery"></div>
+  <hr>
+  <h3>Identifying Characteristics</h3>
+  {% comment %}
+    Need to make the ident characterstics to be an ajax-ified form as well
+  {% endcomment %}
+  <p class="well well-small">Click on an identification detail value to search for other {{ organism.type }} with this same identifying feature</p>
+  {% for id_details in organism.id_details.all %}
+      <p> {{ id_details.field }} - <a href="{% url search-ident organism.type id_details.field id_details.description %}">{{ id_details.description }} </a></p>
+  {% endfor %}
+  <h3>Observations</h3>
+  <table class="table table-hover table-condensed table-striped">
+    <tr>
+      <th></th>
+      <th>Seen by</th>
+      <th>On Date</th>
+      <th>Comments</th>
+      <th>Habitat</th>
+      <th>Qty</th>
+      <th>Link</th>
+    </tr>
+    {% for observation in organism.observation_set.all %}
+      {% comment %}
+        This only shows a child observation if it is YOUR observation. Otherwise we just see the master observation for simplicicty's sake
+      {% endcomment %}
+      {% if not observation.parent_observation %}
+        <tr>
+          <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}</td>
+          <td>{{ observation.user }}</td>
+          <td>{{ observation.observation_date }}</td>
+          <td>{{ observation.comments}}</td>
+          <td>{{ observation.location_descr }}</td>
+          <td>{{ observation.quantity }}</td>
+          <td><a href="{{ observation.get_absolute_url }}">Details</td>
+        </tr>
+      {% else %}
+        {% if observation.user.id == user.id and observation.parent_observation %}
+          <tr>
+            <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}</td>
+            <td>{{ observation.user }}</td>
+            <td>{{ observation.observation_date }}</td>
+            <td>{{ observation.comments}}</td>
+            <td>{{ observation.location_descr }}</td>
+            <td>{{ observation.quantity }}</td>
+            <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}<a href="{{ observation.get_absolute_url }}">Details</td>
+          </tr>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </table>
+  <div class="pull-right">
+    <a class="observation btn btn-primary" href="{% url add-observation %}?org={{ organism.id }}"><i class="icon-plus icon-white"></i> Observation</a>
+  </div>
+{% endblock content %}
+{% block right-content %}
+  <div class="span10 offset2">
+    <h3>Observation Map</h3>
+  </div>
+  <div id="map" class="span12" ></div>
+  {% endblock right-content %}
+
+<div style="display:none">{% block mapurl %}{{ organism.get_map_url }}{% endblock mapurl %}</div>
+{% block loadmap %}
+  <body onload="load()" onunload="GUnload()">
+  </body>
+{% endblock loadmap %}

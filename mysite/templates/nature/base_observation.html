@@ -1,0 +1,60 @@
+{% extends "nature/base_detail.html" %}
+{% block title %}{{ observation.organism.common_name }}{% endblock %}
+{% block content %}
+	<h1><a href="{{ observation.organism.get_absolute_url }}">{{ observation.organism.common_name }}</a></h1>
+	<table class="table">
+		<tr>
+			<td>Seen by:</td>
+			<td>{{ observation.user }}</td>
+		</tr>
+		<tr>
+			<td>On:</td>
+			<td>{{ observation.observation_date }}</td>
+		</tr>
+		<tr>
+			<td>Temperature:</td>
+			<td>{{ observation.temperature }}</td>
+		</tr>
+		<tr>
+			<td>Latitude:</td>
+			<td>{{ observation.latitude }}</td>
+		</tr>
+		<tr>
+			<td>Longitude:</td>
+			<td>{{ observation.longitude }}</td>
+		</tr>
+		<tr>
+			<td>Comments:</td>
+			<td>{{ observation.comments }}</td>
+		</tr>
+		<tr>
+			<td>Location Description:</td>
+			<td>{{ observation.location_descr }}</td>
+		</tr>
+		<tr>
+			<td>Quantity:</td>
+			<td>{{ observation.quantity }}</td>
+		</tr>
+	</table>
+	{% if observation.observation_image %}
+		<a href="{{ observation.observation_image.url }}"><img src="{{ observation.large_image.url }}" id="observation" ></a>
+	{% endif %}
+	{% if observation.user.id == user.id %} 
+    	{% if perms.observation.can_change %}
+			<p><a class="btn pull-right" href="{{ observation.get_edit_url }}"><i class="icon-wrench"></i> Edit Observation</a></p>
+		{% endif %}
+	{% endif %}
+{% endblock content %}
+{% block right-content %}
+    <div class="span10 offset1">
+        <p class="alert alert-info">Observation Map</p>
+    </div>
+    <div id="map" class="span11" ></div>
+{% endblock right-content %}
+<div style="display:none">{% block mapurl %}{{ observation.get_map_url }}{% endblock mapurl %}</div>
+{% block loadmap %}
+<aside id="map">
+	<body onload="load()" onunload="GUnload()">
+	</body>
+</aside>
+{% endblock loadmap %}

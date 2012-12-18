@@ -1,0 +1,116 @@
+{% extends "nature/base.html" %}
+
+{% block title %}Add an Observation{% endblock title %}
+{% block app.scripts %}
+<script src="{{ MEDIA_URL }}js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript">
+function check_existing(organism, lat, lng){
+  $.ajax({
+      type: "GET",
+      url: "/check/existing/"+ organism +"/?lat="+ lat +"&lng="+ lng,
+      success: function(data){
+            //code here to display the other observations:
+            if (!data.length==0){
+              var html = '<tr><td colspan="2">This same tree has been observed nearby. Is one of them the same one you saw?</td></tr>';
+              $(data).each(function(i,val){
+                $.each(val,function(k,v){
+                    //console.log(k+" : "+ v);
+                    if (k=="obs_id"){
+                      html +='<tr><th>' + k + '</th><td id="' + k + '"><a href="/observation/' + v +'/">' + v +'</a></td></tr>';
+                      parent_obs = v;     
+                    }
+                    else {
+                      html +='<tr><th>' + k + '</th><td id="' + k + '">' + v +'</td></tr>';        
+                    }
+                });
+              html +='<tr id="use_this"><th>This one!</th><td><input type="checkbox" id="id_is_child" class="is_child" value="' + parent_obs + '"></td></tr>';
+              });
+              $('#id_longitude').parent().parent().after(html).show();
+            }
+          }
+      });
+  }
+$(function() {
+    $("#common_name").autocomplete({
+      source: "{% url autocomplete %}?search=organism",
+      minLength: 3,
+      select: function(event, ui) {
+        $('#id_organism').val(ui.item.id);
+        $('#common_name').val(ui.item.label);
+      }
+    });
+    $('#id_observation_date').datetimepicker();
+    //one() means it only loads the list once.
+    $('#id_location_descr').one("focus",function(){
+      var organism = $('#id_organism').val();
+      var lat = $('#id_latitude').val();
+      var lng = $('#id_longitude').val();
+      if ($('#id_longitude').val().trim()!=''){
+        check_existing(organism, lat, lng);
+      }
+    });
+    $("#observation_form").on('change', '.is_child',  function(){
+      if (this.checked) {
+        $("#id_parent_observation").val($(this).val());
+      }
+      else {
+        $("#id_parent_observation").val("");
+      }
+    });
+    // $('#observation_form').on('click','#add_to_map',function(e){
+    //   e.preventDefault();
+    //   var lat_check = $("#lat_check").html();
+    //   var lng_check = $("#lng_check").html();
+    //   var addMarker = function() {
+    //     marker = new google.maps.Marker({
+    //         position: new google.maps.LatLng(lat_check, lng_check),
+    //         map: map,
+    //         title: document.getElementById('common_name')
+    //       });
+    //   }
+    // });
+}); 
+  </script>
+{% endblock %}
+{% block content %}
+{% if perms.nature.add_observation %}
+  {% if observation.id and observation.user.id == user.id or not observation.id%}
+    <p class="alert alert-info">Enter the common or latin name</p>
+    <form action="" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+     <table class="table table-hover table-condensed table-striped" id="observation_form">
+       <tr>
+        <th>
+          <label for="id_organism">Organism</label>
+          <span class="requ">*</span>
+        </th>
+        <td>
+          <input id="id_parent_observation" type="hidden" name="parent_observation" value="{% if observation.id %}{{ observation.parent_observation.id }}{% endif %}">
+          <input id="id_organism" type="hidden" value="{% if add_org %}{{ add_org.id }}{% endif %}{% if observation.id %}{{ observation.organism.id }}{% endif %}" name="organism">
+          <input id="common_name" type="text" name="common_name" value="{% if add_org %}{{ add_org.common_name }}{% endif %}{% if observation.id %}{{ observation.organism.common_name }}{% endif %}">
+        </td>
+       {% for field in form %}
+       <tr>
+         <th>{{ field.label_tag }} {% if field.field.required %}<span class="requ">*</span>{% endif %}</th>
+         <td>{{ field.errors }}{{ field }}
+           {% if field.help_text %}{{ field.help_text }}{% endif %}
+         </td>
+       </tr>
+       {% endfor %}
+       <tr><th></th><td><input class="btn btn-primary" type="submit" value="Submit"></td></tr>
+     </table>
+    </form>
+    {% else %}
+  <p>I'm sorry, you are not authorized to edit this observation. Please contact the administrator for more information, or try a different observation.</p>
+  {% endif %}
+{% else %}
+<p>Sorry, you do not have the required permissions. Please contct the administrator.</p>
+{% endif %}
+{% endblock content %}
+{% block right-content %}
+  <div class="span10 offset1">
+    <small><b>Click where you found the organism on the map below to populate the latitude and longitude</b></small>
+  </div>
+  <div id="map" class="span10" ></div>
+  {% include 'nature/include_lookup_map.html' %}
+{%endblock right-content %}

@@ -1,0 +1,27 @@
+{% extends "nature/base.html" %}
+{% block title %}Review Organism Changes{% endblock %}
+{% block content %}
+{% if perms.nature.add_orgidentificationreview %}
+	{% if org_review_list %}
+		<h2>Review Organism Changes:</h2>
+		    <ul class="unstyled">
+		    {% for org in org_review_list %}
+		        <li><a href="{% url review-organism org.id %}">{{ org.organism }}</a></li>
+		    {% endfor %}
+		    </ul>
+	{% endif %}
+	{% if image_review_list %}
+		<h2>Review New Images:</h2>
+		    <ul class="unstyled">
+		    {% for image in image_review_list %}
+		        <li><a href="{% url review-image image.id %}">{{ image.review_image.organism }}</a></li>
+		    {% endfor %}
+		    </ul>
+	{% endif %}
+	{% if not org_review_list and not image_review_list %}
+		<p class="alert alert-info">There are no changes for review at this time!</p>
+	{% endif %}
+{% else %}
+<p>I'm sorry, you are not authorized to moderate changes. Please contact the administrator for more information.</p>
+{% endif %}
+{% endblock content %}

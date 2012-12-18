@@ -1,0 +1,89 @@
+{% extends "nature/base.html" %}
+{% block title %}Observations{% endblock %}
+{% block content %}
+{% if search_by.search_by == 'observation' %}
+<h2>Browse Observations:</h2>
+    <form action="#list" class="form-inline" method="get">
+        <fieldset>
+            <label>Latitude:</label>
+            <input class="input-medium" id="id_latitude" type="text" name="latitude">
+            <label>Longitude:</label>
+            <input class="input-medium" id="id_longitude" type="text" name="longitude">
+            <button id="search" type="submit" class="btn btn-small">Search</button>
+        </fieldset>
+    </form>
+    <p class="alert alert-info">Click on your current location to see what has been observed nearby.</p>
+    <div id="observations"></div>
+    <div id="map"></div>
+    {% include 'nature/include_lookup_map.html' %}
+    {% if discover_list %}
+    <hr id="list">
+    <br>
+    <p class="alert alert-info">Click the Organism type below to remove them from the list</p>
+    <div class="pagination">
+        <ul id="removable" class="navbar navbar-inverse">
+          {% regroup discover_list by organism.type as type_list %}
+          {% for type in type_list %}
+            <li><a href="#remove" data-option-value=".{{ type.grouper|lower }}">{{ type.grouper }}</a></li>
+          {% endfor %}
+        </ul>
+    </div>
+{# </div>closes the row for the main page. will open another below to prevent breaking the rest of the page #}
+        <div id="container">
+            {# <ul class="thumbnails"> #}
+            {% for observation in discover_list %}
+                <div class="organism {{ observation.organism.type|lower }} well well-small">
+                    {% if observation.observation_image %}<img src="{{ observation.wide_thumb.url }}" class="obs-image">{% endif %}
+                    <h5>{{ observation.organism.common_name }}</h5>
+                    <p>{{ observation.observation_date}} - Type: {{ observation.organism.type }}</p>
+                    <p><a class="btn btn-mini" href="{% url observation-detail observation.id %}">View details »</a></p>
+                </div>
+            {% endfor %}
+        </div>
+        {% comment %}
+        Commenting all this out for now becuase we don't need it at the moment.
+        {% for observation in discover_list %}
+             This opens the new row when the counter is 0 and after every 3rd result 
+            {% if forloop.counter0|divisibleby:"3" %}<div class="row-fluid">{% endif %}
+            <div class="span4">
+              <h5>{{ observation.organism }}</h5>
+              <p>{{ observation.observation_date}} - Type: {{ observation.organism.type }} <a class="btn btn-mini" href="{{ observation.get_edit_url }}">Edit</a></p>
+              <p><a class="btn btn-mini" href="#">View details »</a></p>
+            </div><!--/span-->
+            {% if forloop.last or forloop.counter|divisibleby:"3" %}</div>{% endif %} 
+            {% comment %} This closes the row when it is the last result or after every 3rd result 
+        {% endfor %}
+        {% comment %} See if it's possible to also create a map here with the newly created list {% endcomment %}
+{# <div class="row-fluid">  opening back up the row-fluid that the rest of the page expects#}        
+    {% endif %}
+{% endif %}
+{% endblock content %}
+{% block app.scripts %}
+<script src="{{ MEDIA_URL }}js/isotope/jquery.isotope.min.js"></script>
+<script>
+    $(function(){
+
+      var $container = $('#container');
+
+      $container.isotope({
+        itemSelector : '.organism',
+        masonryHorizontal: {
+            rowHeight: 360
+          }
+      });
+
+      $('#removable a').click( function( jQEvent ) {
+        var selector = $(this).attr('data-option-value');
+        var $removable = $container.find( selector );
+        $container.isotope( 'remove', $removable );
+        jQEvent.preventDefault();
+      });
+
+      // remove item if clicked
+      //$container.delegate( '.organism', 'click', function(){
+      //  $container.isotope( 'remove', $(this) );
+      //});
+
+    });
+  </script>
+{% endblock app.scripts %}

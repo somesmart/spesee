@@ -1,0 +1,42 @@
+{% extends "nature/base.html" %}
+{% load i18n %}
+{% block app.scripts %}
+<script type="text/javascript">
+     $(function() {
+          $("#zip_code").autocomplete({
+            source: "{% url autocomplete %}?search=zip",
+            minLength: 3,
+            select: function(event, ui) {
+              $('#id_zipcode').val(ui.item.id);
+              $('#zip_code').val(ui.item.label);
+            }
+          });
+      }); 
+  </script>
+{% endblock %}
+
+{% block content %}
+{% if not user.is_authenticated %}
+<p>If you are only interested in certain types of organisms (i.e. you are here for birding only), feel free to hide the others below in order to restrict the organisms that will appear on auto-completion or location lists. (Note, you can still see them if they are already on an existing list, or you go to them directly.)</p>
+<p>Entering a home zip code will also help center your observation creation map so it defaults to your home location.</p>
+<form method="post" action=".">
+	{% csrf_token %}
+	<table>
+  		{{ form.as_table }}
+  		<tr>
+        <th>
+          <label for="id_zipcode">Home Zip Code</label>
+          <span class="requ">*</span>
+        </th>
+        <td>
+          <input id="id_zipcode" type="hidden" value="1" name="zipcode">
+          <input id="zip_code" type="text" name="zip_code" value=""><span class="help_text">Enter Zip Code to help center maps</span>
+        </td>
+     </tr>
+  	</table>
+  <input type="submit" value="{% trans 'Submit' %}" />
+</form>
+{% else %}
+<p>You are already logged in, why would you need a new account!</p>
+{% endif %}
+{% endblock %}

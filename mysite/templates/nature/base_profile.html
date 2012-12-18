@@ -1,0 +1,45 @@
+{% extends "nature/base.html" %}
+
+{% block title %}User Profile{% endblock title %}
+{% block content %}
+  {% if usersettings.user.id == user.id %} 
+    <p>If you are only interested in certain types of organisms (i.e. you are here for birding only), feel free to hide the others below in order to restrict the organisms that will appear on auto-completion or location lists. (Note, you can still see them if they are already on an existing list, or you go to them directly.)</p>
+    <p>Entering a home zip code will also help center your observation creation map so it defaults to your home location.</p>
+     <table class="table">
+       <tr>
+         <th>Hide Trees</th>
+         <td>{{ usersettings.hide_trees }}</td>
+       </tr>
+       <tr>
+         <th>Hide Birds</th>
+         <td>{{ usersettings.hide_birds }}</td>
+       </tr>
+       <tr>
+         <th>Hide Reptiles</th>
+         <td>{{ usersettings.hide_reptiles }}</td>
+       </tr>
+       <tr>
+         <th>Hide Amphibians</th>
+         <td>{{ usersettings.hide_amphibians }}</td>
+       </tr>
+       <tr>
+         <th>Hide Mammals</th>
+         <td>{{ usersettings.hide_mammals }}</td>
+       </tr>
+       <tr>
+         <th>Home Zip Code</th>
+         <td>{{ usersettings.zipcode.zipcode }}</td>
+       </tr>
+       <tr>
+         <th>Private</th>
+         <td>{{ usersettings.private }}</td>
+       </tr>
+     </table>
+     <p><a class="btn pull-right" href="{{ usersettings.get_absolute_url }}edit/"><i class="icon-wrench"></i> Edit Profile</a></p>
+    {% comment %}
+     <p> {{ perms.user }}</p>
+    {% endcomment %}
+    {% else %}
+    <p>Oops, I don't think you should be here. Did you mean to go to <a href="/accounts/profile/{{ user.username }}/">your profile page?</a></p>
+    {% endif %}
+{% endblock content %}

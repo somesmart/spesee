@@ -1,0 +1,5 @@
+<markers>
+{% for observation in map_data %}
+ <marker name="{{ observation.organism }}" date= "{{ observation.observation_date }}" lat="{{ observation.latitude }}" lng="{{ observation.longitude }}" usr="{{ observation.user.id }}" obs="{{ observation.get_absolute_url }}" orglink="{{ observation.organism.get_absolute_url }}" />
+{% endfor %}
+</markers>

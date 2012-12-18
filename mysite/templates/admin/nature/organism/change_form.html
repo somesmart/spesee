@@ -1,0 +1,17 @@
+{% extends 'admin/change_form.html' %}
+
+{% block after_related_objects %}
+<script>
+django.jQuery(function($){
+  $('#id_type').change(function(evt){
+    $.ajax({
+      url: "/admin/nature/organismtype/" + this.value + '/fields/',
+      type: 'get',
+      success: function(data) {
+        $('tr.form-row td.field-field select').html(data);
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

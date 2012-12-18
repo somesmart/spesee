@@ -1,0 +1,87 @@
+{% extends "nature/base.html" %}
+    {% block map %}
+    <script src="http://maps.google.com/maps?file=api&v=2&key={{ GOOGLE_KEY }}&sensor=false"
+        type="text/javascript">
+    </script>
+
+    <script type="text/javascript">
+    //<![CDATA[
+
+    var blueIcon = new GIcon(G_DEFAULT_ICON);
+    blueIcon.image = "http://maps.google.com/mapfiles/ms/icons/blue.png";
+    blueIcon.iconSize = new GSize(32, 32);
+    var markerOptions = { icon:blueIcon };
+    // green icon http://maps.google.com/mapfiles/ms/icons/green.png
+
+    var iconRed = new GIcon(); 
+    iconRed.image = 'http://labs.google.com/ridefinder/images/mm_20_red.png';
+    iconRed.shadow = 'http://labs.google.com/ridefinder/images/mm_20_shadow.png';
+    iconRed.iconSize = new GSize(12, 20);
+    iconRed.shadowSize = new GSize(22, 20);
+    iconRed.iconAnchor = new GPoint(6, 20);
+    iconRed.infoWindowAnchor = new GPoint(5, 1);
+
+    var currentUser = {% if user.is_anonymous %}0{% else %}{{ user.id }}{% endif %};
+    var customIcons = [];
+    //customIcons["others"] = iconBlue;
+    customIcons["mine"] = iconRed;
+
+    function load() {
+      if (GBrowserIsCompatible()) {
+        var map = new GMap2(document.getElementById("map"));
+        map.addControl(new GSmallMapControl());
+        map.addControl(new GMapTypeControl());
+        map.enableScrollWheelZoom();
+
+        // ==== It is necessary to make a setCenter call of some description before adding markers ====
+        // ==== At this point we dont know the real values ====        
+        map.setCenter(new GLatLng(0,0),0);
+        //allow gmaps to auto determine the center location based on the points selected.
+
+        // ===== Start with an empty GLatLngBounds object =====  
+        var bounds = new GLatLngBounds();
+        //from the organism id to generate map data
+        GDownloadUrl("{% block mapurl %}{% endblock mapurl %}", function(data) {
+            var xml = GXml.parse(data);
+            var markers = xml.documentElement.getElementsByTagName("marker");
+            for (var i = 0; i < markers.length; i++) {
+              var name = markers[i].getAttribute("name");
+              var date = markers[i].getAttribute("date");
+              var obsUser = markers[i].getAttribute("usr");
+              var obsLink = markers[i].getAttribute("obs");
+              var orgLink = markers[i].getAttribute("orglink");
+              var point = new GLatLng(parseFloat(markers[i].getAttribute("lat")),
+                                      parseFloat(markers[i].getAttribute("lng")));
+              var marker = createMarker(point, name, date, obsUser, obsLink, orgLink);
+              map.addOverlay(marker);
+
+              // ==== Each time a point is found, extent the bounds to include it =====
+              bounds.extend(point);
+            }
+
+          // ===== determine the center and zoom level from the bounds ======
+          map.setCenter(bounds.getCenter(), map.getBoundsZoomLevel(bounds));
+          });
+          }
+        }
+
+        function createMarker(point, name, date, obsUser, obsLink, orgLink) {
+         if (obsUser == currentUser)
+          {
+            var marker = new GMarker(point, markerOptions);
+          }
+          else
+          {
+            var marker = new GMarker(point);
+          }
+          //I'd like to include a link to the observation here
+          var html = "<b><a href='" + orgLink + "'>" + name + "</a></b> <br/><a href='" + obsLink + "'>" + date + "</a>";
+          GEvent.addListener(marker, 'click', function() {
+            marker.openInfoWindowHtml(html);
+            //alert(html);
+          });
+          return marker;
+        }
+        //]]>
+  </script>
+  {% endblock map %}

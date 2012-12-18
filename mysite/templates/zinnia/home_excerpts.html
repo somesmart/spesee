@@ -1,0 +1,4 @@
+{% for entry in entries %} 
+	<h1 class="blog-title"><a href="{{ entry.get_absolute_url }}" title="{{ entry.title }}" rel="bookmark">{{ entry.title }}</a></h1> 
+	{{ entry.html_content|truncatewords_html:100|safe }} <p><a class="btn btn-primary" href="{{ entry.get_absolute_url }}" title="{{ entry.title }}" rel="bookmark">Read more &raquo;</a></p>
+{% endfor %} 

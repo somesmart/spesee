@@ -1,0 +1,54 @@
+{% extends "nature/base.html" %}
+{% block app.css %}
+<link rel="stylesheet" href="{{ STATIC_URL }}nature/css/colorbox/colorbox.css">
+{% endblock %}
+{% block title %}My Groups{% endblock %}
+{% block app.scripts %}
+<script type="text/javascript" src="{{ MEDIA_URL }}js/colorbox/jquery.colorbox-min.js"></script>
+<script type ="text/javascript">
+function deleteItem(item_id){
+  $.ajax({
+      type: "GET",
+      url: "/delete/group/"+ item_id +"/",
+      success: function(data){
+            $("." + item_id).remove();
+          }
+      });
+  }
+$(function() {
+  $('.delete').click(function(event){ 
+    //alert(event.target.id);
+    var item_id = event.target.id;
+    if (confirm('Are you sure you want to delete this list? This cannot be undone.')) {
+      deleteItem(item_id);
+    }
+  });
+  $(".ajax").colorbox({height:"650px", width:"565px", iframe:true});
+});
+</script>
+{% endblock %}
+{% block content %}
+<div class="row-fluid">
+  <div class="span7 offset1">
+    <h2>My Groups:</h2>
+    {% if group_list %}
+        <ul>
+        {% for group in group_list %}
+            <li class="{{ group.id }}"><a href="{{ group.get_absolute_url }}">{{ group.name }}</a> <a class="ajax cboxElement btn btn-mini" href="{% url group-edit group.id %}"><i class="icon-wrench"></i></a> <a class="delete btn btn-mini btn-danger" id="{{ group.id }}" href="#"><i class="icon-remove icon-white"></i></a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>You have not created any custom groups yet. Click the link below to create your first group!</p>
+    {% endif %}
+    {% if joined_groups %}
+      <h2>Joined Groups:</h2>
+        <ul>
+        {% for group in joined_groups %}
+            <li class="{{ group.id }}"><a href="{{ group.get_absolute_url }}">{{ group.name }}</a></li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+     <p><a class="ajax cboxElement btn btn-primary" href="{% url group-add %}"><i class="icon-plus icon-white"> </i>New Group</a></p>
+   </div>
+ </div>
+{% endblock content %}

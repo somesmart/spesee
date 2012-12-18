@@ -1,0 +1,5 @@
+<markers>
+{% for observation in organism.observation_set.all %}
+ <marker name="{{ organism.common_name }}" date= "{{ observation.observation_date }}" lat="{{ observation.latitude }}" lng="{{ observation.longitude }}" />
+{% endfor %}
+</markers>

@@ -1,0 +1,70 @@
+{% extends "nature/base.html" %}
+{% block title %}Organism Search{% endblock %}
+{% block app.scripts %}
+<script type="text/javascript">
+function get_ident_fields(type_search){
+	$.ajax({
+	  type: "GET",
+	  url: "/search/"+ type_search +"/",
+	  success: function(data){
+	  		var ident_fields = "<tr id='id_field_row'><th>Search Field:</th><td><select name='search_field' id='id_field_select'>" + data + "</select></td></tr>";
+	        $("#search_table").append(ident_fields);
+	      }
+	  });	
+}
+function get_ident_details(href_search){
+	$.ajax({
+	  type: "GET",
+	  url: href_search,
+	  success: function(data){
+	  		var ident_details = "<tr id='id_details_row'><th>Field Values:</th><td><select name='search_details' id='id_details_select'>" + data + "</select></td></tr>";
+	        $("#search_table").append(ident_details);
+	      }
+	  });
+}
+$(function() {
+	$("#type_select").change(function() {
+		var type_search = $(this).val();
+		//remove the id_field and id_details rows in case we change the org type
+		$("#id_field_row").remove();
+		$("#id_details_row").remove();
+		$("#get_results").attr("href", "/search/" + type_search + "/");
+		get_ident_fields(type_search);
+	});
+	$("#search_table").on("change", "#id_field_select", function(){
+		var id_field_search = $(this).val();
+		var href = $("#get_results").attr("href");
+		//remove the details row in case we change id_fields
+		$("#id_details_row").remove();
+		$("#get_results").attr("href", href + id_field_search + "/")
+		var href_search = $("#get_results").attr("href");
+		get_ident_details(href_search);
+	});
+	$("#search_table").on("change", "#id_details_select", function(){
+		var id_details_search = $(this).val();
+		var href = $("#get_results").attr("href");
+		$("#get_results").attr("href", href + id_details_search + "/")
+		var href_search = $("#get_results").attr("href");
+	});
+})
+</script>
+{% endblock %}
+{% block content %}
+<h1>Search for an Organism</h1>
+
+<p>Did you find something, but aren't sure what it is? Follow the options below to get a list of possible organisms.</p>
+<table class="table" id="search_table">
+	<tr>
+		<th>Select a Type:</th>
+		<td>
+			<select name="type" id="type_select">
+				<option value="">-------------------</option>
+				{% for organismtype in type_list %}
+					<option value="{{ organismtype.description }}">{{ organismtype.description }}</option>
+				{% endfor %}
+			</select>
+		</td>
+	</tr>
+</table>
+<a id="get_results" href="/search/">Get Results</a>
+{% endblock content %}

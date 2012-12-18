@@ -1,0 +1,14 @@
+{% extends "nature/base.html" %}
+{% block title %}Advanced Search{% endblock title %}
+{% block content %}
+<h1>Identifying characteristic search results:</h1>
+{% if organism_list %}
+    <ul>
+    {% for organism in organism_list %}
+        <li><a href="{{ organism.get_absolute_url }}{{ organism.common_name|slugify }}">{{ organism.common_name }} ({{ organism.latin_name }})</a> </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No organisms are available.</p>
+{% endif %}
+{% endblock content %}

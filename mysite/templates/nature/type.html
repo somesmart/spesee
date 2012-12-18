@@ -1,0 +1,14 @@
+{% extends "nature/base.html" %}
+{% block title %}Organism Types{% endblock %}
+{% block content %}
+<h1>{{ organismtype.description }}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<h2>Identification Fields</h2>
+{% for id_fields in organismtype.id_fields.all %}
+<ul>
+	<li>{{ id_fields.name }}</li>
+</ul>
+{% endfor %}
+{% endblock content %}

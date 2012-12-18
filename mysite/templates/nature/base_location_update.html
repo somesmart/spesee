@@ -1,0 +1,48 @@
+{% extends "nature/base.html" %}
+
+{% block title %}Edit your Location{% endblock title %}
+{% block app.scripts %}
+<!-- Load TinyMCE -->
+<script type="text/javascript" src="{{ MEDIA_URL }}js/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript">
+tinyMCE.init({
+  mode: "textareas",
+  theme: "simple"
+});
+</script>
+<!-- /TinyMCE -->
+{% endblock %}
+
+{% block content %}
+  {% if location.created_by.id == user.id %} 
+    {% if perms.nature.add_location %}
+    <form action="" method="post">
+      {% csrf_token %}
+     <table>
+       {% for field in form %}
+       <tr>
+         <th>{{ field.label_tag }} {% if field.field.required %}<span class="requ">*</span>{% endif %}</th>
+         <td>{{ field.errors }}{{ field }}
+           {% if field.help_text %}
+           <p class="help_text">{{ field.help_text }}</p>
+           {% endif %}
+         </td>
+       </tr>
+       {% endfor %}
+       <tr><th></th><td><input type="submit" value="Submit"></td></tr>
+     </table>
+    </form>
+    <p class="small"><b>Click where you would like to center this location.</b></p>
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ GOOGLE_KEY }}" type="text/javascript"></script>
+    <script src="{{ MEDIA_URL }}gmapselect.js" type="text/javascript"></script>
+
+    <body onLoad="loadMap()">
+
+    <div id="map" style="width: 800px; height: 450px"></div><br/>
+    {% else %}
+      <p>sorry, no permissions</p>
+    {% endif %}
+  {% else %}
+    <p>I'm sorry, you are not authorized to edit this observation. Please contact the administrator for more information, or try a different observation.</p>
+  {% endif %}
+{% endblock content %}
