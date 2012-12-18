@@ -140,45 +140,6 @@ class OrganismViewTest(DetailView):
             context['new_ident'] = {'org': self.kwargs['pk']}
         return context        
 
-########################################
-#I believe this can be deleted
-########################################
-class OrgIdentUpdate(UpdateView):
-    template_name = 'nature/base_org_ident_form.html'
-    form_class = OrgIdentForm
-    success_url = '/thanks/'
-    def form_valid(self, form):
-        if form.is_valid():
-            obj = form.save(commit=False)
-            self.now = datetime.now()
-            OrgIdentificationReview(organism=obj.organism, identification=obj.identification, modified_by=self.request.user, modified_date=self.now, status=2).save()
-            #obj.save()
-            return HttpResponseRedirect('/thanks/')
-
-    def get_object(self):
-        return OrgIdentification.objects.select_related().get(organism__id=self.kwargs['pk'])
-
-########################################
-#I believe this can be deleted
-########################################
-class OrgIdentCreate(CreateView):
-    template_name = 'nature/base_org_ident_form.html'
-    form_class = OrgIdentForm
-    def form_valid(self, form):
-        if form.is_valid():
-            org_id = self.kwargs['org']
-            self.organism = Organism.objects.get(id=org_id)
-            obj = form.save(commit=False) 
-            obj.organism = self.organism
-            self.now = datetime.now()
-            OrgIdentificationReview(organism=obj.organism, identification=obj.identification, modified_by=self.request.user, modified_date=self.now, status=2).save()
-            obj.save()
-            return HttpResponseRedirect('/thanks/')
-    def get_context_data(self, **kwargs):
-        context = super(OrgIdentCreate, self).get_context_data(**kwargs)
-        context['new_ident'] = {'org': self.kwargs['org']}
-        return context
-
 def save_org_ident(request):
     org_id = request.POST[u'org']
     organism = Organism.objects.get(id=org_id)
@@ -186,43 +147,6 @@ def save_org_ident(request):
     modified_date = datetime.now()
     OrgIdentificationReview(organism=organism, identification=identification, modified_by=request.user, modified_date=modified_date, status=2).save()
     return HttpResponse('1')
-
-#don't think this is currently in use
-#delete if we don't run into any issues as long as you remember how to do the stuff below
-# class OrganismUpdate(UpdateView):
-#     template_name = 'nature/organism_form.html'
-#     model = Organism #Must keep this
-#     form_class = OrganismForm
-#     # organism = Organism.objects.get(self.object)
-#     def form_valid (self, form):
-#         self.return_url = '/organism/' + form.data['id_details-1-organism']
-#         context = self.get_context_data()
-#         identdetail_form = context['identdetail_form']
-#         images_form = context['images_form']
-#         if identdetail_form.is_valid():
-#             self.object = form.save()
-#             identdetail_form.instance = self.object
-#             identdetail_form.save()
-#         #if images_form.is_valid():
-#         #    self.object = form.save()
-#         #    images_form.instance = self.object
-#         #    images_form.save()
-#         else:
-#             return self.render_to_response(self.get_context_data(form=form))
-#         return HttpResponseRedirect(self.return_url)#change this to send back to that org's page or a page that says "your change will be reviewd"
-
-#     def form_invalid(self, form):
-#         return self.render_to_response(self.get_context_data(form=form))
-
-#     def get_context_data(self, **kwargs):
-#         context = super(OrganismUpdate, self).get_context_data(**kwargs)
-#         if self.request.POST:
-#             context['identdetail_form'] = IdentDetailFormSet(self.request.POST, instance=self.object)
-#         #    context['images_form'] = ImagesFormSet(self.request.POST, instance=self.object)
-#         else:
-#             context['identdetail_form'] = IdentDetailFormSet(instance=self.object)
-#         #    context['images_form'] = ImagesFormSet(instance=self.object)
-#         return context
 
 class IdentDetailListView(ListView):
     template_name='nature/search_ident_fields.html'

@@ -27,25 +27,8 @@ urlpatterns = patterns('',
             model=OrganismType,
             context_object_name='type_list',
             template_name='nature/base_type.html')),
-    #edit/organism/ident/ is the ajax call to edit an organism
-    ######################################
-    #I believe this can be deleted
-    ######################################
-    url(r'^edit/organism/ident/(?P<pk>\d+)/',
-        login_required(OrgIdentUpdate.as_view()), name='org_ident-form'),
-    #edit/organism/ident/ is the ajax call to edit an organism
-    ######################################
-    #I believe this can be deleted
-    ######################################
-    url(r'^add/organism/ident/(?P<org>\d+)/',
-        login_required(OrgIdentCreate.as_view())),
     #save org ident
     url(r'^save/organism/ident/', 'mysite.nature.views.save_org_ident', name='save-org-ident'),
-    #edit/organism/ is to edit an organism
-    #####################################
-    #don't think this is currently in use
-    #url(r'^edit/organism/(?P<pk>\d+)/',
-        #login_required(OrganismUpdate.as_view()), name='organism-form'),
     #/organism/
     url(r'^organism/(?P<pk>\d+)/',
         OrganismView.as_view(), name='organism-view'),
@@ -168,9 +151,7 @@ urlpatterns = patterns('',
     #add a single item to an existing group
     url(r'^add/group/(?P<group>\d+)/user/(?P<user>\d+)/(?P<status>\d+)/$', 'mysite.nature.views.add_group_user', name='group-invite'),
     #edit the group
-    url(r'^edit/group/(?P<pk>\d+)/$',
-        login_required(GroupUpdate.as_view(
-            template_name='nature/base_group_update_head.html')), name='group-edit'),
+    url(r'^edit/group/(?P<pk>\d+)/$', login_required(GroupUpdate.as_view(template_name='nature/base_group_update_head.html')), name='group-edit'),
     #this will delete a single organism from a group
     url(r'^delete/group/user/(?P<pk>\d+)/$', 'mysite.nature.views.delete_group_user'),
     #this will delete an entire group

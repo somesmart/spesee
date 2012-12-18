@@ -39,33 +39,6 @@ class IdentificationDetailInline(forms.Form):
     formset = IdentificationDetailFormSet
     extra = 3
 
-#########################################
-#I believe this can be deleted
-#########################################
-class OrganismForm(ModelForm):
-    habitat_descr = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols': 75, 'rows': 10}))
-    ident_tips = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols': 75, 'rows': 10}))
-    image = forms.ImageField(required=False, help_text='The Primary Organism Image')
-    class Meta:
-        model = Organism
-        fields = ('habitat_descr', 'ident_tips', 'image')
-
-#########################################
-#I believe this can be deleted
-#########################################
-class OrgIdentForm(ModelForm):
-    identification = forms.CharField(widget=forms.Textarea(attrs={'cols': 60, 'rows': 20}))
-    class Meta:
-        model = OrgIdentification
-        exclude = ('organism')
-
-#########################################
-#I believe this can be deleted
-#########################################
-class IdentDetailForm(ModelForm):
-    class Meta:
-        model = IdentificationDetail        
-
 class ImagesForm(ModelForm):
     class Meta:
         model = Images
