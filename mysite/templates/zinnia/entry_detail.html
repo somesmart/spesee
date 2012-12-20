@@ -45,33 +45,33 @@
     {% with comment_list=object.comments %}
     {% if comment_list.count %}
       {% for comment in comment_list %}
-      <div id="comment_{{ comment.pk }}" class="media comment vcard {% cycle box1,box2 %}{% if comment.user in object.authors.all %} post-author{% endif %}">
-        <a class="pull-left" href="">
-        <img src="{% get_gravatar comment.email 60 "G" %}" class="gravatar photo media-object" alt="{{ comment.user_name }}"/>
-        <div class="media-body comment-info">
-        	{% if comment.url %}
-        	<a href="{{ comment.url }}" rel="external nofollow"
-                   class="fn url">{{ comment.user_name }}</a>
-        	{% else %}
-        	<h4 class="media-heading">{{ comment.user_name }}</h4>
-        	{% endif %}
-  	      {% trans "on" %}
-          <abbr class="comment-published" title="{{ comment.submit_date|date:"c" }}Z">
-            {{ comment.submit_date|date:"SHORT_DATETIME_FORMAT" }}
-          </abbr>
-          {{ comment.comment|linebreaks }}
+        <div id="comment_{{ comment.pk }}" class="media comment vcard {% cycle box1,box2 %}{% if comment.user in object.authors.all %} post-author{% endif %}">
+          <a class="pull-left" href="">
+          <img src="{% get_gravatar comment.email 60 "G" %}" class="gravatar photo media-object" alt="{{ comment.user_name }}"/>
+          <div class="media-body comment-info">
+          	{% if comment.url %}
+          	<a href="{{ comment.url }}" rel="external nofollow"
+                     class="fn url">{{ comment.user_name }}</a>
+          	{% else %}
+          	<h4 class="media-heading">{{ comment.user_name }}</h4>
+          	{% endif %}
+    	      {% trans "on" %}
+            <abbr class="comment-published" title="{{ comment.submit_date|date:"c" }}Z">
+              {{ comment.submit_date|date:"SHORT_DATETIME_FORMAT" }}
+            </abbr>
+            {{ comment.comment|linebreaks }}
+          </div>
         </div>
       {% endfor %}
       {% if not object.comments_are_open %}
-    <p>{% trans "Comments are closed." %}</p>
+        <p>{% trans "Comments are closed." %}</p>
       {% endif %}
     {% else %}
       {% if object.comments_are_open %}
-    <p>{% trans "No comments yet." %}</p>
+        <p>{% trans "No comments yet." %}</p>
       {% else %}
-    <p>{% trans "Comments are closed." %}</p>
+        <p>{% trans "Comments are closed." %}</p>
       {% endif %}
-      </div>
     {% endif %}
     {% endwith %}
   </div>
@@ -88,5 +88,5 @@
     <a href="{% url 'admin:zinnia_entry_change' object.pk %}" title="{% trans "Edit the entry" %}" class="btn pull-right"><i class="icon-wrench"></i> {% trans "Edit the entry" %}</a>
   {% endif %}
   {% endblock %}
-</div>
+
 {% endblock content %}

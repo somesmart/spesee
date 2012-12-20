@@ -23,6 +23,8 @@ box-shadow: 0 8px 6px -6px black;
     background: none repeat scroll 0 0 #BFBFBF;
 }
 
+.ui-autocomplete-loading { background:url('../img/indicator.gif') no-repeat right center }
+
 /**** Isotope Filtering ****/
 
 .isotope-item {

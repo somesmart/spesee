@@ -65,10 +65,10 @@ urlpatterns = patterns('',
     #url(r'^search/(?P<type_name>\w+)/$', 'mysite.nature.views.get_ident_fields', name='type_search'),
     #get the id_detail values from the id_field/type selected
     #url(r'^search/(?P<type_name>\w+)/(?P<id_field>[\s\w]+)/$', 'mysite.nature.views.get_ident_details', name='id_field_search'),
-    #search/is for ident fields (shows organisms with a certain value in an particular ident field)
+    #ident/is for ident fields (shows organisms with a certain value in an particular ident field)
     #so, for example you might want to find Birds(type) with a color(ident field) of White (details)
-    #url(r'^search/(\w+)/([\s\w]+)/([\s\w]+)/$',    
-    #    IdentDetailListView.as_view(), name='search-ident'),
+    url(r'^ident/(\w+)/([\s\w]+)/([\s\w]+)/$',    
+        IdentDetailListView.as_view(), name='search-ident'),
     #haystack search urls
     (r'^search/', include('haystack.urls')),
     #observations by user, zip, etc

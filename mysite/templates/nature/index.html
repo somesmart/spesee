@@ -3,8 +3,9 @@
 {% block title %} Welcome to SpeSee {% endblock title %}
 {% block content %}
 	{% get_recent_entries 5 "zinnia/home_excerpts.html" %}
-    <hr>
-    <h2>Recent Observations:</h2>
+{% endblock content %}
+{% block right-content %}
+<h2>Recent Observations:</h2>
     {% if first_ogranisms %}
         <ul>
         {% for organism in first_ogranisms %}
@@ -16,4 +17,4 @@
     {% else %}
         <p>No organisms are available.</p>
     {% endif %}
-{% endblock content %}
+{% endblock %}    
