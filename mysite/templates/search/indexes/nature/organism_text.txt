@@ -1,0 +1,4 @@
+{{ object.common_name }}
+{{ object.latin_name }}
+{{ object.type }}
+{{ object.id }}

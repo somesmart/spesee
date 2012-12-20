@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
+from haystack.query import SearchQuerySet
 from mysite.nature.models import *
 from mysite.nature.forms import *
 from mysite.nature.utils import *
@@ -36,6 +37,29 @@ def autocomplete(request):
                     for organism in model_results:
                         data = {'id': organism.id, 'label': organism.common_name + ' (' + organism.latin_name + ')'}
                         results.append(data)
+            elif search == "primary_search":
+                # user = request.user
+                # hide_types = get_hide_list(user)
+                # # Ignore queries shorter than length 3
+                # if len(value) > 2:
+                #     model_results = Organism.objects.exclude(type__in=hide_types).filter(Q(common_name__icontains=value) | Q(latin_name__icontains=value))
+                #     # Default return list
+                #     results = []
+                #     for organism in model_results:
+                #         data = {'id': '/organism/' + str(organism.id) + '/', 'label': organism.common_name + ' (' + organism.latin_name + ')'}
+                #         results.append(data)
+                if len(value) > 3:
+                    model_results = SearchQuerySet().autocomplete(content_auto=value)
+
+                    results = []
+                    data = None
+                    for organism in model_results:
+                        try:
+                            data = {'id': '/organism/' + str(organism.object.organism.id) + '/', 'label': organism.object.organism.common_name + ' (' + organism.object.organism.latin_name + ')'}
+                        except:
+                            data = {'id': '/organism/' + str(organism.object.id) + '/', 'label': organism.object.common_name + ' (' + organism.object.latin_name + ')' }                             
+                        results.append(data)
+
             elif search == "zip":
                 # Ignore queries shorter than length 4
                 if len(value) > 3:
@@ -54,6 +78,22 @@ def autocomplete(request):
                     for user in model_results:
                         data = {'id': user.user.id, 'label': user.user.username}
                         results.append(data)
+    json = simplejson.dumps(results)
+    return HttpResponse(json, mimetype='application/json')
+
+def haystack_autocomplete(request):
+    word = request.GET['q']
+    limit = request.GET['limit']
+
+    model_results = SearchQuerySet().autocomplete(content_auto=word)
+    if limit:
+        model_results = model_results[:int(limit)]
+
+    results = []
+    for organism in model_results:
+        data = {'id': '/organism/' + str(organism.id) + '/', 'label': organism.common_name + ' (' + organism.latin_name + ')'}
+        results.append(data)
+
     json = simplejson.dumps(results)
     return HttpResponse(json, mimetype='application/json')
 
@@ -175,9 +215,10 @@ class ImageUpload(CreateView):
             obj.upload_user = self.request.user
             obj.upload_date = datetime.now()
             obj.status = 2
+            obj.primary_image = False
             obj.save()
             new_image = Images.objects.get(id=obj.pk)
-            ImagesReview(review_image=new_image, modified_by=obj.upload_user, modified_date=obj.upload_date, status=obj.status).save()
+            ImagesReview(review_image=new_image, modified_by=obj.upload_user, modified_date=obj.upload_date, status=obj.status, primary_image=obj.primary_image).save()
             return HttpResponseRedirect('/thanks/')
 
 def get_org_images(request, organism):
@@ -265,6 +306,7 @@ class ImagesReviewUpdate(UpdateView):
                 except Images.DoesNotExist:
                     image = None                        
                 image.status=review.status
+                image.primary_image=review.primary_image
                 image.save()
             review.save()
             return HttpResponseRedirect('/review/images/')
@@ -274,9 +316,14 @@ class ImagesReviewUpdate(UpdateView):
         self.pk = self.kwargs['pk']
         try:
             context['new_values'] = ImagesReview.objects.select_related().get(id=self.pk)
-        except OrgIdentification.DoesNotExist:
-            context['new_values']  = None
+            self.organism = context['new_values'].review_image.organism
+        except ImagesReview.DoesNotExist:
+            context['new_values'] = None
         context['new_image'] = {'new_image': 1}
+        try:
+            context['primary_image'] = Images.objects.select_related().get(organism=self.organism, primary_image=True)
+        except Images.DoesNotExist:
+            context['primary_image'] = None
         return context            
 
 # ****************************************************************** #

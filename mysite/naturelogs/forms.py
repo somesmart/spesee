@@ -43,7 +43,7 @@ class ImagesForm(ModelForm):
     class Meta:
         model = Images
         caption = forms.CharField(required=False)
-        exclude = ('organism', 'upload_user', 'upload_date', 'status')
+        exclude = ('organism', 'upload_user', 'upload_date', 'status', 'primary_image')
 
 class OrgIdentReviewForm(ModelForm):
     class Meta:

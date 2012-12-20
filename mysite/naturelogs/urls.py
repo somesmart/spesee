@@ -56,18 +56,21 @@ urlpatterns = patterns('',
     #get images for an organism to add to the ident details
     url(r'^organism/image/(?P<organism>\d+)/$', 'mysite.nature.views.get_org_images', name='image-list'),
     #build a search page
-    url(r'^search/$', ListView.as_view(
-            model=OrganismType,
-            context_object_name='type_list',
-            template_name='nature/base_search.html')),
+    #this section is currently commented out to avoid interfering with haystack. I may keep these features, but I need to move them.
+    #url(r'^search/$', ListView.as_view(
+    #        model=OrganismType,
+    #        context_object_name='type_list',
+    #        template_name='nature/base_search.html')),
     #get the id_fields from the selected type
-    url(r'^search/(?P<type_name>\w+)/$', 'mysite.nature.views.get_ident_fields', name='type_search'),
+    #url(r'^search/(?P<type_name>\w+)/$', 'mysite.nature.views.get_ident_fields', name='type_search'),
     #get the id_detail values from the id_field/type selected
-    url(r'^search/(?P<type_name>\w+)/(?P<id_field>[\s\w]+)/$', 'mysite.nature.views.get_ident_details', name='id_field_search'),
+    #url(r'^search/(?P<type_name>\w+)/(?P<id_field>[\s\w]+)/$', 'mysite.nature.views.get_ident_details', name='id_field_search'),
     #search/is for ident fields (shows organisms with a certain value in an particular ident field)
     #so, for example you might want to find Birds(type) with a color(ident field) of White (details)
-    url(r'^search/(\w+)/([\s\w]+)/([\s\w]+)/$',    
-        IdentDetailListView.as_view(), name='search-ident'),
+    #url(r'^search/(\w+)/([\s\w]+)/([\s\w]+)/$',    
+    #    IdentDetailListView.as_view(), name='search-ident'),
+    #haystack search urls
+    (r'^search/', include('haystack.urls')),
     #observations by user, zip, etc
     url(r'^observation/(?P<search>\w+)/(?P<pk>\d+)/$',
         login_required(ObservationList.as_view()), name='observation-list'),
@@ -176,6 +179,7 @@ urlpatterns = patterns('',
     url(r'^delete/location/(?P<pk>\d+)/$', 'mysite.nature.views.delete_location'),
     #automplete all pass to the same view
     url(r'autocomplete/$','mysite.nature.views.autocomplete', name='autocomplete'),
+    url(r'autocomplete/haystack/$', 'mysite.nature.views.autocomplete', name='haystack-autocomplete'),
     #stats/
     url(r'stats/$', StatsView.as_view(
         template_name='nature/base_stats.html')),

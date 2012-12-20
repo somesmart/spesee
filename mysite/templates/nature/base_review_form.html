@@ -30,6 +30,12 @@
           <th>Image</th>
           <td><img src="{{ new_values.review_image.org_image.url }}"></td>
         {% endif %}
+        {% if primary_image %}
+        <tr>
+          <td>Current Primary Image:</td>
+          <td><img src="{{ primary_image.org_image.url }}"></td>
+        </tr>
+        {% endif %}
         <tr>
           <th><label>Modified by: </label></th>
           <td id="id_modified_by">{{ new_values.modified_by }}</td>

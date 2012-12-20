@@ -289,6 +289,7 @@ class Images(models.Model):
 	organism = models.ForeignKey(Organism)
 	caption = models.CharField(max_length=200, null=True, default=None, blank=True)
 	status = models.IntegerField(choices=STATUS_CHOICES, default=2) #1 - Approved; 2 - Pending; 3 - Rejected
+	primary_image = models.BooleanField()
 	def __unicode__(self):
 		return self.caption		
 
@@ -306,6 +307,7 @@ class ImagesReview(models.Model):
 	reason = models.TextField(blank=True)
 	moderated_by = models.ForeignKey(User, related_name='+', null=True, default=None, blank=True)
 	moderated_date = models.DateTimeField(null=True, default=None, blank=True)
+	primary_image = models.BooleanField()
 	def __unicode__(self):
 		return self.reason
 
