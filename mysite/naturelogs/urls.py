@@ -198,6 +198,6 @@ urlpatterns = patterns('',
     url(r'^blog/', include('zinnia.urls.quick_entry')),
     url(r'^comments/', include('django.contrib.comments.urls')),
     #discover
-    url(r'^discover/(?P<search>\w+)/$',
-        login_required(DiscoverList.as_view()), name='discover'),
+    #url(r'^discover/organism/', include('haystack.urls')),
+    url(r'^discover/(?P<search>\w+)/$', DiscoverList.as_view(), name='discover'),
 )

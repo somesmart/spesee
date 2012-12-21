@@ -41,7 +41,7 @@
             {% endfor %}
         </div>
         {% comment %}
-        Commenting all this out for now becuase we don't need it at the moment.
+        Commenting all this out for now becuase we don't need it at the moment. leaving it here so I can remember how to do this if I ever need to.
         {% for observation in discover_list %}
              This opens the new row when the counter is 0 and after every 3rd result 
             {% if forloop.counter0|divisibleby:"3" %}<div class="row-fluid">{% endif %}
@@ -56,6 +56,45 @@
         {% comment %} See if it's possible to also create a map here with the newly created list {% endcomment %}
 {# <div class="row-fluid">  opening back up the row-fluid that the rest of the page expects#}        
     {% endif %}
+{% endif %}
+{% if search_by.search_by == "organism" %}
+<h2>Browse Organisms</h2>
+  <form action="#list" class="form-inline" method="get">
+    <fieldset>
+        <p class="alert alert-success">Enter identification information to browse matching organisms</p>
+        <label>Search:</label>
+        <input class="input-xlarge" id="id_q" type="text" name="q">
+        <button id="search" type="submit" class="btn btn-small">Search</button>
+    </fieldset>
+  </form>
+  {% if discover_list %}
+    <hr id="list">
+    <br>
+    <p class="alert alert-info">Click the Organism type below to remove them from the list</p>
+    <div class="pagination">
+        <ul id="removable" class="navbar navbar-inverse">
+          {% regroup discover_list|dictsort:"object.organism.type.id" by object.organism.type as type_list %}
+          {% for type in type_list %}
+            <li><a href="#remove" data-option-value=".{{ type.grouper|lower }}">{{ type.grouper }}</a></li>
+          {% endfor %}
+        </ul>
+    </div>
+{# </div>closes the row for the main page. will open another below to prevent breaking the rest of the page #}
+    <div id="container">
+        {# <ul class="thumbnails"> #}
+        {% for organism in discover_list %}
+            <div class="organism {{ organism.object.organism.type|lower }} well well-small">
+                {% for images in organism.object.organism.images_set.all %}
+                  {% if images.primary_image %}<img src="{{ images.wide_thumb.url }}" class="obs-image">{% endif %}
+                {% endfor %}
+                <h5>{{ organism.object.organism.common_name }}</h5>
+                <p class="text-info"></em>{{ organism.object.organism.latin_name }}</em></p>
+                <p>Type: {{ organism.object.organism.type }}</p>
+                <p><a class="btn btn-mini" href="{{ organism.object.get_absolute_url }}">View details »</a></p>
+            </div>
+        {% endfor %}
+    </div>
+  {% endif %}
 {% endif %}
 {% endblock content %}
 {% block app.scripts %}
@@ -78,11 +117,6 @@
         $container.isotope( 'remove', $removable );
         jQEvent.preventDefault();
       });
-
-      // remove item if clicked
-      //$container.delegate( '.organism', 'click', function(){
-      //  $container.isotope( 'remove', $(this) );
-      //});
 
     });
   </script>

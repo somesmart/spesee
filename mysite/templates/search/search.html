@@ -12,10 +12,19 @@
             </tr>
         </table>
         {% if query %}
-            <h3>Results</h3>
+            <h3 id="list">Results</h3>
+            <p class="alert alert-info">Click the Organism type below to remove them from the list</p>
+            <div class="pagination">
+                <ul id="removable" class="navbar navbar-inverse">
+                  {% regroup page.object_list by object.type as type_list %}
+                  {% for type in type_list %}
+                    <li><a href="#remove" data-option-value=".{{ type.grouper|lower }}">{{ type.grouper }}</a></li>
+                  {% endfor %}
+                </ul>
+            </div>
             {% for result in page.object_list %}
                 <p>
-                    <a href="{{ result.object.get_absolute_url }}">{{ result.object.organism }}</a>
+                    <a href="{{ result.object.get_absolute_url }}">{{ result.object }} - {{ result.object.type }}</a>
                 </p>
             {% empty %}
                 <p>No results found.</p>

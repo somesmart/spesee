@@ -135,8 +135,6 @@ class Organism(models.Model):
 	ident_tips = models.TextField('identification tips', blank=True)
 	habitat_descr = models.TextField('habitat description', blank=True)
 	image = models.ImageField(upload_to='photos/%Y/%m/%d', blank=True)
-	#this kind of works but it seems to store a record for each ident_field...
-	#history = HistoricalRecords()
 
 	def get_absolute_url(self):
 		return "/organism/%i/" % self.id 
@@ -284,6 +282,7 @@ class Images(models.Model):
 	org_image = models.ImageField(upload_to=get_image_path, blank=True)
 	thumbnail = ImageSpecField([Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(50, 50)], image_field='org_image', format='JPEG', options={'quality': 90})
 	large_image = ImageSpecField([Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(500, 400)], image_field='org_image', format='JPEG', options={'quality': 90})
+	wide_thumb = ImageSpecField([Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(200, 100)], image_field='org_image', format='JPEG', options={'quality': 90})
 	upload_date = models.DateTimeField()
 	upload_user = models.ForeignKey(User, related_name="+")
 	organism = models.ForeignKey(Organism)

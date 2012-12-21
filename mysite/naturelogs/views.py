@@ -7,7 +7,8 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
-from haystack.query import SearchQuerySet
+from django.core.paginator import Paginator
+from haystack.query import SearchQuerySet, SQ
 from mysite.nature.models import *
 from mysite.nature.forms import *
 from mysite.nature.utils import *
@@ -38,16 +39,6 @@ def autocomplete(request):
                         data = {'id': organism.id, 'label': organism.common_name + ' (' + organism.latin_name + ')'}
                         results.append(data)
             elif search == "primary_search":
-                # user = request.user
-                # hide_types = get_hide_list(user)
-                # # Ignore queries shorter than length 3
-                # if len(value) > 2:
-                #     model_results = Organism.objects.exclude(type__in=hide_types).filter(Q(common_name__icontains=value) | Q(latin_name__icontains=value))
-                #     # Default return list
-                #     results = []
-                #     for organism in model_results:
-                #         data = {'id': '/organism/' + str(organism.id) + '/', 'label': organism.common_name + ' (' + organism.latin_name + ')'}
-                #         results.append(data)
                 if len(value) > 3:
                     model_results = SearchQuerySet().autocomplete(content_auto=value)
 
@@ -389,13 +380,22 @@ class DiscoverList(ListView):
         self.search = self.kwargs['search']
         self.hide_types = get_hide_list(self.request.user)
         if self.request.method == "GET":
-            try:
-                lat_lng_box = get_lat_lng_box(self.request.GET['latitude'], self.request.GET['longitude'], 100000) #100 is saying 100 feet * 100 feet
-            except:
-                lat_lng_box = None
-            if lat_lng_box:
-                if self.search == 'observation':
+            if self.search == 'observation':
+                try:
+                    lat_lng_box = get_lat_lng_box(self.request.GET['latitude'], self.request.GET['longitude'], 100000) #100 is saying 100 feet * 100 feet
+                except:
+                    lat_lng_box = None
+                if lat_lng_box:
                     return Observation.objects.select_related().filter(latitude__range=(lat_lng_box['lat_left'], lat_lng_box['lat_right']), longitude__range=(lat_lng_box['lng_bottom'], lat_lng_box['lng_top'])).exclude(parent_observation__isnull=False, organism__type__in=self.hide_types).order_by('organism__type')
+            elif self.search == 'organism':
+                try:
+                    user_query = self.request.GET['q']
+                    sqs = SearchQuerySet()
+                    clean_query = sqs.query.clean(user_query)
+                    sqs = sqs.filter(identification=clean_query)
+                    return sqs
+                except:
+                    return None
         else:
             return None
     def get_context_data(self, **kwargs):

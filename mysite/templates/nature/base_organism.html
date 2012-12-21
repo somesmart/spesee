@@ -149,32 +149,22 @@
       <p> {{ id_details.field }} - <a href="{% url search-ident organism.type id_details.field id_details.description %}">{{ id_details.description }} </a></p>
   {% endfor %}
   <h3>Observations</h3>
-  <table class="table table-hover table-condensed table-striped">
-    <tr>
-      <th></th>
-      <th>Seen by</th>
-      <th>On Date</th>
-      <th>Comments</th>
-      <th>Habitat</th>
-      <th>Qty</th>
-      <th>Link</th>
-    </tr>
-    {% for observation in organism.observation_set.all %}
-      {% comment %}
-        This only shows a child observation if it is YOUR observation. Otherwise we just see the master observation for simplicicty's sake
-      {% endcomment %}
-      {% if not observation.parent_observation %}
-        <tr>
-          <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}</td>
-          <td>{{ observation.user }}</td>
-          <td>{{ observation.observation_date }}</td>
-          <td>{{ observation.comments}}</td>
-          <td>{{ observation.location_descr }}</td>
-          <td>{{ observation.quantity }}</td>
-          <td><a href="{{ observation.get_absolute_url }}">Details</td>
-        </tr>
-      {% else %}
-        {% if observation.user.id == user.id and observation.parent_observation %}
+  <small>
+    <table class="table table-hover table-condensed table-striped">
+      <tr>
+        <th></th>
+        <th>Seen by</th>
+        <th>On Date</th>
+        <th>Comments</th>
+        <th>Habitat</th>
+        <th>Qty</th>
+        <th>Link</th>
+      </tr>
+      {% for observation in organism.observation_set.all %}
+        {% comment %}
+          This only shows a child observation if it is YOUR observation. Otherwise we just see the master observation for simplicicty's sake
+        {% endcomment %}
+        {% if not observation.parent_observation %}
           <tr>
             <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}</td>
             <td>{{ observation.user }}</td>
@@ -182,12 +172,24 @@
             <td>{{ observation.comments}}</td>
             <td>{{ observation.location_descr }}</td>
             <td>{{ observation.quantity }}</td>
-            <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}<a href="{{ observation.get_absolute_url }}">Details</td>
+            <td><a href="{{ observation.get_absolute_url }}">Details</td>
           </tr>
+        {% else %}
+          {% if observation.user.id == user.id and observation.parent_observation %}
+            <tr>
+              <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}</td>
+              <td>{{ observation.user }}</td>
+              <td>{{ observation.observation_date }}</td>
+              <td>{{ observation.comments}}</td>
+              <td>{{ observation.location_descr }}</td>
+              <td>{{ observation.quantity }}</td>
+              <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}<a href="{{ observation.get_absolute_url }}">Details</td>
+            </tr>
+          {% endif %}
         {% endif %}
-      {% endif %}
-    {% endfor %}
-  </table>
+      {% endfor %}
+    </table>
+  </small>
   <div class="pull-right">
     <a class="observation btn btn-primary" href="{% url add-observation %}?org={{ organism.id }}"><i class="icon-plus icon-white"></i> Observation</a>
   </div>
