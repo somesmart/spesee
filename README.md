@@ -1,3 +1,5 @@
+# Hashify Editor
+
 Spesee.org README
 ====================
 

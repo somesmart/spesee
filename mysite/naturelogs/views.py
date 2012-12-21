@@ -455,7 +455,10 @@ class LocationList(ListView):
     template_name='nature/base_location_list.html'
     context_object_name = 'location_list'
     def get_queryset(self):
-        return Location.objects.select_related().filter(created_by = self.request.user).order_by('description')
+        if self.request.user.is_authenticated():
+            return Location.objects.select_related().filter(created_by = self.request.user).order_by('description')
+        else:
+            return Location.objects.select_related().order_by('description')[:10]
 
     #need to set up a way to see other people's locations you want to see
     # def get_context_data(self, **kwargs):

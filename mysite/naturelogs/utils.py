@@ -5,18 +5,19 @@ from decimal import *
 # *********************** hide types view ************************** #
 # ****************************************************************** #
 def get_hide_list(user):
-    hide_types = []
-    user_hides = UserSettings.objects.get(user = user)
-    if user_hides.hide_trees == True:
-        hide_types.append(1)
-    if user_hides.hide_birds == True:
-        hide_types.append(2)
-    if user_hides.hide_mammals == True:
-        hide_types.append(3)
-    if user_hides.hide_amphibians == True:
-        hide_types.append(4)
-    if user_hides.hide_reptiles == True:
-        hide_types.append(5)
+    hide_types = [0] #sets it to hide nothing by default for anonymous users
+    if user.is_authenticated():
+        user_hides = UserSettings.objects.get(user = user)
+        if user_hides.hide_trees == True:
+            hide_types.append(1)
+        if user_hides.hide_birds == True:
+            hide_types.append(2)
+        if user_hides.hide_mammals == True:
+            hide_types.append(3)
+        if user_hides.hide_amphibians == True:
+            hide_types.append(4)
+        if user_hides.hide_reptiles == True:
+            hide_types.append(5)
     return hide_types
 
 def get_zip_box(zipcode):

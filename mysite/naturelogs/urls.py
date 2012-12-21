@@ -166,7 +166,7 @@ urlpatterns = patterns('',
          MapView.as_view(), name='map-data'),
     #location/ is for locations
     url(r'^location/(?P<pk>\d+)/', 
-        login_required(LocationView.as_view()), name='location-view'),  
+        LocationView.as_view(), name='location-view'),  
     url(r'^location/$', LocationList.as_view(
             template_name='nature/base_location_list.html')),
     url(r'^add/location/$', 
