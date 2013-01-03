@@ -3,6 +3,7 @@ from django.forms import ModelForm, Textarea
 from django.forms.models import inlineformset_factory
 from mysite.nature.models import *
 from registration.forms import RegistrationForm
+from tagging.forms import TagField
 
 # ****************************************************************** #
 # ********************* organism related fms *********************** #
@@ -38,6 +39,12 @@ class IdentificationDetailInline(forms.Form):
     model = IdentificationDetail
     formset = IdentificationDetailFormSet
     extra = 3
+    tags = TagField()
+
+    def save(self, commit=True):
+        instance = super(IdentificationDetailInline, self).save(commit)
+        instanct.tags = self.cleaned_data['tags']
+        return instance
 
 class ImagesForm(ModelForm):
     class Meta:
@@ -89,6 +96,11 @@ class CourseForm(ModelForm):
     class Meta:
         model = Course
         exclude = ('user', 'group')
+
+    def __init__(self, *args, **kwargs):
+        super(CourseForm, self).__init__(*args, **kwargs)
+        self.fields['course_name'].label = "List Name"
+        self.fields['course_descr'].label = "List Description"
 
 class CourseDetailForm(ModelForm):
     class Meta:

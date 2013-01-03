@@ -1,11 +1,14 @@
 {% extends "nature/base_detail.html" %}
+{% load tagging_tags %}
 {% block app.css %}
 <link rel="stylesheet" href="{{ STATIC_URL }}nature/css/colorbox/colorbox.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}nature/css/tagmanager/bootstrap-tagmanager.css">
 {% endblock %}
 {% block title %}{{ organism.common_name }}{% endblock %}
 {% block app.scripts %}
 <script src="{{ MEDIA_URL }}jquery.formset.js"></script>
 <script type="text/javascript" src="{{ MEDIA_URL }}js/colorbox/jquery.colorbox-min.js"></script>
+<script type="text/javascript" src="{{ MEDIA_URL }}js/tagmanager/bootstrap-tagmanager.js"></script>
   <!-- Source -->
   <script type="text/javascript" src="{{ MEDIA_URL }}js/tiny_mce/tiny_mce.js"></script>
   <script>
@@ -23,7 +26,8 @@
     theme_advanced_statusbar_location : "bottom",
     theme_advanced_resizing : true,
     cleanup: true,
-    valid_elements :"p,h1,h2,h3,ol,ul,li,a,strong,b,em,i",
+    relative_urls : false,
+    valid_elements :"p,h1,h2,h3,h4,h5,ol,ul,li,a,strong,b,em,i",
     extended_valid_elements : "img[class|src|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style]"
   });
 }
@@ -38,6 +42,23 @@
             $('#image-gallery').append(data);
           }
       });
+  }
+  function get_valid_tags(org_type){
+    $.ajax({
+      type: "GET",
+      url: '{% url type-tags organism.type.id %}',
+      success: function(data) {
+        var valid_tags = [];
+        $(data).each(function(i,val){
+          $.each(val, function(key,vl){
+            $.each(vl, function(k,v){
+              valid_tags.push(v.tag);
+            });
+          });
+        });
+        return valid_tags;
+      }
+    });
   }
     $(function() {
       $("#image-gallery").on("click", '.image', function() {
@@ -75,6 +96,12 @@
               .addClass("success")
               .html("<div class='alert alert-success'>Thank you! Your changes will not be visible until they have been approved by a moderator. <a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
             }
+            else if (data == '2')
+            {
+              $("#status")
+              .addClass("success")
+              .html("<div class='alert alert-success'>Thank you! Your changes have been applied!<a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
+            }
             else
             {
               $("#status").addClass("error").html("Error, data could not be saved <a href='#'' class='close' data-dismiss='alert'>×</a>").fadeIn('slow');
@@ -97,6 +124,45 @@
         $('#image-gallery').hide();
       })
       $(".ajax").colorbox({height:"350px", width:"400px", iframe:true, onClosed:function(){ get_image_list({% if new_ident %}{{ new_ident.org }}{% else %}{{ organism.id }}{% endif %}); } });
+      jQuery(".tagManager").tagsManager({
+        prefilled: [{% tags_for_object organism as prefilled_tags %}{% for tag in prefilled_tags %}"{{ tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+        preventSubmitOnEnter: true,
+        typeahead: true,
+        typeaheadAjaxSource: '{% url type-tags organism.type.id %}', 
+        typeaheadAjaxPolling: false,
+        blinkBGColor_1: '#BCE8F1',
+        blinkBGColor_2: '#D9EDF7',
+        org_type: '{{ organism.type }}',
+        validator: function(tag) {
+          valid_tags = [{% for tagtype in organism.type.typetag_set.all %}"{{ tagtype.tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+          if (jQuery.inArray(tag, valid_tags) > "-1"){
+            return true;
+          }
+        }
+      });
+      $('.save-tags').click(function() {
+        var new_tags = $('input[name=hidden-tagsjax]').val();
+        $.ajax({
+          url: '{% url save-tags organism.id %}',
+          type: 'POST',
+          data: {
+            new_tags: new_tags,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success:function (data) {
+            if (data == '1')
+            {
+              $("#tags-status")
+              .addClass("success")
+              .html("<div class='alert alert-success'>Your tags have been saved. <a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
+            }
+            else
+            {
+              $("#tags-status").addClass("error").html("Error, data could not be saved. Invalid tags: " + data + " <a href='#'' class='close' data-dismiss='alert'>×</a>").fadeIn('slow');
+            }
+          }
+        });
+      });
     });
   </script>
 {% endblock %}
@@ -139,15 +205,15 @@
     {% endif %}
   </div>
   <div id="image-gallery"></div>
+  <div class="tags span12">
+  <div id="tags-status"></div>
+  <form class="form-inline">
+    <input type="text" autocomplete="off" data-items="6" data-provide="typeahead" name="tagsjax" placeholder="Tags" style="width:9em;" class="input-medium tagManager" data-original-title="">
+    <a class="save-tags btn btn-mini">Save Tags</a>
+  </form>
+  <p class="well well-small"><small>Only valid tags for {{ organism.type }} will be accepted. If you think we are missing a tag, please contact us.</small></p>
+  </div>
   <hr>
-  <h3>Identifying Characteristics</h3>
-  {% comment %}
-    Need to make the ident characterstics to be an ajax-ified form as well
-  {% endcomment %}
-  <p class="well well-small">Click on an identification detail value to search for other {{ organism.type }} with this same identifying feature</p>
-  {% for id_details in organism.id_details.all %}
-      <p> {{ id_details.field }} - <a href="{% url search-ident organism.type id_details.field id_details.description %}">{{ id_details.description }} </a></p>
-  {% endfor %}
   <h3>Observations</h3>
   <small>
     <table class="table table-hover table-condensed table-striped">

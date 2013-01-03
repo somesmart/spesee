@@ -1,64 +1,79 @@
 {% extends "nature/base.html" %}
 
 {% block title %}Organism Review{% endblock title %}
-{% block content %}
-  {% if perms.nature.add_orgidentificationreview %}
-    {% if current %}
-    <h3>Current Identification:</h3>
-      <div class="content">{% autoescape off %}{{ current.identification }}{% endautoescape %}</div>
-    {% endif %}
-    <form action="" method="post">
-      {% csrf_token %}
-     <table class="table">
-        {% if new_values and not new_image %}
-        <tr>
-          <th>Organism</th>
-          <td id="id_organism" style="display:none">{{ new_values.organism.id }}</td>
-          <td id="organism">{{ new_values.organism }}</td>
-        </tr>
-        <tr>
-          <th>New Identification:</th>
-          <td id="id_identifiction" class="content">{% autoescape off %}{{ new_values.identification }}{% endautoescape %}</td>
-        </tr>
+{% block top-content %}
+    <div class="container-fluid">
+      <div class="row-fluid">
+        {% if perms.nature.add_orgidentificationreview %}
+        <div class="span6">
+        {% if current %}
+          <h3>Current Identification:</h3>
+          <div class="content">{{ current.identification|safe }}</div>
         {% endif %}
-        {% if new_image %}
-        <tr>
-          <td id="id_review_image" style="display:none">{{ new_values.images.id }}</td>
-          <td id="review_image" style="display:none">{{ new_values.images.id }}</td>
-        </tr>
-        <tr>
-          <th>Image</th>
-          <td><img src="{{ new_values.review_image.org_image.url }}"></td>
+        </div>
+        <div class="span6">
+          <h3>New Identification:</h3>
+          <div class="content">{{ new_values.identification|safe }}</div>
+        </div>
+      </div>
+      <hr>
+      <h3>Moderation:</h3>
+      <div class="row-fluid">
+        <div class="span8 offset2">
+          <form action="" method="post">
+            {% csrf_token %}
+           <table class="table">
+              {% if new_values and not new_image %}
+              <tr>
+                <th>Organism</th>
+                <td id="id_organism" style="display:none">{{ new_values.organism.id }}</td>
+                <td id="organism">{{ new_values.organism }}</td>
+              </tr>
+              <tr>
+                <td id="id_identifiction" style="display:none" class="content">{{ new_values.identification|safe }}</td>
+              </tr>
+              {% endif %}
+              {% if new_image %}
+              <tr>
+                <td id="id_review_image" style="display:none">{{ new_values.images.id }}</td>
+                <td id="review_image" style="display:none">{{ new_values.images.id }}</td>
+              </tr>
+              <tr>
+                <th>Image</th>
+                <td><img src="{{ new_values.review_image.org_image.url }}"></td>
+              {% endif %}
+              {% if primary_image %}
+              <tr>
+                <td>current Primary Image:</td>
+                <td><img src="{{ primary_image.org_image.url }}"></td>
+              </tr>
+              {% endif %}
+              <tr>
+                <th><label>Modified by: </label></th>
+                <td id="id_modified_by">{{ new_values.modified_by }}</td>
+              </tr>
+              <tr>
+                <th><label>Modified Date: </label></th>
+                <td id="id_modified_date">{{ new_values.modified_date }}</td>
+              </tr>
+            </tr>
+             {% for field in form %}
+             <tr class="content">
+               <th>{{ field.label_tag }} {% if field.field.required %}<span class="requ">*</span>{% endif %}</th>
+               <td>{{ field.errors }}{{ field }}
+                 {% if field.help_text %}
+                 <p class="help_text">{{ field.help_text }}</p>
+                 {% endif %}
+               </td>
+             </tr>
+             {% endfor %}
+             <tr><th></th><td><input type="submit" value="Submit"></td></tr>
+           </table>
+          </form>
+        </div>
+        {% else %}
+        <p>I'm sorry, you do not have the required permissions.</a></p>
         {% endif %}
-        {% if primary_image %}
-        <tr>
-          <td>Current Primary Image:</td>
-          <td><img src="{{ primary_image.org_image.url }}"></td>
-        </tr>
-        {% endif %}
-        <tr>
-          <th><label>Modified by: </label></th>
-          <td id="id_modified_by">{{ new_values.modified_by }}</td>
-        </tr>
-        <tr>
-          <th><label>Modified Date: </label></th>
-          <td id="id_modified_date">{{ new_values.modified_date }}</td>
-        </tr>
-      </tr>
-       {% for field in form %}
-       <tr class="content">
-         <th>{{ field.label_tag }} {% if field.field.required %}<span class="requ">*</span>{% endif %}</th>
-         <td>{{ field.errors }}{{ field }}
-           {% if field.help_text %}
-           <p class="help_text">{{ field.help_text }}</p>
-           {% endif %}
-         </td>
-       </tr>
-       {% endfor %}
-       <tr><th></th><td><input type="submit" value="Submit"></td></tr>
-     </table>
-    </form>
-    {% else %}
-    <p>I'm sorry, you do not have the required permissions.</a></p>
-    {% endif %}
-{% endblock content %}
+      </div>
+    </div>
+{% endblock top-content %}

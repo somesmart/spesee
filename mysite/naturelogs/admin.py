@@ -4,6 +4,7 @@ from django.http import HttpResponse
 
 from mysite.nature.models import *
 from mysite.nature.forms import IdentificationDetailFormSet
+from tagging.forms import TagField
 # from moderation.admin import ModerationAdmin
 
 class IdentificationFieldInline(admin.TabularInline):
@@ -39,6 +40,12 @@ class IdentificationDetailInline(admin.TabularInline):
     model = IdentificationDetail
     formset = IdentificationDetailFormSet
     extra = 3
+    tags = TagField()
+
+    def save(self, commit=True):
+        instance = super(IdentificationDetailInline, self).save(commit)
+        instanct.tags = self.cleaned_data['tags']
+        return instance
 
 def latin_name(obj):
     return u"<i>%s</i>" % obj.latin_name
@@ -67,6 +74,7 @@ admin.site.register(OrganismType, OrganismTypeAdmin)
 admin.site.register(Organism, OrganismAdmin)
 admin.site.register(Observation, ObservationAdmin)
 # admin.site.register(IdentificationField)
+admin.site.register(TypeTag)
 admin.site.register(Family)
 admin.site.register(Order)
 admin.site.register(Sp_Class)

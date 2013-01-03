@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 import os
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill, Adjust
+import tagging
+from tagging.fields import TagField
+from tagging.models import Tag
 # from moderation import moderation
 
 # *********************************************************************** #
@@ -18,6 +21,10 @@ class OrganismType(models.Model):
 		return self.description
 	def get_absolute_url(self):
 		return "/type/%i/" % self.id 	
+
+class TypeTag(models.Model):
+	tag = models.ForeignKey(Tag)
+	type = models.ForeignKey(OrganismType)
 
 class IdentificationField(models.Model):
 	type = models.ForeignKey(OrganismType, related_name="id_fields")
@@ -109,15 +116,6 @@ class ZipCode(models.Model):
 	def __unicode__(self):
 		return self.zipcode	
 
-# need to add leaf morphology, seasonality, color, flower, and fruit models
-# may actually need to store all possible identification options in a single model, 
-# and then restrict the forms to only display the appropriate one? Not sure yet
-# probably want to use the limit_choices_to somehow, or a custom method
-# one solution could be to set the possible identification fields in a table
-# which the OrganismType references as a ForeignKey
-# and then the identificationdetails can reference descr in (for example) the 
-# Color model, which has identification_type as a Foreign key?
-
 # ****************************************************************** #
 # ********************* organism/detail data *********************** #
 # ****************************************************************** #
@@ -125,16 +123,16 @@ class ZipCode(models.Model):
 class Organism(models.Model):
 	common_name = models.CharField(max_length=200)
 	latin_name = models.CharField(max_length=200)
-	population_status = models.ForeignKey(PopulationStatus, related_name="org_pop_status")
-	family = models.ForeignKey(Family, related_name="org_family")
-	order = models.ForeignKey(Order, related_name="org_order")
-	sp_class = models.ForeignKey(Sp_Class, related_name="org_class")
-	phylum = models.ForeignKey(Phylum, related_name="org_phylum")
-	kingdom = models.ForeignKey(Kingdom, related_name="org_kingdom")
+	population_status = models.ForeignKey(PopulationStatus, related_name="org_pop_status", null=True, default=None, blank=True)
+	family = models.ForeignKey(Family, related_name="org_family", null=True, default=None, blank=True)
+	order = models.ForeignKey(Order, related_name="org_order", null=True, default=None, blank=True)
+	sp_class = models.ForeignKey(Sp_Class, related_name="org_class", null=True, default=None, blank=True)
+	phylum = models.ForeignKey(Phylum, related_name="org_phylum", null=True, default=None, blank=True)
+	kingdom = models.ForeignKey(Kingdom, related_name="org_kingdom", null=True, default=None, blank=True)
 	type = models.ForeignKey(OrganismType, related_name="organisms")
-	ident_tips = models.TextField('identification tips', blank=True)
-	habitat_descr = models.TextField('habitat description', blank=True)
-	image = models.ImageField(upload_to='photos/%Y/%m/%d', blank=True)
+	#ident_tips = models.TextField('identification tips', blank=True) no longer needed
+	#habitat_descr = models.TextField('habitat description', blank=True) no longer needed
+	#image = models.ImageField(upload_to='photos/%Y/%m/%d', blank=True) no longer needed
 
 	def get_absolute_url(self):
 		return "/organism/%i/" % self.id 
@@ -193,16 +191,15 @@ class OrgIdentificationReview(models.Model):
 class IdentificationDetail(models.Model):
 	organism = models.ForeignKey(Organism, related_name="id_details")
 	field = models.ForeignKey(IdentificationField, related_name="id_field_details")
-	description = models.CharField(max_length=250)
+	description = models.CharField(max_length=250) #Don't need this anymore
 	def __unicode__(self):
 		return u"%s is %s" % (self.field.name, self.description)
 	#consider doing a def save here to store the description slugified...
 	class Meta:
 		verbose_name_plural = "identification details"
 
-#you can specify a specific location, and then see observations within the range as defined
-#by the miles wide and miles tall
-#the map by location will create a range using .014 lat/lng per mile
+tagging.register(Organism)
+
 class Location(models.Model):
 	name = models.CharField(max_length=100)
 	description = models.TextField(blank=True)
@@ -384,10 +381,3 @@ class UserSettings(models.Model):
 		return "/accounts/profile/%i/" % self.id
 	def get_edit_url(self):
 		return "/accounts/profile/%i/edit/" % self.id
-
-# **************************************************************** #
-# *********************** moderation ***************************** #
-# **************************************************************** #	
-
-# moderation.register(OrgIdentification)
-# moderation.register(IdentificationDetail)	

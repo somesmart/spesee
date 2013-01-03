@@ -9,6 +9,7 @@ from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from haystack.query import SearchQuerySet, SQ
+from tagging.models import Tag, TaggedItem
 from mysite.nature.models import *
 from mysite.nature.forms import *
 from mysite.nature.utils import *
@@ -39,6 +40,7 @@ def autocomplete(request):
                         data = {'id': organism.id, 'label': organism.common_name + ' (' + organism.latin_name + ')'}
                         results.append(data)
             elif search == "primary_search":
+                #I may want to make this just a normal autocomplete to make it less resource intense in the future....
                 if len(value) > 3:
                     model_results = SearchQuerySet().autocomplete(content_auto=value)
 
@@ -176,22 +178,31 @@ def save_org_ident(request):
     organism = Organism.objects.get(id=org_id)
     identification = request.POST[u'identification']
     modified_date = datetime.now()
-    OrgIdentificationReview(organism=organism, identification=identification, modified_by=request.user, modified_date=modified_date, status=2).save()
-    return HttpResponse('1')
+    #if the user is a moderator their change is auto-approved
+    if is_moderator(request.user):
+        try:
+            org_ident = OrgIdentification.objects.get(organism=organism)
+        except OrgIdentification.DoesNotExist:
+            org_ident = OrgIdentification(organism=organism, identification=identification)                        
+        org_ident.identification=identification
+        org_ident.save()
+        #also want to save the review as approved for history purposes
+        OrgIdentificationReview(organism=organism, identification=identification, modified_by=request.user, modified_date=modified_date, status=1).save()
+        return HttpResponse('2') #this returns the "already approved" message
+    else:
+        OrgIdentificationReview(organism=organism, identification=identification, modified_by=request.user, modified_date=modified_date, status=2).save()
+        return HttpResponse('1')
 
-class IdentDetailListView(ListView):
-    template_name='nature/search_ident_fields.html'
+class TagListView(ListView):
+    template_name='nature/base_search_tags.html'
     context_object_name='organism_list'
 
     def get_queryset(self):
         #get the orgtype id based on the org description (passed as the first variable in the url)
-        self.orgtype = OrganismType.objects.get(description = self.args[0])
-        #get the id_field id based on the field name (passed as the second variable) and restricted to that orgtype id from above
-        self.id_field = get_object_or_404(IdentificationField.objects.filter(type=self.orgtype), name__iexact=self.args[1])
-        #no need to get the id here since it is the text value of the description.
-        #need to test descriptions with spaces
-        self.id_descr=self.args[2]
-        return Organism.objects.select_related().filter(type=self.orgtype, id_details__description=self.id_descr, id_details__field=self.id_field)
+        self.orgtype = OrganismType.objects.get(description = self.kwargs['type'])
+        self.tag = Tag.objects.get(name = self.kwargs['tag'])
+        #get the organisms tagged with this tag and of the same org type
+        return TaggedItem.objects.get_union_by_model(Organism.objects.filter(type=self.orgtype),self.tag)
 
 class ImageUpload(CreateView):
     form_class = ImagesForm
@@ -223,6 +234,45 @@ def get_org_images(request, organism):
         data += "<a href='#' rel='" + str(x.large_image.url) + "' class='image'><img src='" + str(x.thumbnail.url) + "'class='thumb' border='0'/></a>"
         count += 1
     return HttpResponse(data)
+
+# ****************************************************************** #
+# ********************* tagging related vws ************************ #
+# ****************************************************************** #
+
+def organism_tags(request, organism):
+    organism = Organism.objects.get(id=organism)
+    tags = Tag.objects.get_for_object(organism)
+
+    tag_list = []
+    for tag in tags:
+        data = {'id': tag.id, 'tag': tag.name}
+        tag_list.append(data)
+
+    results = {'tags': tag_list}
+    json = simplejson.dumps(results)
+    return HttpResponse(json, mimetype='application/json')
+
+def type_tags(request, org_type):
+    org_type = OrganismType.objects.get(id=org_type)
+    tags = TypeTag.objects.select_related().filter(type=org_type)
+
+    tag_list = []
+    for tag in tags:
+        data = {'id': tag.id, 'tag': tag.tag.name}
+        tag_list.append(data)
+
+    results = {'tags': tag_list}
+    json = simplejson.dumps(results)
+    return HttpResponse(json, mimetype='application/json')
+
+def save_tags(request, organism):
+    #add save tags code here
+    organism = Organism.objects.get(id=organism)
+    try:
+        Tag.objects.update_tags(organism, request.POST[u'new_tags'])
+        return HttpResponse('1')
+    except:
+        return HttpResponse('0')
 
 # ****************************************************************** #
 # ********************* organism review vws ************************ #
@@ -768,7 +818,10 @@ class UserSettingsView(UpdateView):
             obj = form.save(commit=False)
             obj.user = self.request.user
             obj.zipcode = ZipCode.objects.get(id=form.data['zipcode'])
-            obj.private = form.data['private']
+            try:
+                obj.private = form.data['private']
+            except:
+                obj.private = False
             obj.save()
             return HttpResponseRedirect('/accounts/profile/' + str(self.request.user.username) + '/')        
 

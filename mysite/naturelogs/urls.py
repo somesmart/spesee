@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import *
 from django.contrib.auth.decorators import login_required
 from django.views.generic import DetailView, ListView, UpdateView, CreateView, DeleteView
+from django.views.generic.simple import direct_to_template
 from django.db.models import Count
 from mysite.nature.models import *
 from mysite.nature.views import *
@@ -13,9 +14,11 @@ urlpatterns = patterns('',
     #home page
     url(r'^$',
         ListView.as_view(
-            queryset=Organism.objects.select_related().annotate(observed=Count('observation__id')).order_by('-observation__observation_date')[:10],
+            queryset=Organism.objects.select_related().annotate(observed=Count('observation__id')).order_by('-observation__observation_date')[:30],
             context_object_name='first_ogranisms',
             template_name='nature/index.html')),
+    #about page
+    url(r'^about/$', direct_to_template, { 'template': 'nature/base_about.html'}, name='about-page'),
     #organism type details
     url(r'^type/(?P<pk>\d+)/',
         DetailView.as_view(
@@ -27,6 +30,14 @@ urlpatterns = patterns('',
             model=OrganismType,
             context_object_name='type_list',
             template_name='nature/base_type.html')),
+    #org tag types
+    url(r'^tags/type/(?P<org_type>\d+)/$', 'mysite.nature.views.type_tags', name='type-tags'),
+    #organism tagging
+    url(r'^tags/organism/(?P<organism>\d+)/$', 'mysite.nature.views.organism_tags', name='organism-tags'),
+    #search tags
+    url(r'^tags/search/(?P<type>[\w]+)/(?P<tag>[\s\w]+)/$',TagListView.as_view(), name='search-tags'),
+    #save tags
+    url(r'^save/tags/organism/(?P<organism>\d+)/$', 'mysite.nature.views.save_tags', name='save-tags'),
     #save org ident
     url(r'^save/organism/ident/', 'mysite.nature.views.save_org_ident', name='save-org-ident'),
     #/organism/
@@ -67,8 +78,8 @@ urlpatterns = patterns('',
     #url(r'^search/(?P<type_name>\w+)/(?P<id_field>[\s\w]+)/$', 'mysite.nature.views.get_ident_details', name='id_field_search'),
     #ident/is for ident fields (shows organisms with a certain value in an particular ident field)
     #so, for example you might want to find Birds(type) with a color(ident field) of White (details)
-    url(r'^ident/(\w+)/([\s\w]+)/([\s\w]+)/$',    
-        IdentDetailListView.as_view(), name='search-ident'),
+    # url(r'^ident/(\w+)/([\s\w]+)/([\s\w]+)/$',    
+    #     IdentDetailListView.as_view(), name='search-ident'),
     #haystack search urls
     (r'^search/', include('haystack.urls')),
     #observations by user, zip, etc
@@ -96,9 +107,9 @@ urlpatterns = patterns('',
     #logout the user
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'template_name': 'nature/base_logged_out.html'}, name='account-logout'),
     #shows the user profile page
-    (r'^accounts/profile/(?P<pk>\d+)/edit/$',
+    url(r'^accounts/profile/(?P<pk>\d+)/edit/$',
         login_required(UserSettingsView.as_view(
-            template_name='nature/base_profile_form.html'))),
+            template_name='nature/base_profile_form.html')), name='profile-edit'),
     #view the profile to actually be useful
     (r'^accounts/profile/(?P<pk>\d+)/',
         login_required(UserDetailView.as_view(
@@ -200,4 +211,5 @@ urlpatterns = patterns('',
     #discover
     #url(r'^discover/organism/', include('haystack.urls')),
     url(r'^discover/(?P<search>\w+)/$', DiscoverList.as_view(), name='discover'),
+    (r'^contact/', include('contact_form.urls')),
 )

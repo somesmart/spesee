@@ -35,7 +35,7 @@
          <td>{{ usersettings.private }}</td>
        </tr>
      </table>
-     <p><a class="btn pull-right" href="{{ usersettings.get_absolute_url }}edit/"><i class="icon-wrench"></i> Edit Profile</a></p>
+     <p><a class="btn pull-right" href="{% url profile-edit request.user.id %}"><i class="icon-wrench"></i> Edit Profile</a></p>
     {% comment %}
      <p> {{ perms.user }}</p>
     {% endcomment %}

@@ -2,7 +2,7 @@
 {% block title %}Observations{% endblock %}
 {% block content %}
 {% if search_by.search_by == 'observation' %}
-<h2>Browse Observations:</h2>
+<p class="alert alert-success">Click on your current location to see what has been observed nearby.</p>
     <form action="#list" class="form-inline" method="get">
         <fieldset>
             <label>Latitude:</label>
@@ -12,7 +12,6 @@
             <button id="search" type="submit" class="btn btn-small">Search</button>
         </fieldset>
     </form>
-    <p class="alert alert-info">Click on your current location to see what has been observed nearby.</p>
     <div id="observations"></div>
     <div id="map"></div>
     {% include 'nature/include_lookup_map.html' %}
@@ -58,7 +57,6 @@
     {% endif %}
 {% endif %}
 {% if search_by.search_by == "organism" %}
-<h2>Browse Organisms</h2>
   <form action="#list" class="form-inline" method="get">
     <fieldset>
         <p class="alert alert-success">Enter identification information to browse matching organisms</p>
@@ -82,16 +80,33 @@
 {# </div>closes the row for the main page. will open another below to prevent breaking the rest of the page #}
     <div id="container">
         {# <ul class="thumbnails"> #}
+        {% comment %}
+        This is a different way to approach the layout. It makes a single row for each result with some of the ident details inside of it.
         {% for organism in discover_list %}
-            <div class="organism {{ organism.object.organism.type|lower }} well well-small">
+          <div class="row-fluid">
+            <div class="span12 media organism {{ organism.object.organism.type|lower }}">
+              <a class="pull-left" href="{{ organism.object.get_absolute_url }}">
+                {% for images in organism.object.organism.images_set.all %}
+                  {% if images.primary_image %}<img src="{{ images.wide_thumb.url }}" class="obs-image">{% endif %}
+                {% endfor %}
+              </a>
+              <div class="media-body">
+                <h4 class="media-heading">{{ organism.object.organism.common_name }}</h4>
+                <p>Type: {{ organism.object.organism.type }}</p>
+                <p>{% for ident in organism.object.organism.org_ident.all %}{{ ident.identification|truncatewords_html:30|safe }}{% endfor %} <a class="btn btn-mini" href="{{ organism.object.get_absolute_url }}">View details »</a></p>
+              </div>
+            </div>
+          </div>
+          {% endcomment %}
+          <div class="organism {{ organism.object.organism.type|lower }} well well-small">
                 {% for images in organism.object.organism.images_set.all %}
                   {% if images.primary_image %}<img src="{{ images.wide_thumb.url }}" class="obs-image">{% endif %}
                 {% endfor %}
                 <h5>{{ organism.object.organism.common_name }}</h5>
-                <p class="text-info"></em>{{ organism.object.organism.latin_name }}</em></p>
+                <p></em>{{ organism.object.organism.latin_name }}</em></p>
                 <p>Type: {{ organism.object.organism.type }}</p>
                 <p><a class="btn btn-mini" href="{{ organism.object.get_absolute_url }}">View details »</a></p>
-            </div>
+          </div>
         {% endfor %}
     </div>
   {% endif %}

@@ -35,12 +35,12 @@ box-shadow: 0 8px 6px -6px black;
   pointer-events: none;
   z-index: 1;
 }
-/**** Isotope Sizing *****/
+/**** Isotope Sizing ****
 .isotope-item {
   height: 220px;
   width: 175px;
 }
-
+*/
 /**** Isotope CSS3 transitions ****/
 
 .isotope,

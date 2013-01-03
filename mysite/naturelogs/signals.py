@@ -24,8 +24,8 @@ def create_profile(sender, user, request, **kwargs):
 	if 'hide_mammals' in request.POST:
 		hide_mammals = form.data["hide_mammals"]
 	else:
-		hide_mammals = False	
-	UserSettings(user=user, hide_trees=hide_trees, hide_birds=hide_birds, hide_reptiles=hide_reptiles, hide_amphibians=hide_amphibians, hide_mammals=hide_mammals, zipcode_id=form.data["zipcode"]).save()
+		hide_mammals = False
+	UserSettings(user=user, hide_trees=hide_trees, hide_birds=hide_birds, hide_reptiles=hide_reptiles, hide_amphibians=hide_amphibians, hide_mammals=hide_mammals, zipcode_id=form.data["zipcode"], private=False).save()
 	#add the new user to the StandardUser group
 	g = Group.objects.get(name="StandardUser")
 	g.user_set.add(user)

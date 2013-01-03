@@ -42,3 +42,8 @@ def get_lat_lng_box(lat, lng, size):
     lng_bottom = lng - add_value
     lat_lng_box = {'lat_left': lat_left, 'lat_right': lat_right, 'lng_bottom': lng_bottom, 'lng_top': lng_top}
     return lat_lng_box
+
+def is_moderator(user):
+    if user:
+        return user.groups.filter(name='Moderator').exists()
+    return False

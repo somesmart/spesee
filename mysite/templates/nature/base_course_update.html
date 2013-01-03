@@ -77,8 +77,8 @@ $(function() {
 {% block content %}
   {% if course.user.id == user.id %} 
     {% if perms.nature.add_course %}
-        <h1>Edit your custom list</h1><a href="{{ course.get_absolute_url }}">Back to the list</a>
-        <form action="" method="post">
+        <h3>Edit your custom list</h3><a href="{{ course.get_absolute_url }}">Back to the list</a>
+        <form action="" method="post" class="form-horizontal">
           <div class="form-row">
             {{ form.title.label_tag }}
             {{ form.title }}
@@ -99,23 +99,23 @@ $(function() {
                   <option value="{{ group.id }}">{{ group.name }}</option>
                 {% endfor %}
               </select>
-              <a id="add_group" class="ajax cboxElement" href="{% url group-add %}">Create Group</a>
+              <a id="add_group" class="ajax cboxElement btn" href="{% url group-add %}">Create Group</a>
             </td>
           </tr>
           {% csrf_token %}
           <tr>
-            <td><input type="submit" value="Update List Setup" class="submit" /></td>
+            <td><input type="submit" value="Update List Setup" class="submit btn" /></td>
           </tr>
         </table>
         </form>
-        <form action="#" id="autocomplete_form">
+        <form action="#" id="autocomplete_form" class="form-horizontal">
           <input type="text" id="selector" name="selector"/>
           <input type="hidden" id="organism_id" name="organism_id" />
           <input type="hidden" id="course_id" name="course_id" value="{{ course.id }}" />
           <input type="hidden" id="common_name" name="common_name" />
-          <input type="submit" value="Add Organism" id="add_organism" />
+          <input type="submit" value="Add Organism" id="add_organism" class="btn" />
         </form>
-        <table id="org_table">
+        <table id="org_table" class="table">
             {% for x in detail_list %}
               <tr class="{{ x.id }}">
                 <td>{{ x.organism }}</td>

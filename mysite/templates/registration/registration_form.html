@@ -21,7 +21,7 @@
 <p>Entering a home zip code will also help center your observation creation map so it defaults to your home location.</p>
 <form method="post" action=".">
 	{% csrf_token %}
-	<table>
+	<table class="table">
   		{{ form.as_table }}
   		<tr>
         <th>
@@ -34,7 +34,7 @@
         </td>
      </tr>
   	</table>
-  <input type="submit" value="{% trans 'Submit' %}" />
+  <input type="submit" class="btn" value="{% trans 'Submit' %}" />
 </form>
 {% else %}
 <p>You are already logged in, why would you need a new account!</p>

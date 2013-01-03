@@ -42,7 +42,7 @@
           <div class="input-prepend">
             <input id="search_url" type="hidden" name="search_url">
             <span class="add-on"><i class="icon-search"></i></span>
-            <input id="search" type="text" class="span3" placeholder="Enter name or characteristics">
+            <input id="search" type="text" class="span3" placeholder="Enter common or latin name">
           </div>
         </form>
         <div id="user-bar">
@@ -103,7 +103,13 @@
 
   <hr>
   <footer>
-    <p>&copy; SpeSee 2012 <a href="http://www.djangoproject.com/"><img src="https://www.djangoproject.com/m/img/badges/djangoproject120x25.gif" border="0" alt="A Django project." title="A Django project." /></a> <a href="#">About</a> <a href="#">Contact</a></p>
+    <div class="container">
+      <ul class="nav nav-pills">
+        <li class="disabled"><a href="">&copy; SpeSee 2012</a></li>
+        <li><a href="{% url about-page %}">About</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
   </footer>
 
 </div> <!-- /container -->
@@ -204,12 +210,12 @@ $(function() {
     event.preventDefault();
   });
   $("#search").autocomplete({
-      source: "{% url autocomplete %}?search=primary_search",
+      source: "{% url autocomplete %}?search=organism",
       minLength: 3,
       select: function(event, ui) {
         // $('#search_url').val(ui.item.id);
         // $('#search').val(ui.item.label);
-        window.location.href = ui.item.id;
+        window.location.href = "/organism/" + ui.item.id;
       }
     });
 })
