@@ -1,0 +1,14 @@
+{% extends "nature/base.html" %}
+{% block title %}Tag Search{% endblock title %}
+{% block content %}
+<h3>Tag search results:</h3>
+{% if organism_list %}
+    <ul class="unstyled">
+    {% for organism in organism_list %}
+        <li><a href="{{ organism.get_absolute_url }}{{ organism.common_name|slugify }}">{{ organism.common_name }} ({{ organism.latin_name }})</a> </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No organisms found.</p>
+{% endif %}
+{% endblock content %}
