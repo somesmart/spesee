@@ -1,4 +1,4 @@
-{% extends "nature/base_detail.html" %}
+{% extends "nature/base.html" %}
 {% block title %}{{ location.name }} Location Details{% endblock title %}
 {% block content %}
 <h3>{{ location.name }} - <a class="btn" href="{{ location.get_edit_url }}"><i class="icon-wrench"></i></a></h3>
@@ -16,12 +16,6 @@
     <div class="span10 offset1">
       <p class="alert alert-info">Map items in blue are those you have already found. Red icons have been sighted by others.</p>
     </div>
-    <div id="map" class="span11" ></div>
+    {% include "nature/include_map.html" %}
+    <div id="map_canvas" class="span12"></div>
 {% endblock right-content %}
-<div style="display:none">{% block mapurl %}{{ location.get_map_url }}{% endblock mapurl %}</div>
-{% block loadmap %}
-<aside id="map">
-	<body onload="load()" onunload="GUnload()">
-	</body>
-</aside>
-{% endblock loadmap %}   

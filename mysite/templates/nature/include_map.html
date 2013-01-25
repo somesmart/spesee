@@ -1,0 +1,64 @@
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6b-LfSPC4oIvgGh2OyVvabLrgd9HSCRc&sensor=false"></script>
+<script type="text/javascript">
+var infowindow = null;
+    $(document).ready(function () { initialize();  });
+
+    function initialize() {
+
+        var centerMap = new google.maps.LatLng(0, 0);
+
+        var myOptions = {
+            zoom: 4,
+            center: centerMap,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+
+        var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+        setMarkers(map, sites);
+	    infowindow = new google.maps.InfoWindow({
+                content: "loading..."
+            });
+    }
+
+    var sites = [
+    {% if single_observation %}
+    ['{{ single_observation.organism }}', {{ single_observation.latitude }}, {{ single_observation.longitude }}, 1, '{{ single_observation.organism}} <br>Seen {{ single_observation.observation_date }} by {{ single_observation.user }}', {% if not user.is_anonymous %}{% if user.id == single_observation.user.id %}'0066FF'{% else %}'009933'{% endif %}{% else %}'009933'{% endif %}]
+    {% else %}
+    {% for observation in map_observations %}
+    ['{{ observation.organism }}', {{ observation.latitude }}, {{ observation.longitude }}, {{ forloop.counter }}, '{{ observation.organism}} <br>Seen {{ observation.observation_date }} by {{ observation.user }}', {% if not user.is_anonymous %}{% if user.id == observation.user.id %}'0066FF'{% else %}'009933'{% endif %}{% else %}'009933'{% endif %}]{% if not forloop.last %},{% endif %}
+    {% endfor %}
+    {% endif %}
+];
+
+    function setMarkers(map, markers) {
+        var bounds = new google.maps.LatLngBounds();
+        for (var i = 0; i < markers.length; i++) {
+            var sites = markers[i];
+            var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + sites[5]);
+            var pinShadow = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_shadow",
+                new google.maps.Size(40, 37),
+                new google.maps.Point(0, 0),
+                new google.maps.Point(12, 35));
+            var siteLatLng = new google.maps.LatLng(sites[1], sites[2]);
+            var marker = new google.maps.Marker({
+                position: siteLatLng,
+                map: map,
+                icon: pinImage,
+                shadow: pinShadow,
+                title: sites[0],
+                zIndex: sites[3],
+                html: sites[4]
+            });
+            bounds.extend(siteLatLng);
+
+            var contentString = "Some content";
+
+            google.maps.event.addListener(marker, "click", function () {
+                infowindow.setContent(this.html);
+                infowindow.open(map, this);
+            });
+        }
+        map.fitBounds(bounds);
+    }
+</script>

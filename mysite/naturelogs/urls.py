@@ -92,6 +92,7 @@ urlpatterns = patterns('',
     url(r'^observation/(?P<pk>\d+)/$',
         DetailView.as_view(
             queryset = Observation.objects.select_related(),
+            context_object_name='observation',
             template_name='nature/base_observation.html'), name='observation-detail'),
     #edit/observation/(?<pk>\d+)/ is for a user to edit their own observation
     url(r'^edit/observation/(?P<pk>\d+)/$',
@@ -101,6 +102,8 @@ urlpatterns = patterns('',
     url(r'^add/observation/$',
         login_required(ObservationCreateView.as_view(
             template_name='nature/base_observation_form.html')), name='add-observation'),
+    #export my observations
+    url(r'observation/export/$', 'mysite.nature.views.export_obs', name='export-observations'),
     #shows the login screen
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', {'template_name': 'nature/base_login.html'}, name='account-login'),
     url(r'^accounts/login/simple/$', 'mysite.nature.views.login', name='login-simple'),
@@ -196,6 +199,7 @@ urlpatterns = patterns('',
         template_name='nature/base_stats.html')),
     #this is currently where you end up after submitting any forms....
     url(r'thanks/', 'mysite.nature.views.thanks', name='thanks'),
+    url(r'noresults/', direct_to_template, { 'template': 'nature/base_noresults.html' }, name='no-results'),
     #zinnia
     url(r'^blog/', include('zinnia.urls')),
     url(r'^blog/tags/', include('zinnia.urls.tags')),

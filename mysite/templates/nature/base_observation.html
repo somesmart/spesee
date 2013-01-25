@@ -1,4 +1,4 @@
-{% extends "nature/base_detail.html" %}
+{% extends "nature/base.html" %}
 {% block title %}{{ observation.organism.common_name }}{% endblock %}
 {% block content %}
 	<h1><a href="{{ observation.organism.get_absolute_url }}">{{ observation.organism.common_name }}</a></h1>
@@ -37,7 +37,7 @@
 		</tr>
 	</table>
 	{% if observation.observation_image %}
-		<a href="{{ observation.observation_image.url }}"><img src="{{ observation.large_image.url }}" id="observation" ></a>
+		<a href="{{ observation.observation_image.url }}"><img src="{{ observation.large_image.url }}" id="observation" class="obs-image"></a>
 	{% endif %}
 	{% if observation.user.id == user.id %} 
     	{% if perms.observation.can_change %}
@@ -49,12 +49,8 @@
     <div class="span10 offset1">
         <p class="alert alert-info">Observation Map</p>
     </div>
-    <div id="map" class="span11" ></div>
+    <div id="map_canvas" class="span11" ></div>
+    {% with observation as single_observation %}
+    {% include "nature/include_map.html" %}
+    {% endwith %}
 {% endblock right-content %}
-<div style="display:none">{% block mapurl %}{{ observation.get_map_url }}{% endblock mapurl %}</div>
-{% block loadmap %}
-<aside id="map">
-	<body onload="load()" onunload="GUnload()">
-	</body>
-</aside>
-{% endblock loadmap %}

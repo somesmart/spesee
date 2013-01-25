@@ -15,7 +15,7 @@ tinyMCE.init({
 {% block top-content %}
   <div class="row-fluid">
     <div class="well well-small span8 offset1">
-    Locations are meant to help you monitor the observations that are found within a specific area, without having to tag each observation with a specific location. Instead, you simply define how many miles wide a locaiton is, how many miles tall, and the center point of it. Thus, any observations that fall within that bounding box will be included as a part of that location.
+    Locations are meant to help you monitor the observations that are found within a specific area, without having to tag each observation with a specific location. Instead, you simply define how many miles wide a location is, how many miles tall, and the center point of it. Thus, any observations that fall within that bounding box will be included as a part of that location.
     </div>
   </div>
 {% endblock %}
@@ -46,6 +46,6 @@ tinyMCE.init({
   <div class="span10 offset1">
     <p class="alert alert-info">Click where you would like to center this location.</p>
   </div>
-  <div id="map" class="span10" ></div>
+  <div id="map_canvas" class="span11" ></div>
   {% include 'nature/include_lookup_map.html' %}
 {% endblock %}

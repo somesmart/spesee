@@ -1,0 +1,3 @@
+User|Organism|Date|Latitude|Longitude|Quantity|Temperature|LocationDescription|Comments
+{% if observations %}{% for observation in observations %}{{ observation.user }}|{{ observation.organism }}|{{ observation.observation_date }}|{{ observation.latitude }}|{{ observation.longitude }}|{{ observation.quantity }}|{{ observation.temperature }}|{{ observation.location_descr}}|{{ observation.comments}}
+{% endfor %}{% endif %}

@@ -8,7 +8,6 @@ from imagekit.processors import ResizeToFill, Adjust
 import tagging
 from tagging.fields import TagField
 from tagging.models import Tag
-# from moderation import moderation
 
 # *********************************************************************** #
 # **************************set up/meta data **************************** #

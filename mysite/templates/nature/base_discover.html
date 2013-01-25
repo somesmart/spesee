@@ -13,7 +13,7 @@
         </fieldset>
     </form>
     <div id="observations"></div>
-    <div id="map"></div>
+    <div id="map_canvas"></div>
     {% include 'nature/include_lookup_map.html' %}
     {% if discover_list %}
     <hr id="list">
@@ -34,7 +34,11 @@
                 <div class="organism {{ observation.organism.type|lower }} well well-small">
                     {% if observation.observation_image %}<img src="{{ observation.wide_thumb.url }}" class="obs-image">{% endif %}
                     <h5>{{ observation.organism.common_name }}</h5>
-                    <p>{{ observation.observation_date}} - Type: {{ observation.organism.type }}</p>
+                    <small>
+                    <p>{{ observation.observation_date}}</p>
+                    <p><em>{{ observation.organism.latin_name }}</em></p>
+                    <p>Type: {{ observation.organism.type }}</p>
+                    </small>
                     <p><a class="btn btn-mini" href="{% url observation-detail observation.id %}">View details »</a></p>
                 </div>
             {% endfor %}
@@ -54,8 +58,8 @@
         {% endfor %}
         {% comment %} See if it's possible to also create a map here with the newly created list {% endcomment %}
 {# <div class="row-fluid">  opening back up the row-fluid that the rest of the page expects#}        
-    {% endif %}
-{% endif %}
+    {% endif %} {# end discover_list #}
+{% endif %} {# end if search.by #}
 {% if search_by.search_by == "organism" %}
   <form action="#list" class="form-inline" method="get">
     <fieldset>
@@ -82,7 +86,9 @@
         {# <ul class="thumbnails"> #}
         {% comment %}
         This is a different way to approach the layout. It makes a single row for each result with some of the ident details inside of it.
+        {% endcomment %}
         {% for organism in discover_list %}
+        {% comment %}
           <div class="row-fluid">
             <div class="span12 media organism {{ organism.object.organism.type|lower }}">
               <a class="pull-left" href="{{ organism.object.get_absolute_url }}">
@@ -99,13 +105,13 @@
           </div>
           {% endcomment %}
           <div class="organism {{ organism.object.organism.type|lower }} well well-small">
-                {% for images in organism.object.organism.images_set.all %}
-                  {% if images.primary_image %}<img src="{{ images.wide_thumb.url }}" class="obs-image">{% endif %}
-                {% endfor %}
-                <h5>{{ organism.object.organism.common_name }}</h5>
-                <p></em>{{ organism.object.organism.latin_name }}</em></p>
-                <p>Type: {{ organism.object.organism.type }}</p>
-                <p><a class="btn btn-mini" href="{{ organism.object.get_absolute_url }}">View details »</a></p>
+              {% for images in organism.object.organism.images_set.all %}
+                {% if images.primary_image %}<img src="{{ images.wide_thumb.url }}" class="obs-image">{% endif %}
+              {% endfor %}
+              <h5>{{ organism.object.organism.common_name }}</h5>
+              <p><em>{{ organism.object.organism.latin_name }}</em></p>
+              <p>Type: {{ organism.object.organism.type }}</p>
+              <p><a class="btn btn-mini" href="{{ organism.object.get_absolute_url }}">View details »</a></p>
           </div>
         {% endfor %}
     </div>

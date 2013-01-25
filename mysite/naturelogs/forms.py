@@ -39,7 +39,7 @@ class IdentificationDetailInline(forms.Form):
     model = IdentificationDetail
     formset = IdentificationDetailFormSet
     extra = 3
-    tags = TagField()
+    tags = TagField() #do I need this tags stuff here?
 
     def save(self, commit=True):
         instance = super(IdentificationDetailInline, self).save(commit)

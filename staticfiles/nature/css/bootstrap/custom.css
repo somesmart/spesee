@@ -7,6 +7,16 @@ label {
 	display: inline;
 }
 
+#map_canvas {
+  min-height: 400px;
+  color: black;
+}
+#map_canvas img { max-width:none; }
+label {
+  display: inline;
+}
+
+
 #identification {
   min-height: 265px;
 }
@@ -77,5 +87,14 @@ box-shadow: 0 8px 6px -6px black;
      -moz-transition-duration: 0s;
       -ms-transition-duration: 0s;
        -o-transition-duration: 0s;
-          transition-duration: 0s;
+          transition-duration
+          : 0s;
+}
+#identification img {
+  margin-bottom: 5px;
+  margin-top: 5px;
+  margin-right: 12px;
+  -webkit-box-shadow: 0 8px 6px -6px black;
+  -moz-box-shadow: 0 8px 6px -6px black;
+  box-shadow: 0 8px 6px -6px black;
 }

@@ -90,3 +90,7 @@
   {% endblock %}
 
 {% endblock content %}
+{% block right-content %}
+  <h3>Related Posts</h3>
+  {% get_similar_entries 5 %}
+{% endblock right-content %}

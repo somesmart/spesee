@@ -5,7 +5,7 @@ from django.db.models import Q, Count
 from django.views.generic import DetailView, ListView, UpdateView, CreateView, FormView
 from django.contrib.auth import authenticate, login as auth_login
 from django.core.urlresolvers import reverse
-from django.template import RequestContext
+from django.template import RequestContext, loader, Context as TemplContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
 from haystack.query import SearchQuerySet, SQ
@@ -15,6 +15,7 @@ from mysite.nature.forms import *
 from mysite.nature.utils import *
 from decimal import *
 from datetime import datetime
+import csv
 
 def thanks(request):
     return HttpResponse("<p>Thank you for your submission. It will be reviewed shortly.</p>")
@@ -26,7 +27,8 @@ def autocomplete(request):
     if request.method == "GET":
         if request.GET.has_key(u'term'):
             value = request.GET[u'term']
-            search = request.GET[u'search']            
+            search = request.GET[u'search']
+            results = []
             if search == "organism":
                 #this is only needed for by organism autocomplete because type doesn't impact zip.
                 user = request.user
@@ -35,16 +37,17 @@ def autocomplete(request):
                 if len(value) > 2:
                     model_results = Organism.objects.exclude(type__in=hide_types).filter(Q(common_name__icontains=value) | Q(latin_name__icontains=value))
                     # Default return list
-                    results = []
                     for organism in model_results:
                         data = {'id': organism.id, 'label': organism.common_name + ' (' + organism.latin_name + ')'}
                         results.append(data)
+                    json = simplejson.dumps(results)
+                    return HttpResponse(json, mimetype='application/json')
+                else:
+                    return HttpResponseRedirect('/noresults/')
             elif search == "primary_search":
                 #I may want to make this just a normal autocomplete to make it less resource intense in the future....
                 if len(value) > 3:
                     model_results = SearchQuerySet().autocomplete(content_auto=value)
-
-                    results = []
                     data = None
                     for organism in model_results:
                         try:
@@ -52,27 +55,35 @@ def autocomplete(request):
                         except:
                             data = {'id': '/organism/' + str(organism.object.id) + '/', 'label': organism.object.common_name + ' (' + organism.object.latin_name + ')' }                             
                         results.append(data)
-
+                    json = simplejson.dumps(results)
+                    return HttpResponse(json, mimetype='application/json')
+                else:
+                    return HttpResponseRedirect('/noresults/')
             elif search == "zip":
                 # Ignore queries shorter than length 4
                 if len(value) > 3:
                     model_results = ZipCode.objects.select_related().filter(zipcode__startswith=value)
-                    # Default return list
-                    results = []
                     for zipcode in model_results:
                         data = {'id': zipcode.id, 'label': zipcode.zipcode + ' - ' + zipcode.county}
                         results.append(data)
+                    json = simplejson.dumps(results)
+                    return HttpResponse(json, mimetype='application/json')
+                else:
+                    return HttpResponseRedirect('/noresults/')
             elif search == "user":
                 # Ignore queries shorter than length 3
                 if len(value) > 2:
                     model_results = UserSettings.objects.select_related().filter(user__username__startswith=value, private=False)
                     # Default return list
-                    results = []
                     for user in model_results:
                         data = {'id': user.user.id, 'label': user.user.username}
                         results.append(data)
-    json = simplejson.dumps(results)
-    return HttpResponse(json, mimetype='application/json')
+                    json = simplejson.dumps(results)
+                    return HttpResponse(json, mimetype='application/json')
+                else:
+                    return HttpResponseRedirect('/noresults/')
+        else:
+            return HttpResponseRedirect('/noresults/')
 
 def haystack_autocomplete(request):
     word = request.GET['q']
@@ -155,10 +166,12 @@ class OrganismView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(OrganismView, self).get_context_data(**kwargs)
+        self.org_id = self.kwargs['pk']
         try:
-            context['org_ident'] = OrgIdentification.objects.get(organism=self.kwargs['pk'])
+            context['org_ident'] = OrgIdentification.objects.get(organism=self.org_id)
         except OrgIdentification.DoesNotExist:
-            context['new_ident'] = {'org': self.kwargs['pk']}
+            context['new_ident'] = {'org': self.org_id}
+        context['map_observations'] = get_map_queryset('organism', self.org_id, self.request.user)
         return context
 
 class OrganismViewTest(DetailView):
@@ -407,6 +420,7 @@ class ObservationUpdateView(UpdateView):
 class ObservationList(ListView):
     template_name='nature/base_observation_list.html'
     context_object_name = 'observation_list'
+    paginate_by = 30
     def get_queryset(self):
         self.search = self.kwargs['search']
         self.value = self.kwargs['pk']
@@ -451,11 +465,17 @@ class DiscoverList(ListView):
     def get_context_data(self, **kwargs):
         context = super(DiscoverList, self).get_context_data(**kwargs)
         context['search_by'] = {'search_by': self.search}
+        try:
+            self.zipcode = UserSettings.objects.select_related().filter(user = self.request.user).values('zipcode')
+        except:
+            self.zipcode = UserSettings.objects.select_related().filter(user__id = 2).values('zipcode')
+        context['lat_lng'] = ZipCode.objects.get(id = self.zipcode)
         return context
 
 class ObservationListSelf(ListView):
     template_name='nature/base_observation_list.html'
     context_object_name = 'observation_list'
+    paginate_by = 30
     def get_queryset(self):
         return Observation.objects.select_related().filter(user = self.request.user).order_by('-observation_date')
     def get_context_data(self, **kwargs):
@@ -532,6 +552,7 @@ class LocationView(DetailView):
         self.lng_bottom = self.location.longitude - self.add_height
         self.lng_top = self.location.longitude + self.add_height
         context['location_details'] = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top)).values('organism', 'organism__id', 'organism__common_name', 'organism__latin_name').annotate(Count('id')).order_by('organism__common_name')
+        context['map_observations'] = Observation.objects.exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top))
         return context
 
 def delete_location(request, pk):
@@ -585,6 +606,7 @@ class CourseView(DetailView):
         #percent complete stats
         getcontext().prec = 2
         context['completion'] = {'total': self.course_total, 'total_user': self.total_found_user}
+        context['map_observations'] = get_map_queryset('list', self.course_id, self.request.user)
         return context
 
 class CourseList(ListView):
@@ -877,3 +899,21 @@ class StatsView(ListView):
         context = super(StatsView, self).get_context_data(**kwargs)
         context['orgs_found'] = Observation.objects.exclude(parent_observation__isnull=False).aggregate(total_found=Count('organism'))
         return context
+
+# ****************************************************************** #
+# *********************** export data views ************************ #
+# ****************************************************************** #
+
+def export_obs(request):
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment;filename="observations.txt"'
+
+    observations = Observation.objects.select_related().filter(user=request.user)
+
+    t = loader.get_template('nature/observation_export.txt')
+    c = TemplContext({
+        'observations': observations,
+    })
+    response.write(t.render(c))
+    return response

@@ -29,7 +29,7 @@ tinyMCE.init({
          </td>
        </tr>
        {% endfor %}
-       <tr><th></th><td><input type="submit" value="Submit"></td></tr>
+       <tr><th></th><td><input type="submit" class="btn" value="Submit"></td></tr>
      </table>
     </form>
     {% else %}
@@ -44,7 +44,7 @@ tinyMCE.init({
   <div class="span10 offset1">
     <p class="alert alert-info">Click where you would like to center this location.</p>
   </div>
-  <div id="map" class="span10" ></div>
+  <div id="map_canvas" class="span11" ></div>
   {% include 'nature/include_lookup_map.html' %}
 {% endif %}
 {% endblock %}

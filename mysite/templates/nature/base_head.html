@@ -26,15 +26,16 @@
     <![endif]-->
 
     <!-- Fav and touch icons -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 </head>
 <html>
 <body>
 {% block body %}{% endblock %}
 <!-- Placed at the end of the document so the pages load faster -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/bootstrap/bootstrap.min.js"></script>
     {% block app.scripts %}{% endblock %}
     {% block base.scripts %}{% endblock %}
+    {% block map.scripts %}{% endblock %}
 </body>
 </html>  

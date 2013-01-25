@@ -1,36 +1,41 @@
-{% extends "nature/base_detail.html" %}
+{% extends "nature/base.html" %}
 {% block title %}Observations{% endblock %}
+{% block app.scripts %}
+<script>
+$(function() {
+    $('.note').tooltip({ title: 'Edit this observation', placement: 'right' });
+});
+</script>
+{% endblock %}
 {% block content %}
 <h2>Observations:</h2>
     <small>
     {% if observation_list %}
-        <dl>
+        <dl class="dl-horizontal">
         {% for observation in observation_list %}
             <dt><a href="{{ observation.get_absolute_url }}">{{ observation.organism }}</a></dt>
-            <dd>{{ observation.observation_date}} - Type: {{ observation.organism.type }} <a class="btn btn-mini" href="{{ observation.get_edit_url }}"><i class="icon-wrench">Edit</a></dd>
+            <dd>{{ observation.observation_date}} - Type: {{ observation.organism.type }} <a class="btn btn-mini note" href="{{ observation.get_edit_url }}"><i class="icon-wrench"></i></a></dd>
         {% endfor %}
         </dl>
     {% else %}
         <p>No observations are available.</p>
     {% endif %}
     </small>
+    {% include "nature/include_pagination.html" %}
     <p><a class="btn btn-primary" href="{% url add-observation %}"><i class="icon-plus icon-white"></i> New Observation</a></p>
+    <span class="label label-info">Download all of your observations:</span> <a href="{% url export-observations %}" class="btn btn-mini"><i class="icon-download-alt"></i></a>
 {% endblock content %}
 {% block right-content %}
-    <div class="span10 offset1">
-        {% if observation_list %}
-            <p class="alert alert-info">Observation Map</p>
-        {% endif %}
-    </div>
-    <div id="map" class="span11" ></div>
-{% endblock right-content %}
-<div style="display:none">{% block mapurl %}{% url map-data search_by.search_by search_by.value %}{% endblock mapurl %}</div>
-{% block loadmap %}
     {% if observation_list %}
-        <body onload="load()" onunload="GUnload()">
-        </body>
+    <div class="span10 offset2">
+        <p class="alert alert-info">Observation Map</p>
+    </div>
+    {% with observation_list as map_observations %}
+    {% include "nature/include_map.html" %}
+        <div id="map_canvas" class="span12"></div>
+    {% endwith %}
     {% endif %}
-{% endblock loadmap %}
+{% endblock right-content %}
 {% comment %}
 {% regroup observation_list by observation.organism.type as org_type_list %}
 <ul>

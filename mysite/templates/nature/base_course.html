@@ -1,4 +1,4 @@
-{% extends "nature/base_detail.html" %}
+{% extends "nature/base.html" %}
 {% block title %}Identificaion List Details{% endblock title %}
 {% block app.scripts %}
 <script>
@@ -71,7 +71,8 @@ $(function() {
     <div class="span10 offset1">
       <p class="alert alert-info">Map items in blue are those you have already found. Red icons have been sighted by others, offering quick access to those items on your list that you are still missing!</p>
     </div>
-    <div id="map" class="span11" ></div>
+	{% include "nature/include_map.html" %}
+	<div id="map_canvas" class="span12"></div>
 {% endblock right-content %}
 {% comment %}
 {% if debug %}
@@ -105,8 +106,3 @@ $(function() {
 </div>
 {% endif %}
 {% endcomment %}
-<div style="display:none">{% block mapurl %}{{ course.get_map_url }}{% endblock mapurl %}</div>
-{% block loadmap %}
-	<body onload="load()" onunload="GUnload()">
-	</body>
-{% endblock loadmap %}    
