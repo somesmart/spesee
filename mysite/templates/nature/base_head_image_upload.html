@@ -3,6 +3,7 @@
 {% block body %}
 {% if perms.nature.add_images %}
   {% block content %}
+    <p class="alert alert-info">Do not upload photos you did not take.</p>
     <h3>Upload Image</h3>
     <form class="modalbox" action="" method="post" enctype="multipart/form-data">
       <div class="form-row">

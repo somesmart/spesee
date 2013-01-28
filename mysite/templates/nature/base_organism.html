@@ -170,6 +170,7 @@
         return false;
       });
 
+      {% if user.is_authenticated %}
       $('.edit').click(function() {
         $('.edit').hide();
         $('.save').show();
@@ -224,6 +225,7 @@
         $('.upload').hide();
         $('#image-gallery').hide();
       });
+      {% endif %}
       jQuery(".tagManager").tagsManager({
         prefilled: [{% tags_for_object organism as prefilled_tags %}{% for tag in prefilled_tags %}"{{ tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
         preventSubmitOnEnter: true,
@@ -264,7 +266,7 @@
         });
       });
       jQuery(".ajax").colorbox({
-          height:"350px",
+          height:"370px",
           width:"400px",
           iframe:true,
           onClosed:function(){
