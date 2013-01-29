@@ -19,6 +19,17 @@ import csv
 
 def thanks(request):
     return HttpResponse("<p>Thank you for your submission. It will be reviewed shortly.</p>")
+
+class IndexListView(ListView):
+    queryset=Organism.objects.select_related().annotate(observed=Count('observation__id')).order_by('-observation__observation_date')[:10]
+    context_object_name='first_ogranisms'
+    template_name='nature/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexListView, self).get_context_data(**kwargs)
+        context['recent_updates'] = OrgIdentificationReview.objects.select_related().annotate(updates=Count('id')).order_by('-moderated_date')[:10]
+        return context
+
 # ****************************************************************** #
 # ********************* autocomplete views ************************* #
 # ****************************************************************** #
@@ -299,6 +310,7 @@ class ReviewHome(ListView):
     def get_context_data(self, **kwargs):
         context = super(ReviewHome, self).get_context_data(**kwargs)
         context['image_count'] = ImagesReview.objects.filter(status=2).aggregate(total_pending=Count('id'))
+        context['obs_count'] = ObservationUnknown.objects.exclude(status=1).aggregate(total_pending=Count('id'))
         return context
 
 class OrgIdentReviewList(ListView):
@@ -336,6 +348,38 @@ class OrgIdentReview(UpdateView):
         except OrgIdentification.DoesNotExist:
             context['current']  = None
         context['new_values'] = OrgIdentificationReview.objects.select_related().get(id=self.pk)
+        return context
+
+class ObservationReviewList(ListView):
+    template_name='nature/base_review_list.html'
+    model = ObservationUnknown
+    queryset = ObservationUnknown.objects.select_related().exclude(status=1)
+    context_object_name = 'obs_review_list'
+
+class ObservationReview(UpdateView):
+    form_class = ObservationReviewForm
+    model = ObservationUnknown
+    template_name='nature/base_review_form.html'
+    def form_valid(self, form):
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.moderated_by = self.request.user
+            review.moderated_date = datetime.now()
+            if review.status == 1:
+                try:
+                    review.organism = Organism.objects.get(id=form.data['organism'])
+                    obs_unk = ObservationUnknown.objects.get(id=review.id)
+                    Observation(organism=review.organism, user=obs_unk.user, observation_date=obs_unk.observation_date, temperature=obs_unk.temperature, latitude=obs_unk.latitude, longitude=obs_unk.longitude, location_descr=obs_unk.location_descr, comments=obs_unk.comments, quantity=obs_unk.quantity, observation_image=obs_unk.observation_image, parent_observation=obs_unk.parent_observation).save()
+                except Organism.DoesNotExist:
+                    review.organism = None                      
+            review.save()
+            return HttpResponseRedirect('/review/observation/')
+
+    def get_context_data(self, **kwargs):
+        context = super(ObservationReview, self).get_context_data(**kwargs)
+        self.pk = self.kwargs['pk']
+        context['new_values'] = ObservationUnknown.objects.select_related().get(id=self.pk)
+        context['unknown_obs'] = {'new_obs': 1}
         return context
 
 class ImagesReviewList(ListView):
@@ -390,12 +434,19 @@ class ObservationCreateView(CreateView):
         if form.is_valid():
             obj = form.save(commit=False)
             obj.user = self.request.user
-            obj.organism = Organism.objects.get(id=form.data['organism'])
-            if form.data['parent_observation'] == '':
-                obj.parent_observation = None #obj.id
+            if 'unknown' in self.request.POST:
+                try:
+                    obj.organism = Organism.objects.get(id=form.data['organism'])
+                    ObservationUnknown(organism=obj.organism, user=obj.user, observation_date=form.cleaned_data['observation_date'], temperature=form.data['temperature'], latitude=form.data['latitude'], longitude=form.data['longitude'], location_descr=form.data['location_descr'], comments=form.data['comments'], quantity=form.data['quantity'], observation_image=form.data['observation_image'], modified_by=obj.user, modified_date=datetime.now(),status=3, reason='', moderated_by=None, moderated_date=datetime.now()).save()
+                except:
+                    ObservationUnknown(organism=None, user=obj.user, observation_date=form.cleaned_data['observation_date'], temperature=form.data['temperature'], latitude=form.data['latitude'], longitude=form.data['longitude'], location_descr=form.data['location_descr'], comments=form.data['comments'], quantity=form.data['quantity'], observation_image=form.data['observation_image'], modified_by=obj.user, modified_date=datetime.now(),status=3, reason='', moderated_by=None, moderated_date=datetime.now()).save()
             else:
-                obj.parent_observation = Observation.objects.get(id=form.data['parent_observation'])
-            obj.save()
+                obj.organism = Organism.objects.get(id=form.data['organism'])
+                if form.data['parent_observation'] == '':
+                    obj.parent_observation = None #obj.id
+                else:
+                    obj.parent_observation = Observation.objects.get(id=form.data['parent_observation'])
+                obj.save()
             return HttpResponseRedirect('/observation/')
 
     def get_context_data(self, **kwargs):
@@ -481,6 +532,7 @@ class ObservationListSelf(ListView):
     def get_context_data(self, **kwargs):
         context = super(ObservationListSelf, self).get_context_data(**kwargs)
         context['search_by'] = {'search_by': 'user', 'value': self.request.user.id}
+        context['unknown_obs'] = ObservationUnknown.objects.select_related().filter(user = self.request.user).order_by('-observation_date')
         return context
 
 def check_existing(request, search_type, search_value):

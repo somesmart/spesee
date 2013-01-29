@@ -267,6 +267,32 @@ class Observation(models.Model):
 	# def get_add_specific_url(self):
 	# 	return "/observation/?org=%i/" % self.id
 
+#stores the unknown observation so others can review it later
+class ObservationUnknown(models.Model):
+	STATUS_CHOICES = (
+        (1, 'Identified'),
+        (2, 'Pending'),
+        (3, 'Unknown'),
+    )
+	organism = models.ForeignKey(Organism, null=True, default=None, blank=True)
+	user = models.TextField(blank=True)
+	observation_date = models.DateTimeField()
+	temperature = models.DecimalField(max_digits=5, decimal_places=2)
+	latitude = models.DecimalField(max_digits=11, decimal_places=9)
+	longitude = models.DecimalField(max_digits=11, decimal_places=9)
+	location_descr = models.CharField('description of location', max_length=200)
+	comments = models.CharField(max_length=200)
+	quantity = models.IntegerField()
+	observation_image = models.ImageField(upload_to='photos/%Y/%m/%d', blank=True)
+	modified_by = models.ForeignKey(User, related_name='+')
+	modified_date = models.DateTimeField()
+	status = models.IntegerField(choices=STATUS_CHOICES) #1 - Approved; 2 - Pending; 3 - Rejected
+	reason = models.TextField(blank=True)
+	moderated_by = models.ForeignKey(User, related_name='+', null=True, default=None, blank=True)
+	moderated_date = models.DateTimeField(null=True, default=None, blank=True)
+	def __unicode__(self):
+		return self.comments
+
 class Images(models.Model):
 	def get_image_path(instance, filename):
 		return os.path.join('photos/organism', str(instance.organism.id), filename)

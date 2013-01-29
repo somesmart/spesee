@@ -12,11 +12,7 @@ import mysite.nature.signals
 
 urlpatterns = patterns('',
     #home page
-    url(r'^$',
-        ListView.as_view(
-            queryset=Organism.objects.select_related().annotate(observed=Count('observation__id')).order_by('-observation__observation_date')[:30],
-            context_object_name='first_ogranisms',
-            template_name='nature/index.html')),
+    url(r'^$', IndexListView.as_view(), name='home-page'),
     #about page
     url(r'^about/$', direct_to_template, { 'template': 'nature/base_about.html'}, name='about-page'),
     #organism type details
@@ -55,6 +51,12 @@ urlpatterns = patterns('',
     #specific item to be reviewed
     url(r'^review/organism/(?P<pk>\d+)/$',
         OrgIdentReview.as_view(), name='review-organism'),
+    #obs to be reviewed
+    url(r'^review/observation/$',
+        ObservationReviewList.as_view(), name='review-obs-list'),
+    #specific obs to be reviewed
+    url(r'^review/observation/(?P<pk>\d+)/$',
+        ObservationReview.as_view(), name='review-obs'),
     #list of images to be reviewed
     url(r'^review/images/$',
         ImagesReviewList.as_view(), name='review-image-list'),

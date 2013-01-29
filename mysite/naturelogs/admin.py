@@ -66,6 +66,9 @@ class ObservationAdmin(admin.ModelAdmin):
     list_display = ('organism', 'observation_date', 'user', 'comments', 'quantity')
     list_filter = ('user',)
 
+class ImagesAdmin(admin.ModelAdmin):
+    list_display = ('organism', 'caption', 'primary_image', 'status', 'upload_date', 'upload_user')
+
 # class OrgIdentAdmin(ModerationAdmin):
 #     pass
 
@@ -92,5 +95,5 @@ admin.site.register(Course)
 admin.site.register(CourseDetail)
 #admin.site.register(CourseUsers)
 admin.site.register(UserSettings)
-admin.site.register(Images)
+admin.site.register(Images, ImagesAdmin)
 admin.site.register(Group)

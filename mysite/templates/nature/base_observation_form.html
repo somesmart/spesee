@@ -69,6 +69,7 @@ $(function() {
     //       });
     //   }
     // });
+    $('.note').tooltip({ title: 'Check this box if you are unsure of the organism and want another user to review it', placement: 'bottom' });
 }); 
   </script>
 {% endblock %}
@@ -89,10 +90,14 @@ $(function() {
           <input id="id_organism" type="hidden" value="{% if add_org %}{{ add_org.id }}{% endif %}{% if observation.id %}{{ observation.organism.id }}{% endif %}" name="organism">
           <input id="common_name" type="text" name="common_name" value="{% if add_org %}{{ add_org.common_name }}{% endif %}{% if observation.id %}{{ observation.organism.common_name }}{% endif %}">
         </td>
+        <td>
+          <input id="unknown" type="checkbox" name="unknown" value="" class="note">
+          Unknown
+        </td>
        {% for field in form %}
        <tr>
          <th>{{ field.label_tag }} {% if field.field.required %}<span class="requ">*</span>{% endif %}</th>
-         <td>{{ field.errors }}{{ field }}
+         <td colspan="2">{{ field.errors }}{{ field }}
            {% if field.help_text %}{{ field.help_text }}{% endif %}
          </td>
        </tr>

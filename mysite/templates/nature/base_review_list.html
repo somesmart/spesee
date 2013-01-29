@@ -18,7 +18,15 @@
 		    {% endfor %}
 		    </ul>
 	{% endif %}
-	{% if not org_review_list and not image_review_list %}
+	{% if obs_review_list %}
+		<h2>Review Unknown Observations:</h2>
+		    <ul class="unstyled">
+		    {% for obs in obs_review_list %}
+		        <li><a href="{% url review-obs obs.id %}">{{ obs.user}} - {{ obs.comments }}</a></li>
+		    {% endfor %}
+		    </ul>
+	{% endif %}
+	{% if not org_review_list and not image_review_list and not obs_review_list %}
 		<p class="alert alert-info">There are no changes for review at this time!</p>
 	{% endif %}
 {% else %}

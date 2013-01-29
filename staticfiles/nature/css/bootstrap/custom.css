@@ -29,6 +29,14 @@ margin-right: 12px;
 box-shadow: 0 8px 6px -6px black;
 }
 
+.obs-small {
+margin-bottom: 1px;
+margin-top: 1px;
+margin-right: 12px;
+-webkit-box-shadow: 0 2px 5px -1px black;
+-moz-box-shadow: 0 2px 5px -1px black;
+box-shadow: 0 2px 5px -1px black;
+}
 .completion {
     background: none repeat scroll 0 0 #BFBFBF;
 }

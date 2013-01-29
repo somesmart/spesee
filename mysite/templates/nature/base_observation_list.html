@@ -4,6 +4,7 @@
 <script>
 $(function() {
     $('.note').tooltip({ title: 'Edit this observation', placement: 'right' });
+    $('.note2').tooltip({ title: 'Click to download all your observations', placement: 'right' });
 });
 </script>
 {% endblock %}
@@ -21,9 +22,19 @@ $(function() {
         <p>No observations are available.</p>
     {% endif %}
     </small>
-    {% include "nature/include_pagination.html" %}
+{% if unknown_obs %}
+<h2>Unknown Observations:</h2>
+    <small>
+        <dl class="dl-horizontal">
+        {% for observation in unknown_obs %}
+            <dt>{{ observation.observation_date }}</a></dt>
+            <dd>{{ observation.comments}} Status: <strong>{{ observation.get_status_display }}</strong></dd>
+        {% endfor %}
+        </dl>
+    </small>
+{% endif %}
     <p><a class="btn btn-primary" href="{% url add-observation %}"><i class="icon-plus icon-white"></i> New Observation</a></p>
-    <span class="label label-info">Download all of your observations:</span> <a href="{% url export-observations %}" class="btn btn-mini"><i class="icon-download-alt"></i></a>
+    <span class="label label-info">Download all of your observations:</span> <a href="{% url export-observations %}" class="btn btn-mini note2"><i class="icon-download-alt"></i></a>
 {% endblock content %}
 {% block right-content %}
     {% if observation_list %}

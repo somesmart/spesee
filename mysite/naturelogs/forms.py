@@ -76,6 +76,11 @@ class ObservationForm(forms.ModelForm):
         model = Observation
         exclude = ('user', 'organism', 'parent_observation')
 
+class ObservationReviewForm(forms.ModelForm):
+    class Meta:
+        model = ObservationUnknown
+        exclude = ('moderated_by', 'moderated_date', 'organism', 'modified_by', 'modified_date', 'user', 'observation_date', 'temperature', 'latitude', 'longitude', 'location_descr', 'comments', 'quantity', 'observation_image')
+
 # ****************************************************************** #
 # ********************* location related vws *********************** #
 # ****************************************************************** #           

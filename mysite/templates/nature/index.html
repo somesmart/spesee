@@ -1,6 +1,17 @@
 {% extends "nature/base.html" %}
 {% load zinnia_tags %}
 {% block title %} Welcome to SpeSee {% endblock title %}
+{% block top-content %}
+<div class="hero-unit">
+  <h1>Welcome to SpeSee!</h1>
+  <p>SpeSee is a community built site for tracking your nature observations and helping others to identify tough to recognize organisms, or find even the most elusive species missing from a life list.</p>
+  <p>
+    <a href="{% url about-page %}" class="btn btn-primary btn-large">
+      Learn more
+    </a>
+  </p>
+</div>
+{% endblock %}
 {% block content %}
 	{% get_recent_entries 5 "zinnia/home_excerpts.html" %}
 {% endblock content %}
@@ -17,4 +28,12 @@
     {% else %}
         <p>No organisms are available.</p>
     {% endif %}
+<h2>Updated Identifications:</h2>
+{% if recent_updates %}
+    <ul>
+        {% for organism in recent_updates %}
+            <li><a href="{{ organism.organism.get_absolute_url }}{{ organism.organism.common_name|slugify }}">{{ organism.organism}} - {{ organism.updates }}</a></li>
+        {% endfor %}
+    </ul>
+{% endif %}
 {% endblock %}    

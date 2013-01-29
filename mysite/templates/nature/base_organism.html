@@ -71,7 +71,7 @@
         {% endcomment %}
         {% if not observation.parent_observation %}
           <tr>
-            <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}</td>
+            <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" class="obs-small" >{% endif %}</td>
             <td>{{ observation.user }}</td>
             <td>{{ observation.observation_date }}</td>
             <td>{{ observation.comments}}</td>
