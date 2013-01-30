@@ -2,6 +2,15 @@
 <script type="text/javascript">
 var map;
 var infowindow = null;
+var markersArray = [];
+function deleteOverlays() {
+  if (markersArray) {
+    for (i in markersArray) {
+      markersArray[i].setMap(null);
+    }
+    markersArray.length = 0;
+  }
+}
 $(document).ready(function () { initialize();  });
 
 function initialize() {
@@ -24,9 +33,17 @@ function initialize() {
 
     infowindow = new google.maps.InfoWindow({content: "loading..."});
 
+    var marker;
     google.maps.event.addListener(map, 'click', function(event) {
+      deleteOverlays();
       document.getElementById("id_latitude").value = event.latLng.lat().toFixed(9);
       document.getElementById("id_longitude").value = event.latLng.lng().toFixed(9);
+      var myLatlng = new google.maps.LatLng(event.latLng.lat(), event.latLng.lng());
+        marker = new google.maps.Marker({
+        position: myLatlng, 
+        map: map,
+      });
+      markersArray.push(marker);
     });
 }
 </script>
