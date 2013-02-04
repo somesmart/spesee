@@ -1,4 +1,4 @@
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6b-LfSPC4oIvgGh2OyVvabLrgd9HSCRc&sensor=false"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6b-LfSPC4oIvgGh2OyVvabLrgd9HSCRc&sensor=true"></script>
 <script type="text/javascript">
 var map;
 var infowindow = null;
@@ -31,9 +31,24 @@ function initialize() {
 
     var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 
+    var marker;
+
+    if (navigator.geolocation) { 
+      navigator.geolocation.getCurrentPosition(function(position) {  
+        var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+        map.setCenter(pos);
+        document.getElementById("id_latitude").value = position.coords.latitude.toFixed(9);
+        document.getElementById("id_longitude").value = position.coords.longitude.toFixed(9);
+        var geoLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+          marker = new google.maps.Marker({
+          position: geoLatLng, 
+          map: map,
+        });
+        markersArray.push(marker);
+      }); 
+    } 
     infowindow = new google.maps.InfoWindow({content: "loading..."});
 
-    var marker;
     google.maps.event.addListener(map, 'click', function(event) {
       deleteOverlays();
       document.getElementById("id_latitude").value = event.latLng.lat().toFixed(9);

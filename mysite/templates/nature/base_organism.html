@@ -6,7 +6,12 @@
 {% endblock %}
 {% block title %}{{ organism.common_name }}{% endblock %}
 {% block content %}
-  <h2>{{ organism.common_name }}</h2>
+  <div>
+    <span class="pull-right inline"><a href="https://twitter.com/share" class="twitter-share-button pull-right" data-related="jasoncosta" data-lang="en" data-size="large" data-count="horizontal" data-text="{{ organism.common_name }} identification tips: ">Tweet</a>
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </span>
+    <h2>{{ organism.common_name }}</h2>
+  </div>
   {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
   <!--the csrf_token prevents Cross Site Request Forgeries -->
   {% csrf_token %}
