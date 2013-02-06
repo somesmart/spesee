@@ -27,7 +27,7 @@ class IndexListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(IndexListView, self).get_context_data(**kwargs)
-        context['recent_updates'] = OrgIdentificationReview.objects.select_related().annotate(updates=Count('id')).order_by('-moderated_date')[:10]
+        context['recent_updates'] = OrgIdentificationReview.objects.select_related().values('organism', 'organism__id', 'organism__common_name', 'organism__latin_name').annotate(updates=Count('id')).order_by('-moderated_date')[:10]
         return context
 
 # ****************************************************************** #
@@ -252,7 +252,6 @@ def get_org_images(request, organism):
     data = ""
     count = 1
     for x in images:
-        # data += "<li><a href='" + str(x.org_image.url) + "'>" + str(x.caption) + "</a></td><td><img src='" + str(x.thumbnail.url) + "' height='50px'></li>"
         if count == 1:
             data += "<div id='image' class='images'><img src='" + str(x.large_image.url) + "' border='0'></div>"
         data += "<a href='#' rel='" + str(x.large_image.url) + "' class='image'><img src='" + str(x.thumbnail.url) + "'class='thumb' border='0'/></a>"
@@ -925,19 +924,20 @@ def get_invite_count(request, user):
     return HttpResponse(json, mimetype='application/json')
 
 def login(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        if user.is_active:
-            auth_login(request, user)
-            return HttpResponse('1')
+    if 'username' in request.POST:
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                auth_login(request, user)
+                return HttpResponse('1')
+            else:
+                return HttpResponse('0') #disabled account
         else:
-            return HttpResponse('0') #disabled account
+            return HttpResponse('2') #invalid login
     else:
-        return HttpResponse('2') #invalid login
-    
-
+        return HttpResponseRedirect('/noresults/')
 
 # ****************************************************************** #
 # ********************* global/user stats vw *********************** #

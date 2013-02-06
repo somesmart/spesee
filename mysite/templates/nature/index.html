@@ -32,7 +32,7 @@
 {% if recent_updates %}
     <ul>
         {% for organism in recent_updates %}
-            <li><a href="{{ organism.organism.get_absolute_url }}{{ organism.organism.common_name|slugify }}">{{ organism.organism}} - {{ organism.updates }}</a></li>
+            <li><a href="{% url organism-view organism.organism__id %}{{ organism.organism__common_name|slugify }}">{{ organism.organism__common_name }} ({{ organism.organism__latin_name }}) - {{ organism.updates }}</a></li>
         {% endfor %}
     </ul>
 {% endif %}

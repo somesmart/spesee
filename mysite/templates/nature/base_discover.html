@@ -27,37 +27,27 @@
           {% endfor %}
         </ul>
     </div>
-{# </div>closes the row for the main page. will open another below to prevent breaking the rest of the page #}
         <div id="container">
-            {# <ul class="thumbnails"> #}
-            {% for observation in discover_list %}
-                <div class="organism {{ observation.organism.type|lower }} well well-small">
-                    {% if observation.observation_image %}<img src="{{ observation.wide_thumb.url }}" class="obs-image">{% endif %}
-                    <h5>{{ observation.organism.common_name }}</h5>
-                    <small>
-                    <p>{{ observation.observation_date}}</p>
-                    <p><em>{{ observation.organism.latin_name }}</em></p>
-                    <p>Type: {{ observation.organism.type }}</p>
-                    </small>
-                    <p><a class="btn btn-mini" href="{% url observation-detail observation.id %}">View details »</a></p>
+          {% for observation in discover_list %}
+            {% if forloop.counter0|divisibleby:"3" %}<div class="row-fluid"><ul class="thumbnails">{% endif %}
+              <li class="span4">
+                <div class="thumbnail organism {{ observation.organism.type|lower }} well well-small">
+                    {% if observation.observation_image %}<img src="{{ observation.wide_thumb.url }}" class="obs-image">
+                    {% else %}<img src="holder.js/179x89" class= "obs-image">{% endif %}
+                    <div class="caption">
+                      <h5>{{ observation.organism.common_name }}</h5>
+                      <small>
+                      <p>{{ observation.observation_date}}</p>
+                      <p><em>{{ observation.organism.latin_name }}</em></p>
+                      <p>Type: {{ observation.organism.type }}</p>
+                      </small>
+                      <p><a class="btn btn-mini" href="{% url observation-detail observation.id %}">View details »</a></p>
+                    </div>
                 </div>
+              </li>
+              {% if forloop.last or forloop.counter|divisibleby:"3" %}</ul></div>{% endif %} 
             {% endfor %}
-        </div>
-        {% comment %}
-        Commenting all this out for now becuase we don't need it at the moment. leaving it here so I can remember how to do this if I ever need to.
-        {% for observation in discover_list %}
-             This opens the new row when the counter is 0 and after every 3rd result 
-            {% if forloop.counter0|divisibleby:"3" %}<div class="row-fluid">{% endif %}
-            <div class="span4">
-              <h5>{{ observation.organism }}</h5>
-              <p>{{ observation.observation_date}} - Type: {{ observation.organism.type }} <a class="btn btn-mini" href="{{ observation.get_edit_url }}">Edit</a></p>
-              <p><a class="btn btn-mini" href="#">View details »</a></p>
-            </div><!--/span-->
-            {% if forloop.last or forloop.counter|divisibleby:"3" %}</div>{% endif %} 
-            {% comment %} This closes the row when it is the last result or after every 3rd result 
-        {% endfor %}
-        {% comment %} See if it's possible to also create a map here with the newly created list {% endcomment %}
-{# <div class="row-fluid">  opening back up the row-fluid that the rest of the page expects#}        
+        </div>    
     {% endif %} {# end discover_list #}
 {% endif %} {# end if search.by #}
 {% if search_by.search_by == "organism" %}
@@ -81,64 +71,40 @@
           {% endfor %}
         </ul>
     </div>
-{# </div>closes the row for the main page. will open another below to prevent breaking the rest of the page #}
     <div id="container">
-        {# <ul class="thumbnails"> #}
-        {% comment %}
-        This is a different way to approach the layout. It makes a single row for each result with some of the ident details inside of it.
-        {% endcomment %}
         {% for organism in discover_list %}
-        {% comment %}
-          <div class="row-fluid">
-            <div class="span12 media organism {{ organism.object.organism.type|lower }}">
-              <a class="pull-left" href="{{ organism.object.get_absolute_url }}">
-                {% for images in organism.object.organism.images_set.all %}
-                  {% if images.primary_image %}<img src="{{ images.wide_thumb.url }}" class="obs-image">{% endif %}
-                {% endfor %}
-              </a>
-              <div class="media-body">
-                <h4 class="media-heading">{{ organism.object.organism.common_name }}</h4>
-                <p>Type: {{ organism.object.organism.type }}</p>
-                <p>{% for ident in organism.object.organism.org_ident.all %}{{ ident.identification|truncatewords_html:30|safe }}{% endfor %} <a class="btn btn-mini" href="{{ organism.object.get_absolute_url }}">View details »</a></p>
-              </div>
-            </div>
-          </div>
-          {% endcomment %}
-          <div class="organism {{ organism.object.organism.type|lower }} well well-small">
+          {% if forloop.counter0|divisibleby:"3" %}<div class="row-fluid"><ul class="thumbnails">{% endif %}
+            <li class="span4">
+              <div class="thumbnail organism {{ organism.object.organism.type|lower }} well well-small">
               {% for images in organism.object.organism.images_set.all %}
                 {% if images.primary_image %}<img src="{{ images.wide_thumb.url }}" class="obs-image">{% endif %}
+                {% empty %}<img src="holder.js/179x89" class= "obs-image">
               {% endfor %}
-              <h5>{{ organism.object.organism.common_name }}</h5>
-              <p><em>{{ organism.object.organism.latin_name }}</em></p>
-              <p>Type: {{ organism.object.organism.type }}</p>
-              <p><a class="btn btn-mini" href="{{ organism.object.get_absolute_url }}">View details »</a></p>
-          </div>
+                <div class="caption">
+                  <h5>{{ organism.object.organism.common_name }}</h5>
+                  <p><em>{{ organism.object.organism.latin_name }}</em></p>
+                  <p>Type: {{ organism.object.organism.type }}</p>
+                  <p><a class="btn btn-mini" href="{{ organism.object.get_absolute_url }}">View details »</a></p>
+                </div>
+              </div>
+            </li>
+          {% if forloop.last or forloop.counter|divisibleby:"3" %}</ul></div>{% endif %} 
         {% endfor %}
     </div>
   {% endif %}
 {% endif %}
 {% endblock content %}
 {% block app.scripts %}
-<script src="{{ MEDIA_URL }}js/isotope/jquery.isotope.min.js"></script>
+<script src="{{ MEDIA_URL }}js/holder/holder.js"></script>
 <script>
     $(function(){
-
-      var $container = $('#container');
-
-      $container.isotope({
-        itemSelector : '.organism',
-        masonryHorizontal: {
-            rowHeight: 360
-          }
-      });
-
       $('#removable a').click( function( jQEvent ) {
         var selector = $(this).attr('data-option-value');
-        var $removable = $container.find( selector );
-        $container.isotope( 'remove', $removable );
+        $(selector).fadeOut("slow", function() {
+          $(this).remove();
+        });
         jQEvent.preventDefault();
       });
-
     });
   </script>
 {% endblock app.scripts %}
