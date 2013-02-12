@@ -1,4 +1,7 @@
 {% extends "nature/base.html" %}
+{% block app.css %}
+<link rel="stylesheet" href="{{ STATIC_URL }}nature/css/colorbox/colorbox.css">
+{% endblock %}
 {% block title %}{{ observation.organism.common_name }}{% endblock %}
 {% block content %}
 	<div>
@@ -6,7 +9,7 @@
 			<a href="https://twitter.com/share" class="twitter-share-button" data-related="jasoncosta" data-lang="en" data-size="large" data-count="horizontal" data-text="I found a {{ observation.organism.common_name }}:">Tweet</a>
 			<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 		</span>
-	<h1><a href="{{ observation.organism.get_absolute_url }}">{{ observation.organism.common_name }}</a></h1>
+	<h1><a href="{{ observation.organism.get_absolute_url }}{{ observation.organism.common_name|slugify}}/">{{ observation.organism.common_name }}</a></h1>
     </div>
 	<table class="table">
 		<tr>
@@ -43,7 +46,7 @@
 		</tr>
 	</table>
 	{% if observation.observation_image %}
-		<a href="{{ observation.observation_image.url }}"><img src="{{ observation.large_image.url }}" id="observation" class="obs-image"></a>
+		<a href="{{ observation.observation_image.url }}" class="cboxPicture cboxElement"><img src="{{ observation.large_image.url }}" id="observation" class="obs-image"></a>
 	{% endif %}
 	{% if observation.user.id == user.id %} 
     	{% if perms.observation.can_change %}
@@ -60,3 +63,11 @@
     {% include "nature/include_map.html" %}
     {% endwith %}
 {% endblock right-content %}
+{% block app.scripts %}
+<script type="text/javascript" src="{{ MEDIA_URL }}js/colorbox/jquery.colorbox.js"></script>
+<script>
+$(function() {
+	jQuery(".cboxPicture").colorbox({maxwidth:"60%", maxHeight:"80%"});
+});
+  </script>
+{% endblock app.scripts %}  

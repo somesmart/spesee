@@ -133,7 +133,7 @@
     theme_advanced_resizing : true,
     cleanup: true,
     relative_urls : false,
-    valid_elements :"p,h1,h2,h3,h4,h5,ol,ul,li,a,strong,b,em,i",
+    valid_elements :"p,h1,h2,h3,h4,h5,ol,ul,li,a[name|href|target|title|alt|class],strong,b,em,i",
     extended_valid_elements : "img[class|src|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style]"
   });
 }
@@ -278,6 +278,7 @@
             get_image_list({% if new_ident %}{{ new_ident.org }}{% else %}{{ organism.id }}{% endif %}); 
           } 
         });
+      jQuery(".cboxPicture").colorbox({maxwidth:"60%", maxHeight:"80%"});
     });
   </script>
 {% endblock app.scripts %}  
