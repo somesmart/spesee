@@ -20,8 +20,9 @@
 </tr>
 </table>
 
-<input type="submit" value="login" />
+<input class="btn btn-small" type="submit" value="Sign In" />
 <input type="hidden" name="next" value="/observation/" />
 </form>
 
+<a class="btn btn-small" href="{% url 'registration_register' %}">Register a New Account</a>
 {% endblock %}

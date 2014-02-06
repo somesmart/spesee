@@ -1,5 +1,5 @@
 {% extends "nature/base.html" %}
-{% block title %}Identificaion List Details{% endblock title %}
+{% block title %}{{ course.course_name }}{% endblock title %}
 {% block app.scripts %}
 <script>
 $(function() {
@@ -14,7 +14,7 @@ $(function() {
 </script>
 {% endblock %}
 {% block content %}
-	<h2>{{ course.course_name }}:</h1>
+	<h2>{{ course.course_name }}: <a class="btn btn-small note_copy pull-right" href="{% url list-copy course.id %}">Copy this List <i class="icon-share"></i></a></h1>
 	<h3>{{ course.course_descr }}</h3>
 	<div id="org_list">
 		{% if completion %}

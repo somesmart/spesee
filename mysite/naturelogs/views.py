@@ -754,6 +754,19 @@ def add_list_item(request, course, organism):
     else:
         return HttpResponse("you shouldn't be here")
 
+def copy_list(request, course):
+    course = Course.objects.get(id=course)
+    if course:
+        new_user = User.objects.get(id=request.user.id)
+        new_course = Course(course_name=course.course_name, course_descr=course.course_descr, user=new_user, is_group=False)
+        new_course.save()
+    course_detail = CourseDetail.objects.filter(course=course)
+    if course_detail:
+        for detail in course_detail:
+            new_course_detail = CourseDetail(course=new_course, organism=detail.organism)
+            new_course_detail.save()
+    return HttpResponseRedirect('/list/')
+
 # ****************************************************************** #
 # ********************* groups related views *********************** #
 # ****************************************************************** #

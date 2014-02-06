@@ -85,14 +85,13 @@
     </div>
   </div>
 </div>
-<div id="message" class="span3 offset9"></div>
-{% block top-content %}{% endblock top-content %}
+<div id="message" class="span3 offset9"></div>{% block top-content %}{% endblock top-content %}
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span6 offset1">
+    {% block content-span%}<div class="span6 offset1">{% endblock %}
     {% block content %}{% endblock %}
     </div>
-    <div class="span5">
+    {% block right-span%}<div class="span5">{% endblock %}
       <div class="row-fluid">
         {% block right-content %}{% endblock %}
       </div>
@@ -110,7 +109,6 @@
       </ul>
     </div>
   </footer>
-
 </div> <!-- /container -->
 {% endblock body %}
 {% block base.scripts %}

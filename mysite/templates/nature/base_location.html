@@ -1,5 +1,6 @@
 {% extends "nature/base.html" %}
 {% block title %}{{ location.name }} Location Details{% endblock title %}
+{% block content-span%}<div class="span4 offset1">{% endblock %}
 {% block content %}
 <h3>{{ location.name }} - <a class="btn" href="{{ location.get_edit_url }}"><i class="icon-wrench"></i></a></h3>
 {{ location.description|safe }}
@@ -12,6 +13,7 @@
 		    </ul>
 	</div>
 {% endblock content %}
+{% block right-span%}<div class="span7">{% endblock %}
 {% block right-content %}
     <div class="span10 offset1">
       <p class="alert alert-info">Map items in blue are those you have already found. Red icons have been sighted by others.</p>

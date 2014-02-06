@@ -89,7 +89,7 @@ urlpatterns = patterns('',
         login_required(ObservationList.as_view()), name='observation-list'),
     #observation/$ shows all observations for the user logged in
     url(r'^observation/$',
-        login_required(ObservationListSelf.as_view())),
+        login_required(ObservationListSelf.as_view()), name="observation-home"),
     #observation/(?<pk>\d+) displays a specific observation
     url(r'^observation/(?P<pk>\d+)/$',
         DetailView.as_view(
@@ -143,13 +143,13 @@ urlpatterns = patterns('',
     url(r'^list/$',
         login_required(CourseList.as_view()), name='course-list'),
     #add/list/ is to create a new list
-    ##########################
-    #add the ability to copy someone's course to your own
     url(r'^add/list/$',
         login_required(CourseCreateView.as_view(
             template_name='nature/base_course_create.html')), name='list-add'),
     #add a single item to an existing list
     url(r'^add/list/(?P<course>\d+)/item/(?P<organism>\d+)/$', 'mysite.nature.views.add_list_item'),
+    #copy someone else's list to your userid
+    url(r'^copy/list/(?P<course>\d+)/$', 'mysite.nature.views.copy_list', name='list-copy'),
     #edit the list
     url(r'^edit/list/(?P<pk>\d+)/$',
         login_required(CourseUpdate.as_view(

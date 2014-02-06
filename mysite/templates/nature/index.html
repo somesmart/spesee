@@ -2,18 +2,74 @@
 {% load zinnia_tags %}
 {% block title %} Welcome to SpeSee {% endblock title %}
 {% block top-content %}
-<div class="hero-unit">
-  <h1>Welcome to SpeSee!</h1>
-  <p>SpeSee is a community built site for tracking your nature observations and helping others to identify tough to recognize organisms, or find even the most elusive species missing from a life list.</p>
-  <p>
-    <a href="{% url about-page %}" class="btn btn-primary btn-large">
-      Learn more
-    </a>
-  </p>
+<div class="jumbotron masthead">
+  <div class="container">
+    <h1>SpeSee</h1>
+    <p>Observe, identify, and track organisms across North America.</p>
+    <p>
+    <a href="{% url about-page %}" class="btn btn-primary btn-large">Learn more</a>
+    </p>
+    <ul class="masthead-links">
+      <li>
+        <a href="{% url zinnia_entry_archive_index %}">Blog</a>
+      <li>
+        <a href="https://bitbucket.org/somesmart/spesee/overview">Fork on Bitbucket</a>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="marketing">
+  <h1>Learn - Observe - Share</h1>
+  <p class="marketing-byline">Need help identifying an organism? Or have tips for others?</p>
+  <div class="row-fluid">
+    <div class="span4">
+      <img class="marketing-img" src="{{ MEDIA_URL }}simple_tips.jpg">
+      <h2>Straightforward Tips</h2>
+      <p>Check out other users tips on identifying organisms, structured to help any naturalist with even the toughest identifications, no matter their technical knowledge.</p>
+    </div>
+    <div class="span4">
+      <img class="marketing-img" src="{{ MEDIA_URL }}list_example.PNG">
+      <h2>Observe together</h2>
+      <p>Create lists to share with others, or to help track down those tough to find organisms that others might have seen already.</p>
+    </div>
+    <div class="span4">
+      <img class="marketing-img" src="{{ MEDIA_URL }}download.png">
+      <h2>Liberate your data</h2>
+      <p>Your data is yours, so head to your <a href="{% url observation-home %}">observation page</a> and download every observation you've entered in an easy to use and portable format.</p>
+    </div>
+  </div>
+</div>
+<hr>
+<div class="row-fluid">
+  <div class="span4 offset2">
+      <h2>Recent Observations:</h2>
+        {% if first_ogranisms %}
+            <ul class="unstyled">
+            {% for organism in first_ogranisms %}
+                {% if organism.observed > 0 %}
+                <li><a href="{{ organism.get_absolute_url }}{{ organism.common_name|slugify }}">{{ organism.common_name }} ({{ organism.latin_name }}) - {{ organism.observed }}</a> </li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No organisms are available.</p>
+        {% endif %}
+    </div>
+    <div class="span6">
+    <h2>Updated Identifications:</h2>
+    {% if recent_updates %}
+        <ul class="unstyled">
+            {% for organism in recent_updates %}
+                <li><a href="{% url organism-view organism.organism__id %}{{ organism.organism__common_name|slugify }}">{{ organism.organism__common_name }} ({{ organism.organism__latin_name }}) - {{ organism.updates }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
+{% comment %}
 {% block content %}
-	{% get_recent_entries 5 "zinnia/home_excerpts.html" %}
+  {% get_recent_entries 5 "zinnia/home_excerpts.html" %}
 {% endblock content %}
 {% block right-content %}
 <h2>Recent Observations:</h2>
@@ -37,3 +93,4 @@
     </ul>
 {% endif %}
 {% endblock %}    
+{% endcomment %}
