@@ -1,9 +1,9 @@
 {% extends "nature/base_head.html" %}
-{% block title %}Edit Your Group{% endblock title %}
+{% block title %}Group Setup{% endblock title %}
 {% block body %}
 {% if perms.nature.add_group %}
   {% block content %}
-    <h3>Edit your group</h3>
+    <h3>Group Setup</h3>
     <form action="" method="post">
       <div class="form-row">
         {{ form.title.label_tag }}
@@ -15,7 +15,7 @@
     </table>
     <div class="submit-row">
       {% csrf_token %}
-      <input type="submit" value="Create Group" class="submit" />
+      <input type="submit" value="Create Group" class="submit btn btn-primary" />
     </div>
     </form>
   {% endblock %}
