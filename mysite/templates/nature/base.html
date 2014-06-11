@@ -14,11 +14,11 @@
           <li class="dropdown {% if 'observation' in request.path and not 'discover' in request.path %} active {% endif %}">
             <a href="/observation/" class="dropdown-toggle" data-toggle="dropdown">Observations <b class="caret"></b></a>
             <ul class="dropdown-menu">
-              <li><a href="{% url discover 'observation' %}">Browse Observations</a></li>
+              <li><a href="{% url 'discover' 'observation' %}">Browse Observations</a></li>
               <li class="divider"></li>
               {# <li class="nav-header">Nav header</li> #}
               <li><a href="/observation/">My Observations</a></li>
-              <li><a href="{% url add-observation %}"><i class="icon-plus"></i> New Observation</a></li>
+              <li><a href="{% url 'add-observation' %}"><i class="icon-plus"></i> New Observation</a></li>
             </ul>
           </li>
           <li class="dropdown {% if 'list' in request.path %} active {% endif %}">
@@ -33,7 +33,7 @@
           <li class="dropdown {% if 'discover' in request.path %} active {% endif %}">
             <a href="/discover/" class="dropdown-toggle" data-toggle="dropdown">Discover <b class="caret"></b></a>
             <ul class="dropdown-menu">
-              <li><a href="{% url discover 'organism' %}">Browse Organisms</a></li>
+              <li><a href="{% url 'discover' 'organism' %}">Browse Organisms</a></li>
               <li><a href="{% url discover 'observation' %}">Browse Observations</a></li>
             </ul>
           </li>
@@ -51,11 +51,11 @@
             <li class="dropdown {% if 'accounts' in request.path %} active {% endif %}">
             <a href="/accounts/" class="dropdown-toggle" data-toggle="dropdown">{{ user.username }} <b class="caret"></b></a>
             <ul class="dropdown-menu">
-              <li><a href="{% url user-profile user.username %}">Profile</a></li>
+              <li><a href="{% url 'user-profile' user.username %}">Profile</a></li>
               {% if perms.nature.add_orgidentificationreview %}
-              <li><a href="{% url review-home %}">Review</a></li>
+              <li><a href="{% url 'review-home'' %}">Review</a></li>
               {% endif %}
-              <li><a href="{% url account-logout %}">Logout</a></li>
+              <li><a href="{% url 'account-logout' %}">Logout</a></li>
             </ul>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle invites" data-toggle="dropdown"><i class="icon-inbox invites"></i><span id="invites">0</span> <strong class="caret"></strong></a>
@@ -67,7 +67,7 @@
         {% else %} 
         </div>
         <ul id="login-form" class="nav pull-right">
-          <li><a href="{% url registration_register %}">Sign Up</a></li>
+          <li><a href="{% url 'registration_register' %}">Sign Up</a></li>
           <li class="divider-vertical"></li>
           <li class="dropdown">
             <a class="dropdown-toggle" href="#" data-toggle="dropdown">Sign In <strong class="caret"></strong></a>
@@ -104,7 +104,7 @@
     <div class="container">
       <ul class="nav nav-pills">
         <li class="disabled"><a href="">&copy; SpeSee 2012</a></li>
-        <li><a href="{% url about-page %}">About</a></li>
+        <li><a href="{% url 'about-page' %}">About</a></li>
         <li><a href="/contact/">Contact</a></li>
       </ul>
     </div>
@@ -117,7 +117,7 @@
 function getInvites(){
   $.ajax({
       type: "GET",
-      url: "{% url invite-count user.id %}",
+      url: "{% url 'invite-count' user.id %}",
       success: function(data){
         var count = data.total_invites;
         if (count > 0){
@@ -129,7 +129,7 @@ function getInvites(){
 function getInviteList(){
   $.ajax({
       type: "GET",
-      url: "{% url invite-list user.id %}",
+      url: "{% url 'invite-list' user.id %}",
       success: function(data){
         $(data).each(function(i,val){
            $.each(val,function(k,v){
@@ -170,7 +170,7 @@ $(function() {
       var username = $('#username').val();
       var password = $('#password').val();
       $.ajax({
-          url: '{% url login-simple %}',
+          url: '{% url "login-simple" %}',
           type: 'POST',
           data: {
             username: username,
@@ -184,7 +184,7 @@ $(function() {
               .addClass("success")
               .html("<div class='alert alert-success'>Thank you for logging in! <a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
               $("#login-form").hide();
-              html = "<p class='navbar-text pull-right'>Welcome <a class='navbar-link' href='/accounts/profile/" + username + "/'>" + username + "</a><a class='navbar-link' href='{% url account-logout %}''> Logout</a></p><ul class='nav pull-right'><li class='dropdown'><a href='#' class='dropdown-toggle invites' data-toggle='dropdown'><i class='icon-inbox invites'></i><span id='invites'>0</span> <strong class='caret'></strong></a><div id='invite-list' class='dropdown-menu' style='padding: 15px; padding-bottom: 10px;'></div></li></ul>";
+              html = "<p class='navbar-text pull-right'>Welcome <a class='navbar-link' href='/accounts/profile/" + username + "/'>" + username + "</a><a class='navbar-link' href='{% url 'account-logout' %}''> Logout</a></p><ul class='nav pull-right'><li class='dropdown'><a href='#' class='dropdown-toggle invites' data-toggle='dropdown'><i class='icon-inbox invites'></i><span id='invites'>0</span> <strong class='caret'></strong></a><div id='invite-list' class='dropdown-menu' style='padding: 15px; padding-bottom: 10px;'></div></li></ul>";
               $("#user-bar").append(html);
             }
             else
@@ -207,7 +207,7 @@ $(function() {
     event.preventDefault();
   });
   $("#search").autocomplete({
-      source: "{% url autocomplete %}?search=organism",
+      source: "{% url 'autocomplete' %}?search=organism",
       minLength: 3,
       select: function(event, ui) {
         // $('#search_url').val(ui.item.id);

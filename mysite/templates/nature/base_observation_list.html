@@ -34,8 +34,8 @@ $(function() {
         </dl>
     </small>
 {% endif %}
-    <p><a class="btn btn-primary" href="{% url add-observation %}"><i class="icon-plus icon-white"></i> New Observation</a></p>
-    <span class="label label-info">Download all of your observations:</span> <a href="{% url export-observations %}" class="btn btn-mini note2"><i class="icon-download-alt"></i></a>
+    <p><a class="btn btn-primary" href="{% url 'add-observation' %}"><i class="icon-plus icon-white"></i> New Observation</a></p>
+    <span class="label label-info">Download all of your observations:</span> <a href="{% url 'export-observations' %}" class="btn btn-mini note2"><i class="icon-download-alt"></i></a>
 {% endblock content %}
 {% block right-span%}<div class="span6">{% endblock %}
 {% block right-content %}
@@ -49,17 +49,3 @@ $(function() {
     {% endwith %}
     {% endif %}
 {% endblock right-content %}
-{% comment %}
-{% regroup observation_list by observation.organism.type as org_type_list %}
-<ul>
-    {% for type in org_type_list %}
-    <li>{{ type.grouper }}
-        <ul>
-            {% for observation in type.list %}
-                <li>{{ observation.organism }}</li>
-            {% endfor %}
-        </ul>
-    </li>
-    {% endfor %}
-</ul>
-{% endcomment %}

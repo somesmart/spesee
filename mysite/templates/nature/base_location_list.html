@@ -34,5 +34,5 @@ $(function() {
   {% else %}
       <p>No locations are available.</p>
   {% endif %}
-  <p><a class="btn btn-primary" href="{% url location-add %}"><i class="icon-plus icon-white"></i> Location</a></p>
+  <p><a class="btn btn-primary" href="{% url 'location-add' %}"><i class="icon-plus icon-white"></i> Location</a></p>
 {% endblock content %}

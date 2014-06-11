@@ -4,7 +4,7 @@
   {% csrf_token %}
   <fieldset>
     <legend>{% trans "Post your comment" %}</legend>
-    <input type="hidden" name="next" value="{% url 'zinnia_discussion_success' %}"/>
+    <input type="hidden" name="next" value="{% url 'zinnia_comment_success' %}"/>
     <div class="form-row">
       {{ form.title.label_tag }}
       {{ form.title }}

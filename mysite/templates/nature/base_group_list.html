@@ -34,7 +34,7 @@ $(function() {
     {% if group_list %}
         <ul>
         {% for group in group_list %}
-            <li class="{{ group.id }}"><a href="{{ group.get_absolute_url }}">{{ group.name }}</a> <a class="ajax cboxElement btn btn-mini" href="{% url group-edit group.id %}"><i class="icon-wrench"></i></a> <a class="delete btn btn-mini btn-danger" id="{{ group.id }}" href="#"><i class="icon-remove icon-white"></i></a></li>
+            <li class="{{ group.id }}"><a href="{{ group.get_absolute_url }}">{{ group.name }}</a> <a class="ajax cboxElement btn btn-mini" href="{% url 'group-edit' group.id %}"><i class="icon-wrench"></i></a> <a class="delete btn btn-mini btn-danger" id="{{ group.id }}" href="#"><i class="icon-remove icon-white"></i></a></li>
         {% endfor %}
         </ul>
     {% else %}
@@ -48,7 +48,7 @@ $(function() {
         {% endfor %}
         </ul>
     {% endif %}
-     <p><a class="ajax cboxElement btn btn-primary" href="{% url group-add %}"><i class="icon-plus icon-white"> </i>New Group</a></p>
+     <p><a class="ajax cboxElement btn btn-primary" href="{% url 'group-add' %}"><i class="icon-plus icon-white"> </i>New Group</a></p>
    </div>
  </div>
 {% endblock content %}

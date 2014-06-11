@@ -127,7 +127,7 @@
 <script type="text/javascript">
 $(function() {
   $("#common_name").autocomplete({
-    source: "{% url autocomplete %}?search=organism",
+    source: "{% url 'autocomplete' %}?search=organism",
     minLength: 3,
     select: function(event, ui) {
       $('#id_organism').val(ui.item.id);

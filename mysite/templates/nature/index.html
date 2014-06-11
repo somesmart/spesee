@@ -7,11 +7,11 @@
     <h1>SpeSee</h1>
     <p>Observe, identify, and track organisms across North America.</p>
     <p>
-    <a href="{% url about-page %}" class="btn btn-primary btn-large">Learn more</a>
+    <a href="{% url 'about-page' %}" class="btn btn-primary btn-large">Learn more</a>
     </p>
     <ul class="masthead-links">
       <li>
-        <a href="{% url zinnia_entry_archive_index %}">Blog</a>
+        <a href="{% url 'zinnia_entry_archive_index' %}">Blog</a>
       <li>
         <a href="https://bitbucket.org/somesmart/spesee/overview">Fork on Bitbucket</a>
       </li>
@@ -35,7 +35,7 @@
     <div class="span4">
       <img class="marketing-img" src="{{ MEDIA_URL }}download.png">
       <h2>Liberate your data</h2>
-      <p>Your data is yours, so head to your <a href="{% url observation-home %}">observation page</a> and download every observation you've entered in an easy to use and portable format.</p>
+      <p>Your data is yours, so head to your <a href="{% url 'observation-home' %}">observation page</a> and download every observation you've entered in an easy to use and portable format.</p>
     </div>
   </div>
 </div>
@@ -60,37 +60,10 @@
     {% if recent_updates %}
         <ul class="unstyled">
             {% for organism in recent_updates %}
-                <li><a href="{% url organism-view organism.organism__id %}{{ organism.organism__common_name|slugify }}">{{ organism.organism__common_name }} ({{ organism.organism__latin_name }}) - {{ organism.updates }}</a></li>
+                <li><a href="{% url 'organism-view' organism.organism__id %}{{ organism.organism__common_name|slugify }}">{{ organism.organism__common_name }} ({{ organism.organism__latin_name }}) - {{ organism.updates }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
   </div>
 </div>
 {% endblock %}
-{% comment %}
-{% block content %}
-  {% get_recent_entries 5 "zinnia/home_excerpts.html" %}
-{% endblock content %}
-{% block right-content %}
-<h2>Recent Observations:</h2>
-    {% if first_ogranisms %}
-        <ul>
-        {% for organism in first_ogranisms %}
-            {% if organism.observed > 0 %}
-            <li><a href="{{ organism.get_absolute_url }}{{ organism.common_name|slugify }}">{{ organism.common_name }} ({{ organism.latin_name }}) - {{ organism.observed }}</a> </li>
-            {% endif %}
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No organisms are available.</p>
-    {% endif %}
-<h2>Updated Identifications:</h2>
-{% if recent_updates %}
-    <ul>
-        {% for organism in recent_updates %}
-            <li><a href="{% url organism-view organism.organism__id %}{{ organism.organism__common_name|slugify }}">{{ organism.organism__common_name }} ({{ organism.organism__latin_name }}) - {{ organism.updates }}</a></li>
-        {% endfor %}
-    </ul>
-{% endif %}
-{% endblock %}    
-{% endcomment %}

@@ -1,6 +1,6 @@
 # Spesee.org README
 
-## Django v 1.4.10
+## Django v 1.5.8
 
 ## Current Installed Apps:
   - django.contrib.auth

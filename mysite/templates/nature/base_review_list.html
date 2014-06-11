@@ -6,7 +6,7 @@
 		<h2>Review Organism Changes:</h2>
 		    <ul class="unstyled">
 		    {% for org in org_review_list %}
-		        <li><a href="{% url review-organism org.id %}">{{ org.organism }}</a></li>
+		        <li><a href="{% url 'review-organism' org.id %}">{{ org.organism }}</a></li>
 		    {% endfor %}
 		    </ul>
 	{% endif %}
@@ -14,7 +14,7 @@
 		<h2>Review New Images:</h2>
 		    <ul class="unstyled">
 		    {% for image in image_review_list %}
-		        <li><a href="{% url review-image image.id %}">{{ image.review_image.organism }}</a></li>
+		        <li><a href="{% url 'review-image' image.id %}">{{ image.review_image.organism }}</a></li>
 		    {% endfor %}
 		    </ul>
 	{% endif %}
@@ -22,7 +22,7 @@
 		<h2>Review Unknown Observations:</h2>
 		    <ul class="unstyled">
 		    {% for obs in obs_review_list %}
-		        <li><a href="{% url review-obs obs.id %}">{{ obs.user}} - {{ obs.comments }}</a></li>
+		        <li><a href="{% url 'review-obs' obs.id %}">{{ obs.user}} - {{ obs.comments }}</a></li>
 		    {% endfor %}
 		    </ul>
 	{% endif %}

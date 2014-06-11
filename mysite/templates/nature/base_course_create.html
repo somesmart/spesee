@@ -19,7 +19,7 @@ $(function() {
     $("#id_group").parent().parent().hide();
     $("#add_group").hide();
     $("#selector").autocomplete({
-      source: "{% url autocomplete %}?search=organism",
+      source: "{% url 'autocomplete' %}?search=organism",
       minLength: 3,
       select: function(event, ui) {
         $('#organism_id').val(ui.item.id);
@@ -86,7 +86,7 @@ $(function() {
               <option value="{{ group.id }}">{{ group.name }}</option>
             {% endfor %}
           </select>
-          <a id="add_group" class="ajax cboxElement btn btn-primary" href="{% url group-add %}"><i class="icon-plus icon-white"></i> Group</a>
+          <a id="add_group" class="ajax cboxElement btn btn-primary" href="{% url 'group-add' %}"><i class="icon-plus icon-white"></i> Group</a>
         </td>
       </tr>
     </table>

@@ -41,7 +41,7 @@
                       <p><em>{{ observation.organism.latin_name }}</em></p>
                       <p>Type: {{ observation.organism.type }}</p>
                       </small>
-                      <p><a class="btn btn-mini" href="{% url observation-detail observation.id %}">View details »</a></p>
+                      <p><a class="btn btn-mini" href="{% url 'observation-detail' observation.id %}">View details »</a></p>
                     </div>
                 </div>
               </li>

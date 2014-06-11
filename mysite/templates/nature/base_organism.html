@@ -26,7 +26,7 @@
           <a class="cancel btn btn-danger" style="display:none">Cancel</a>
       </div>
     {% else %}
-      <span>Please <a href="{% url account-login %}">login</a> to edit the content below</a></span>
+      <span>Please <a href="{% url 'account-login' %}">login</a> to edit the content below</a></span>
     {% endif %}
   </div>
   <div id="tools"></div>
@@ -42,9 +42,9 @@
   <div class="pull-right">
     {% if perms.nature.add_images %}
       {% if new_ident %}
-      <a id="uploader" class="ajax cboxElement upload btn btn-primary" style="display:none" href="{% url image-upload new_ident.org %}">Upload an Image</a>
+      <a id="uploader" class="ajax cboxElement upload btn btn-primary" style="display:none" href="{% url 'image-upload' new_ident.org %}">Upload an Image</a>
       {% else %}
-      <a id="uploader" class="ajax cboxElement upload btn btn-primary" style="display:none" href="{% url image-upload organism.id %}">Upload an Image</a>
+      <a id="uploader" class="ajax cboxElement upload btn btn-primary" style="display:none" href="{% url 'image-upload' organism.id %}">Upload an Image</a>
       {% endif %}
     {% endif %}
   </div>
@@ -101,7 +101,7 @@
     </table>
   </small>
   <div class="pull-right">
-    <a class="observation btn btn-primary" href="{% url add-observation %}?org={{ organism.id }}"><i class="icon-plus icon-white"></i> Observation</a>
+    <a class="observation btn btn-primary" href="{% url 'add-observation' %}?org={{ organism.id }}"><i class="icon-plus icon-white"></i> Observation</a>
   </div>
 {% endblock content %}
 {% block right-content %}
@@ -152,7 +152,7 @@
   function get_valid_tags(org_type){
     $.ajax({
       type: "GET",
-      url: '{% url type-tags organism.type.id %}',
+      url: '{% url 'type-tags' organism.type.id %}',
       success: function(data) {
         var valid_tags = [];
         $(data).each(function(i,val){
@@ -189,7 +189,7 @@
         var identification = ed.getContent();
         var org = '{{ organism.id }}';
         $.ajax({
-          url: '{% url save-org-ident %}',
+          url: '{% url "save-org-ident" %}',
           type: 'POST',
           data: {
             org: org,
@@ -235,7 +235,7 @@
         prefilled: [{% tags_for_object organism as prefilled_tags %}{% for tag in prefilled_tags %}"{{ tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
         preventSubmitOnEnter: true,
         typeahead: true,
-        typeaheadAjaxSource: '{% url type-tags organism.type.id %}', 
+        typeaheadAjaxSource: '{% url "type-tags" organism.type.id %}', 
         typeaheadAjaxPolling: false,
         blinkBGColor_1: '#BCE8F1',
         blinkBGColor_2: '#D9EDF7',
@@ -250,7 +250,7 @@
       $('.save-tags').click(function() {
         var new_tags = $('input[name=hidden-tagsjax]').val();
         $.ajax({
-          url: '{% url save-tags organism.id %}',
+          url: '{% url "save-tags" organism.id %}',
           type: 'POST',
           data: {
             new_tags: new_tags,

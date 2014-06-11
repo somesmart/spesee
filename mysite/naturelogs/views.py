@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
-from django.utils import simplejson
+import json
 from django.db.models import Q, Count
 from django.views.generic import DetailView, ListView, UpdateView, CreateView, FormView
 from django.contrib.auth import authenticate, login as auth_login
@@ -51,8 +51,8 @@ def autocomplete(request):
                     for organism in model_results:
                         data = {'id': organism.id, 'label': organism.common_name + ' (' + organism.latin_name + ')'}
                         results.append(data)
-                    json = simplejson.dumps(results)
-                    return HttpResponse(json, mimetype='application/json')
+                    json_results = json.dumps(results)
+                    return HttpResponse(json_results, mimetype='application/json')
                 else:
                     return HttpResponseRedirect('/noresults/')
             elif search == "primary_search":
@@ -66,8 +66,8 @@ def autocomplete(request):
                         except:
                             data = {'id': '/organism/' + str(organism.object.id) + '/', 'label': organism.object.common_name + ' (' + organism.object.latin_name + ')' }                             
                         results.append(data)
-                    json = simplejson.dumps(results)
-                    return HttpResponse(json, mimetype='application/json')
+                    json_results = json.dumps(results)
+                    return HttpResponse(json_results, mimetype='application/json')
                 else:
                     return HttpResponseRedirect('/noresults/')
             elif search == "zip":
@@ -77,8 +77,8 @@ def autocomplete(request):
                     for zipcode in model_results:
                         data = {'id': zipcode.id, 'label': zipcode.zipcode + ' - ' + zipcode.county}
                         results.append(data)
-                    json = simplejson.dumps(results)
-                    return HttpResponse(json, mimetype='application/json')
+                    json_results = json.dumps(results)
+                    return HttpResponse(json_results, mimetype='application/json')
                 else:
                     return HttpResponseRedirect('/noresults/')
             elif search == "user":
@@ -89,8 +89,8 @@ def autocomplete(request):
                     for user in model_results:
                         data = {'id': user.user.id, 'label': user.user.username}
                         results.append(data)
-                    json = simplejson.dumps(results)
-                    return HttpResponse(json, mimetype='application/json')
+                    json_results = json.dumps(results)
+                    return HttpResponse(json_results, mimetype='application/json')
                 else:
                     return HttpResponseRedirect('/noresults/')
         else:
@@ -109,8 +109,8 @@ def haystack_autocomplete(request):
         data = {'id': '/organism/' + str(organism.id) + '/', 'label': organism.common_name + ' (' + organism.latin_name + ')'}
         results.append(data)
 
-    json = simplejson.dumps(results)
-    return HttpResponse(json, mimetype='application/json')
+    json_results = json.dumps(results)
+    return HttpResponse(json_results, mimetype='application/json')
 
 # ****************************************************************** #
 # *********************** the big map views ************************ #
@@ -272,8 +272,8 @@ def organism_tags(request, organism):
         tag_list.append(data)
 
     results = {'tags': tag_list}
-    json = simplejson.dumps(results)
-    return HttpResponse(json, mimetype='application/json')
+    json_results = json.dumps(results)
+    return HttpResponse(json_results, mimetype='application/json')
 
 def type_tags(request, org_type):
     org_type = OrganismType.objects.get(id=org_type)
@@ -285,8 +285,8 @@ def type_tags(request, org_type):
         tag_list.append(data)
 
     results = {'tags': tag_list}
-    json = simplejson.dumps(results)
-    return HttpResponse(json, mimetype='application/json')
+    json_results = json.dumps(results)
+    return HttpResponse(json_results, mimetype='application/json')
 
 def save_tags(request, organism):
     #add save tags code here
@@ -546,8 +546,8 @@ def check_existing(request, search_type, search_value):
             else:
                 data = {'obs_id': obs.id, 'location_descr': obs.location_descr, 'comments': obs.comments, 'image' : obs.observation_image.url }#'lat_check': str(obs.latitude), 'lng_check': str(obs.longitude)}
             results.append(data)
-    json = simplejson.dumps(results)
-    return HttpResponse(json, mimetype='application/json')
+    json_results = json.dumps(results)
+    return HttpResponse(json_results, mimetype='application/json')
 
 # ****************************************************************** #
 # ********************* location related vws *********************** #
@@ -928,13 +928,13 @@ def user_profile(request, username):
 def get_invite_list(request, user):
     invites = GroupUsers.objects.select_related().filter(user=user, status=2).values('group__name', 'group__id', 'user__id')
     invites = list(invites)
-    json = simplejson.dumps(invites)
-    return HttpResponse(json, mimetype='application/json')
+    json_results = json.dumps(invites)
+    return HttpResponse(json_results, mimetype='application/json')
 
 def get_invite_count(request, user):
     invites = GroupUsers.objects.filter(user=user, status=2).aggregate(total_invites=Count('id'))
-    json = simplejson.dumps(invites)
-    return HttpResponse(json, mimetype='application/json')
+    json_results = json.dumps(invites)
+    return HttpResponse(json_results, mimetype='application/json')
 
 def login(request):
     if 'username' in request.POST:
