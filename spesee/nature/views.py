@@ -8,11 +8,11 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext, loader, Context as TemplContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from haystack.query import SearchQuerySet, SQ
+#from haystack.query import SearchQuerySet, SQ
 from tagging.models import Tag, TaggedItem
-from mysite.nature.models import *
-from mysite.nature.forms import *
-from mysite.nature.utils import *
+from nature.models import *
+from nature.forms import *
+from nature.utils import *
 from decimal import *
 from datetime import datetime
 import csv

@@ -1,4 +1,4 @@
-from mysite.nature.models import UserSettings, ZipCode, Observation, CourseDetail
+from nature.models import UserSettings, ZipCode, Observation, CourseDetail
 from decimal import *
  
 # ****************************************************************** #

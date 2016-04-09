@@ -1,6 +1,6 @@
 import datetime
 from haystack import indexes
-from mysite.nature.models import Organism, OrgIdentification
+from nature.models import Organism, OrgIdentification
 
 class OrgIdentificationIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)

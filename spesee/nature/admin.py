@@ -1,9 +1,9 @@
 from django.contrib import admin
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from django.http import HttpResponse
 
-from mysite.nature.models import *
-from mysite.nature.forms import IdentificationDetailFormSet
+from nature.models import *
+from nature.forms import IdentificationDetailFormSet
 from tagging.forms import TagField
 # from moderation.admin import ModerationAdmin
 

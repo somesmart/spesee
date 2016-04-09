@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm, Textarea
 from django.forms.models import inlineformset_factory
-from mysite.nature.models import *
+from nature.models import *
 from registration.forms import RegistrationForm
 from tagging.forms import TagField
 
@@ -10,6 +10,8 @@ from tagging.forms import TagField
 # ****************************************************************** #
 
 class IdentificationDetailFormSet(forms.models.BaseInlineFormSet):
+    fields = '__all__'
+
     def __init__(self, *args, **kwargs):
         super(IdentificationDetailFormSet, self).__init__(*args, **kwargs)
         for form in self.forms:
@@ -63,7 +65,7 @@ class ImagesReviewForm(ModelForm):
         exclude = ('moderated_by', 'moderated_date', 'review_image', 'modified_by', 'modified_date')        
 
 
-IdentDetailFormSet = inlineformset_factory(Organism, IdentificationDetail, formset=IdentificationDetailFormSet, extra=3)        
+IdentDetailFormSet = inlineformset_factory(Organism, IdentificationDetail, formset=IdentificationDetailFormSet, extra=3, fields = '__all__')        
 
 ImagesFormSet = inlineformset_factory(Organism, Images, form=ImagesForm, extra=3)
 
@@ -89,7 +91,7 @@ class LocationForm(forms.ModelForm):
     description = forms.CharField(required=False, widget=forms.Textarea(attrs={'cols': 70, 'rows': 10}))
     class Meta:
         model = Location
-        exclude = ('created_by')
+        exclude = ['created_by']
 
 # ****************************************************************** #
 # ********************* course related forms *********************** #
@@ -109,9 +111,10 @@ class CourseForm(ModelForm):
 
 class CourseDetailForm(ModelForm):
     class Meta:
-        model = CourseDetail 
+        model = CourseDetail
+        fields = '__all__'
 
-CourseDetailFormSet = inlineformset_factory(Course, CourseDetail, form=CourseDetailForm)
+CourseDetailFormSet = inlineformset_factory(Course, CourseDetail, form=CourseDetailForm, fields='__all__')
 
 # ****************************************************************** #
 # ********************* groups related forms *********************** #
@@ -122,7 +125,7 @@ class GroupForm(ModelForm):
         
     class Meta:
         model = Group
-        exclude = ('owner')
+        exclude = ['owner']
 
 # ****************************************************************** #
 # ********************* user signup edit etc *********************** #

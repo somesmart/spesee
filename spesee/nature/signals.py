@@ -1,6 +1,6 @@
 from registration.signals import user_registered #user_activated
-from mysite.nature.models import UserSettings
-from mysite.nature.forms import UserRegistrationForm
+from nature.models import UserSettings
+from nature.forms import UserRegistrationForm
 from django.contrib.auth.models import Group
 
 def create_profile(sender, user, request, **kwargs):
