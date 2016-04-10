@@ -34,7 +34,7 @@ $(function() {
 {% else %}
   <h1>{{ group.name }}</h1>
   {% if group.owner.id == user.id %} 
-  <a class="ajax colorBox btn" href="{% url group-edit group.id %}"><i class="icon-wrench"> </i>Edit Group</a>
+  <a class="ajax colorBox btn" href="{% url 'group-edit' group.id %}"><i class="icon-wrench"> </i>Edit Group</a>
   {% endif %}
   <table id="user_table" class="table">
     <tr>

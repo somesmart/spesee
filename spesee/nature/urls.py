@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 from django.contrib.auth.decorators import login_required
 from django.views.generic import *
 from django.db.models import Count
@@ -7,8 +7,6 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from nature.models import *
 from nature.views import *
 from nature.signals import *
-from registration.views import register
-import registration.backends.default.urls as regUrls
 import nature.signals
 
 admin.autodiscover()
@@ -107,10 +105,8 @@ urlpatterns = patterns('',
     url(r'^accounts/invites/list/(?P<user>\d+)/$', 'nature.views.get_invite_list', name='invite-list'),
     #accept/reject the invitation
     url(r'^accounts/invites/(?P<group>\d+)/(?P<response>\d+)/$', 'nature.views.group_invite_response'),
-    #for registration form override
-    url(r'^accounts/register/$', register, {'backend': 'registration.backends.default.DefaultBackend','form_class': UserRegistrationForm}, name='registration_register'),
     #all other accounts/ url functions go to the registration module
-    (r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^accounts/', include('registration.backends.hmac.urls')),
     #list/ is for lists/courses
     url(r'^list/(?P<pk>\d+)/', login_required(CourseView.as_view()), name='course-view'),
     url(r'^list/$', login_required(CourseList.as_view()), name='course-list'),
@@ -121,11 +117,11 @@ urlpatterns = patterns('',
     #copy someone else's list to your userid
     url(r'^copy/list/(?P<course>\d+)/$', 'nature.views.copy_list', name='list-copy'),
     #edit the list
-    url(r'^edit/list/(?P<pk>\d+)/$', login_required(CourseUpdate.as_view(template_name='nature/base_course_update.html'))),
+    url(r'^edit/list/(?P<pk>\d+)/$', login_required(CourseUpdate.as_view(template_name='nature/base_course_update.html')), name='location-edit'),
     #this will delete a single organism from a list
     url(r'^delete/list/item/(?P<pk>\d+)/$', 'nature.views.delete_list_item'),
     #this will delete an entire list
-    url(r'^delete/list/(?P<pk>\d+)/$', 'nature.views.delete_list'),
+    url(r'^delete/list/(?P<pk>\d+)/$', 'nature.views.delete_list', name='delete-list'),
     #group/ is for a specific group
     url(r'^group/(?P<pk>\d+)/', login_required(GroupView.as_view()), name='group-view'),
     url(r'^group/$', login_required(GroupList.as_view()), name='group-list'),
@@ -145,7 +141,7 @@ urlpatterns = patterns('',
     url(r'^map/(?P<maptype>\w+)/(?P<pk>\d+)/$', MapView.as_view(), name='map-data'),
     #location/ is for locations
     url(r'^location/(?P<pk>\d+)/', LocationView.as_view(), name='location-view'),  
-    url(r'^location/$', LocationList.as_view(template_name='nature/base_location_list.html')),
+    url(r'^location/$', LocationList.as_view(template_name='nature/base_location_list.html'), name='location-home'),
     url(r'^add/location/$', login_required(LocationCreate.as_view(template_name='nature/base_location_form.html')), name='location-add'),
     url(r'^edit/location/(?P<pk>\d+)/$', login_required(LocationUpdate.as_view(template_name='nature/base_location_update.html'))),
     #this will delete an entire location
@@ -163,19 +159,10 @@ urlpatterns = patterns('',
     url(r'stats/$', StatsView.as_view(template_name='nature/base_stats.html')),
     #this is currently where you end up after submitting any forms....
     url(r'thanks/', 'nature.views.thanks', name='thanks'),
-    url(r'noresults/', direct_to_template, { 'template': 'nature/base_noresults.html' }, name='no-results'),
+    url(r'noresults/', TemplateView.as_view(template_name = 'nature/base_noresults.html'), name='no-results'),
     #zinnia
-    url(r'^blog/', include('zinnia.urls')),
-    url(r'^blog/tags/', include('zinnia.urls.tags')),
-    url(r'^blog/feeds/', include('zinnia.urls.feeds')),
-    url(r'^blog/authors/', include('zinnia.urls.authors')),
-    url(r'^blog/categories/', include('zinnia.urls.categories')),
-    url(r'^blog/discussions/', include('zinnia.urls.discussions')),
-    url(r'^blog/', include('zinnia.urls.entries')),
-    url(r'^blog/', include('zinnia.urls.archives')),
-    url(r'^blog/', include('zinnia.urls.shortlink')),
-    url(r'^blog/', include('zinnia.urls.quick_entry')),
-    url(r'^comments/', include('django.contrib.comments.urls')),
+    url(r'^blog/', include('zinnia.urls', namespace='zinnia')),
+    url(r'^comments/', include('django_comments.urls')),
     #discover
     #url(r'^discover/organism/', include('haystack.urls')),
     url(r'^discover/(?P<search>\w+)/$', DiscoverList.as_view(), name='discover'),

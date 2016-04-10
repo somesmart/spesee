@@ -1,5 +1,5 @@
 {% extends "nature/base.html" %}
-{% load zinnia_tags %}
+{% load zinnia %}
 {% block title %} Welcome to SpeSee {% endblock title %}
 {% block top-content %}
 <div class="jumbotron masthead">
@@ -11,7 +11,7 @@
     </p>
     <ul class="masthead-links">
       <li>
-        <a href="{% url 'zinnia_entry_archive_index' %}">Blog</a>
+        <a href="/blog/">Blog</a>
       <li>
         <a href="https://bitbucket.org/somesmart/spesee/overview">Fork on Bitbucket</a>
       </li>

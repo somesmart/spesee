@@ -1,4 +1,5 @@
 {% extends "nature/base_head.html" %}
+{% load staticfiles %}
 {% block body %}
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="navbar-inner">
@@ -8,33 +9,33 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </a>
-      <a class="brand" href="/"><img src="{{ MEDIA_URL }}tree_deciduous.png"> SpeSee</a>
+      <a class="brand" href="/"><img src="{% static 'tree_deciduous.png' %}"> SpeSee</a>
       <div class="nav-collapse collapse">
         <ul class="nav">
           <li class="dropdown {% if 'observation' in request.path and not 'discover' in request.path %} active {% endif %}">
-            <a href="/observation/" class="dropdown-toggle" data-toggle="dropdown">Observations <b class="caret"></b></a>
+            <a href="{% url 'observation-home' %}" class="dropdown-toggle" data-toggle="dropdown">Observations <b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li><a href="{% url 'discover' 'observation' %}">Browse Observations</a></li>
               <li class="divider"></li>
               {# <li class="nav-header">Nav header</li> #}
-              <li><a href="/observation/">My Observations</a></li>
+              <li><a href="{% url 'observation-home' %}">My Observations</a></li>
               <li><a href="{% url 'add-observation' %}"><i class="icon-plus"></i> New Observation</a></li>
             </ul>
           </li>
           <li class="dropdown {% if 'list' in request.path %} active {% endif %}">
-            <a href="/list/" class="dropdown-toggle" data-toggle="dropdown">Lists <b class="caret"></b></a>
+            <a href="{% url 'course-list' %}" class="dropdown-toggle" data-toggle="dropdown">Lists <b class="caret"></b></a>
             <ul class="dropdown-menu">
-              <li><a href="/list/">My Lists</a></li>
-              <li><a href="/group/">My Groups</a></li>
-              <li><a href="/add/list/"><i class="icon-plus"></i> List</a></li>
+              <li><a href="{% url 'course-list' %}">My Lists</a></li>
+              <li><a href="{% url 'group-list' %}">My Groups</a></li>
+              <li><a href="{% url 'list-add' %}"><i class="icon-plus"></i> List</a></li>
             </ul>
           </li>
-          <li {% if request.path == '/location/' %} class="active" {% endif %}><a href="/location/">Locations</a></li>
+          <li {% if request.path == '/location/' %} class="active" {% endif %}><a href="{% url 'location-home' %}">Locations</a></li>
           <li class="dropdown {% if 'discover' in request.path %} active {% endif %}">
             <a href="/discover/" class="dropdown-toggle" data-toggle="dropdown">Discover <b class="caret"></b></a>
             <ul class="dropdown-menu">
               <li><a href="{% url 'discover' 'organism' %}">Browse Organisms</a></li>
-              <li><a href="{% url discover 'observation' %}">Browse Observations</a></li>
+              <li><a href="{% url 'discover' 'observation' %}">Browse Observations</a></li>
             </ul>
           </li>
         </ul>
@@ -53,7 +54,7 @@
             <ul class="dropdown-menu">
               <li><a href="{% url 'user-profile' user.username %}">Profile</a></li>
               {% if perms.nature.add_orgidentificationreview %}
-              <li><a href="{% url 'review-home'' %}">Review</a></li>
+              <li><a href="{% url 'review-home' %}">Review</a></li>
               {% endif %}
               <li><a href="{% url 'account-logout' %}">Logout</a></li>
             </ul>

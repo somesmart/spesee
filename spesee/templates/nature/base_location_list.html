@@ -27,7 +27,7 @@ $(function() {
   {% if location_list %}
       <dl>
       {% for location in location_list %}
-          <dt class="{{ location.id }}"><a href="{{ location.get_absolute_url }}">{{ location.name }}</a> <a class="btn btn-mini" href="{{ location.get_edit_url }}"><i class="icon-wrench icon"></i></a> <a class="btn btn-mini btn-danger" href="#"><i id="{{ location.id }}" class="icon-remove icon-white delete"></i></a></dt>
+          <dt class="{{ location.id }}"><a href="{% url 'location-view' location.id %}">{{ location.name }}</a> <a class="btn btn-mini" href="{% url 'location-edit' location.id %}"><i class="icon-wrench icon"></i></a> <a class="btn btn-mini btn-danger" href="#"><i id="{{ location.id }}" class="icon-remove icon-white delete"></i></a></dt>
           <dd class="{{ location.id }}">{{ location.description|safe }}</dd>
       {% endfor %}
       </dl>
