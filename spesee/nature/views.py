@@ -52,9 +52,9 @@ def autocomplete(request):
                         data = {'id': organism.id, 'label': organism.common_name + ' (' + organism.latin_name + ')'}
                         results.append(data)
                     json_results = json.dumps(results)
-                    return HttpResponse(json_results, mimetype='application/json')
+                    return HttpResponse(json_results, content_type='application/json')
                 else:
-                    return HttpResponseRedirect('/noresults/')
+                    return HttpResponseRedirect(reverse('no-results'))
             elif search == "primary_search":
                 #I may want to make this just a normal autocomplete to make it less resource intense in the future....
                 if len(value) > 3:
@@ -67,9 +67,9 @@ def autocomplete(request):
                             data = {'id': '/organism/' + str(organism.object.id) + '/', 'label': organism.object.common_name + ' (' + organism.object.latin_name + ')' }                             
                         results.append(data)
                     json_results = json.dumps(results)
-                    return HttpResponse(json_results, mimetype='application/json')
+                    return HttpResponse(json_results, content_type='application/json')
                 else:
-                    return HttpResponseRedirect('/noresults/')
+                    return HttpResponseRedirect(reverse('no-results'))
             elif search == "zip":
                 # Ignore queries shorter than length 4
                 if len(value) > 3:
@@ -78,9 +78,9 @@ def autocomplete(request):
                         data = {'id': zipcode.id, 'label': zipcode.zipcode + ' - ' + zipcode.county}
                         results.append(data)
                     json_results = json.dumps(results)
-                    return HttpResponse(json_results, mimetype='application/json')
+                    return HttpResponse(json_results, content_type='application/json')
                 else:
-                    return HttpResponseRedirect('/noresults/')
+                    return HttpResponseRedirect(reverse('no-results'))
             elif search == "user":
                 # Ignore queries shorter than length 3
                 if len(value) > 2:
@@ -90,11 +90,11 @@ def autocomplete(request):
                         data = {'id': user.user.id, 'label': user.user.username}
                         results.append(data)
                     json_results = json.dumps(results)
-                    return HttpResponse(json_results, mimetype='application/json')
+                    return HttpResponse(json_results, content_type='application/json')
                 else:
-                    return HttpResponseRedirect('/noresults/')
+                    return HttpResponseRedirect(reverse('no-results'))
         else:
-            return HttpResponseRedirect('/noresults/')
+            return HttpResponseRedirect(reverse('no-results'))
 
 def haystack_autocomplete(request):
     word = request.GET['q']
@@ -110,7 +110,7 @@ def haystack_autocomplete(request):
         results.append(data)
 
     json_results = json.dumps(results)
-    return HttpResponse(json_results, mimetype='application/json')
+    return HttpResponse(json_results, content_type='application/json')
 
 # ****************************************************************** #
 # *********************** the big map views ************************ #
@@ -245,7 +245,7 @@ class ImageUpload(CreateView):
             obj.save()
             new_image = Images.objects.get(id=obj.pk)
             ImagesReview(review_image=new_image, modified_by=obj.upload_user, modified_date=obj.upload_date, status=obj.status, primary_image=obj.primary_image).save()
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect(reverse('thanks'))
 
 def get_org_images(request, organism):
     images = Images.objects.filter(organism=organism, status=1) #only show approved images
@@ -273,7 +273,7 @@ def organism_tags(request, organism):
 
     results = {'tags': tag_list}
     json_results = json.dumps(results)
-    return HttpResponse(json_results, mimetype='application/json')
+    return HttpResponse(json_results, content_type='application/json')
 
 def type_tags(request, org_type):
     org_type = OrganismType.objects.get(id=org_type)
@@ -286,7 +286,7 @@ def type_tags(request, org_type):
 
     results = {'tags': tag_list}
     json_results = json.dumps(results)
-    return HttpResponse(json_results, mimetype='application/json')
+    return HttpResponse(json_results, content_type='application/json')
 
 def save_tags(request, organism):
     #add save tags code here
@@ -336,7 +336,7 @@ class OrgIdentReview(UpdateView):
                 org_ident.identification=review.identification
                 org_ident.save()
             review.save()
-            return HttpResponseRedirect('/review/organism/')
+            return HttpResponseRedirect(reverse('review-list'))
 
     def get_context_data(self, **kwargs):
         context = super(OrgIdentReview, self).get_context_data(**kwargs)
@@ -372,7 +372,7 @@ class ObservationReview(UpdateView):
                 except Organism.DoesNotExist:
                     review.organism = None                      
             review.save()
-            return HttpResponseRedirect('/review/observation/')
+            return HttpResponseRedirect(reverse('review-obs-list'))
 
     def get_context_data(self, **kwargs):
         context = super(ObservationReview, self).get_context_data(**kwargs)
@@ -406,7 +406,7 @@ class ImagesReviewUpdate(UpdateView):
                 image.primary_image=review.primary_image
                 image.save()
             review.save()
-            return HttpResponseRedirect('/review/images/')
+            return HttpResponseRedirect(reverse('review-image-list'))
 
     def get_context_data(self, **kwargs):
         context = super(ImagesReviewUpdate, self).get_context_data(**kwargs)
@@ -446,7 +446,7 @@ class ObservationCreateView(CreateView):
                 else:
                     obj.parent_observation = Observation.objects.get(id=form.data['parent_observation'])
                 obj.save()
-            return HttpResponseRedirect('/observation/')
+            return HttpResponseRedirect(reverse('observation-home'))
 
     def get_context_data(self, **kwargs):
         context = super(ObservationCreateView, self).get_context_data(**kwargs)
@@ -547,7 +547,7 @@ def check_existing(request, search_type, search_value):
                 data = {'obs_id': obs.id, 'location_descr': obs.location_descr, 'comments': obs.comments, 'image' : obs.observation_image.url }#'lat_check': str(obs.latitude), 'lng_check': str(obs.longitude)}
             results.append(data)
     json_results = json.dumps(results)
-    return HttpResponse(json_results, mimetype='application/json')
+    return HttpResponse(json_results, content_type='application/json')
 
 # ****************************************************************** #
 # ********************* location related vws *********************** #
@@ -560,7 +560,7 @@ class LocationCreate(CreateView):
             obj = form.save(commit=False)
             obj.created_by = self.request.user
             obj.save()
-            return HttpResponseRedirect('/location/')
+            return HttpResponseRedirect(reverse('location-home'))
 
     def get_context_data(self, **kwargs):
         context = super(LocationCreate, self).get_context_data(**kwargs)
@@ -691,7 +691,7 @@ class CourseCreateView(CreateView):
             self.object = form.save()
             coursedetail_form.instance = self.object
             coursedetail_form.save()
-            return HttpResponseRedirect('/list/')
+            return HttpResponseRedirect(reverse('list-summary'))
         else:
             return self.render_to_response(self.get_context_data(form=form))
 
@@ -727,7 +727,7 @@ class CourseUpdate(UpdateView):
             obj = form.save(commit=False)
             obj.group = Group.objects.get(id=form.data['group'])
             obj.save()
-            return HttpResponseRedirect('/list/')
+            return HttpResponseRedirect(reverse('list-summary'))
 
     def get_context_data(self, **kwargs):
         context = super(CourseUpdate, self).get_context_data(**kwargs)
@@ -765,7 +765,7 @@ def copy_list(request, course):
         for detail in course_detail:
             new_course_detail = CourseDetail(course=new_course, organism=detail.organism)
             new_course_detail.save()
-    return HttpResponseRedirect('/list/')
+    return HttpResponseRedirect(reverse('list-summary'))
 
 # ****************************************************************** #
 # ********************* groups related views *********************** #
@@ -802,7 +802,7 @@ class GroupCreateView(CreateView):
             obj = form.save(commit=False)
             obj.owner = self.request.user
             obj.save()
-            return HttpResponseRedirect('/edit/group/' + str(obj.id) + '/')
+            return HttpResponseRedirect(reverse('group-edit', args=(str(obj.id),)))
 
 def delete_group(request, pk):
     group_owner = Group.objects.select_related().get(id=pk)
@@ -909,7 +909,7 @@ class UserSettingsView(UpdateView):
             except:
                 obj.private = False
             obj.save()
-            return HttpResponseRedirect('/accounts/profile/' + str(self.request.user.username) + '/')        
+            return HttpResponseRedirect(reverse('user-profile', args=(str(self.request.user.username),)))
 
 class UserDetailView(DetailView):
     template_name='nature/base_profile.html'
@@ -929,12 +929,12 @@ def get_invite_list(request, user):
     invites = GroupUsers.objects.select_related().filter(user=user, status=2).values('group__name', 'group__id', 'user__id')
     invites = list(invites)
     json_results = json.dumps(invites)
-    return HttpResponse(json_results, mimetype='application/json')
+    return HttpResponse(json_results, content_type='application/json')
 
 def get_invite_count(request, user):
     invites = GroupUsers.objects.filter(user=user, status=2).aggregate(total_invites=Count('id'))
     json_results = json.dumps(invites)
-    return HttpResponse(json_results, mimetype='application/json')
+    return HttpResponse(json_results, content_type='application/json')
 
 def login(request):
     if 'username' in request.POST:
@@ -950,7 +950,7 @@ def login(request):
         else:
             return HttpResponse('2') #invalid login
     else:
-        return HttpResponseRedirect('/noresults/')
+        return HttpResponseRedirect(reverse('no-results'))
 
 # ****************************************************************** #
 # ********************* global/user stats vw *********************** #
@@ -971,7 +971,7 @@ class StatsView(ListView):
 
 def export_obs(request):
     # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment;filename="observations.txt"'
 
     observations = Observation.objects.select_related().filter(user=request.user)

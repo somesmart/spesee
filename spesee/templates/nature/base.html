@@ -9,7 +9,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </a>
-      <a class="brand" href="/"><img src="{% static 'tree_deciduous.png' %}"> SpeSee</a>
+      <a class="brand" href="{% url 'home-page'%}"><img src="{% static 'tree_deciduous.png' %}"> SpeSee</a>
       <div class="nav-collapse collapse">
         <ul class="nav">
           <li class="dropdown {% if 'observation' in request.path and not 'discover' in request.path %} active {% endif %}">
@@ -143,12 +143,17 @@ function getInviteList(){
     });
   }
 function respondInvite(item_id, response){
+  var django_url = "{% url 'group-invite-response' 1 2 %}";
+  django_url = django_url.replace('1', item_id);
+  django_url = django_url.replace('2', response);
+  alert(django_url);
   $.ajax({
       type: "GET",
-      url: "/accounts/invites/" + item_id + "/" + response + "/",
+      url: django_url,
       success: function(data){
             //empty and reload the invite list
             var count = $("#invites").html();
+            alert(count);
             if(count>0){
               count = count-1;
               $("#invites").empty().append(count);
@@ -208,12 +213,14 @@ $(function() {
     event.preventDefault();
   });
   $("#search").autocomplete({
-      source: "{% url 'autocomplete' %}?search=organism",
+      source: "{% url 'nature-autocomplete' %}?search=organism",
       minLength: 3,
       select: function(event, ui) {
         // $('#search_url').val(ui.item.id);
         // $('#search').val(ui.item.label);
-        window.location.href = "/organism/" + ui.item.id;
+        var django_url = "{% url 'organism-view' 1 %}";
+        django_url = django_url.replace('1', ui.item.id);
+        window.location.href = django_url;
       }
     });
 })

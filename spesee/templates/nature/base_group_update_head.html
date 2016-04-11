@@ -30,7 +30,7 @@ $(function() {
   $("#id_group").parent().parent().hide();
   $("#add_group").hide();
   $("#selector").autocomplete({
-      source: "{% url 'autocomplete' %}?search=user",
+      source: "{% url 'nature-autocomplete' %}?search=user",
       minLength: 3,
       select: function(event, ui) {
         $('#user_id').val(ui.item.id);

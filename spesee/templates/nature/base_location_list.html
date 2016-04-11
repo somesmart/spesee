@@ -3,9 +3,17 @@
 {% block app.scripts %}
 <script type ="text/javascript">
 function deleteItem(item_id){
+  {% if location_list %}
+  {% for location in location_list %}
+  {% if forloop.first %}
+  var django_url = "{% url 'location-delete' location.id %}";
+  django_url = django_url.replace('6', item_id);
+  {% endif %}
+  {% endfor %}
+  {% endif %}
   $.ajax({
       type: "GET",
-      url: "/delete/location/"+ item_id +"/",
+      url: django_url,
       success: function(data){
             $("." + item_id).remove();
           }

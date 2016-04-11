@@ -104,7 +104,7 @@ urlpatterns = patterns('',
     url(r'^accounts/invites/count/(?P<user>\d+)/$', 'nature.views.get_invite_count', name='invite-count'),
     url(r'^accounts/invites/list/(?P<user>\d+)/$', 'nature.views.get_invite_list', name='invite-list'),
     #accept/reject the invitation
-    url(r'^accounts/invites/(?P<group>\d+)/(?P<response>\d+)/$', 'nature.views.group_invite_response'),
+    url(r'^accounts/invites/(?P<group>\d+)/(?P<response>\d+)/$', 'nature.views.group_invite_response', name='group-invite-response'),
     #all other accounts/ url functions go to the registration module
     url(r'^accounts/', include('registration.backends.hmac.urls')),
     #list/ is for lists/courses
@@ -145,9 +145,9 @@ urlpatterns = patterns('',
     url(r'^add/location/$', login_required(LocationCreate.as_view(template_name='nature/base_location_form.html')), name='location-add'),
     url(r'^edit/location/(?P<pk>\d+)/$', login_required(LocationUpdate.as_view(template_name='nature/base_location_update.html'))),
     #this will delete an entire location
-    url(r'^delete/location/(?P<pk>\d+)/$', 'nature.views.delete_location'),
+    url(r'^delete/location/(?P<pk>\d+)/$', 'nature.views.delete_location', name='location-delete'),
     #automplete all pass to the same view
-    url(r'autocomplete/$','nature.views.autocomplete', name='autocomplete'),
+    url(r'^autocomplete/$','nature.views.autocomplete', name='nature-autocomplete'),
     
     ###################################################
     ################ re-enable ########################
