@@ -13,6 +13,8 @@
   - django.contrib.messages
   - django.contrib.staticfiles
   - django.contrib.admin
+  - djangojs
+  - django_comments
   - haystack
   - registration
   - tagging

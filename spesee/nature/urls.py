@@ -36,11 +36,11 @@ urlpatterns = patterns('',
     url(r'^test/organism/(?P<pk>\d+)/', OrganismViewTest.as_view(), name='organism-view-test'),
     #/check for existing obs for that org/lat/lng
     url(r'^check/(?P<search_type>\w+)/(?P<search_value>\d+)/', 'nature.views.check_existing', name='check-existing'),
-    url(r'^review/$', ReviewHome.as_view(), name='review-home'),
+    url(r'^review/$', ReviewHome.as_view(), name='nature-review-home'),
     #list organism changes to be reviewed
-    url(r'^review/organism/$', OrgIdentReviewList.as_view(), name='review-list'),
+    url(r'^review/organism/$', OrgIdentReviewList.as_view(), name='review-organism-list'),
     #specific item to be reviewed
-    url(r'^review/organism/(?P<pk>\d+)/$', OrgIdentReview.as_view(), name='review-organism'),
+    url(r'^review/organism/(?P<pk>\d+)/$', OrgIdentReview.as_view(), name='review-organism-view'),
     #obs to be reviewed
     url(r'^review/observation/$', ObservationReviewList.as_view(), name='review-obs-list'),
     #specific obs to be reviewed
@@ -120,7 +120,7 @@ urlpatterns = patterns('',
     #edit the list
     url(r'^edit/list/(?P<pk>\d+)/$', login_required(CourseUpdate.as_view(template_name='nature/base_course_update.html')), name='course-edit'),
     #this will delete a single organism from a list
-    url(r'^delete/list/item/(?P<pk>\d+)/$', 'nature.views.delete_list_item'),
+    url(r'^delete/list/item/(?P<pk>\d+)/$', 'nature.views.delete_list_item', name='delete-course-item'),
     #this will delete an entire list
     url(r'^delete/list/(?P<pk>\d+)/$', 'nature.views.delete_list', name='delete-list'),
     #group/ is for a specific group

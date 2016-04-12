@@ -5,12 +5,12 @@
 {% endblock %}
 {% block title %}Edit Your List {% endblock title %}
 {% block app.scripts %}
-<script type="text/javascript" src="{% static 'js/colorbox/jquery.colorbox-min.js' %}"></script>
+<script type="text/javascript" src="{% static 'colorbox/jquery.colorbox-min.js' %}"></script>
 <script type ="text/javascript">
 function deleteItem(item_id){
   $.ajax({
       type: "GET",
-      url: "/delete/list/item/"+ item_id +"/",
+      url: Django.url('delete-course-item', item_id),
       success: function(){
             $("." + item_id).remove();
           }
@@ -19,7 +19,7 @@ function deleteItem(item_id){
 function addItem(course, organism, common_name){
   $.ajax({
     type: "GET",
-    url: "/add/list/" + course + "/item/" + organism + "/",
+    url: Django.url('course-add-item', course, organism),
     success: function(data){
       var new_item_id = data;
       var htmlData = "<tr class='" + new_item_id + "'><td>" + common_name + "</td><td><a href='#' class='btn btn-danger btn-mini note'><i id='" + new_item_id + "' class='delete icon-remove icon-white'></i></a></td></tr>";

@@ -54,7 +54,7 @@
             <ul class="dropdown-menu">
               <li><a href="{% url 'user-profile' user.username %}">Profile</a></li>
               {% if perms.nature.add_orgidentificationreview %}
-              <li><a href="{% url 'review-home' %}">Review</a></li>
+              <li><a href="{% url 'nature-review-home' %}">Review</a></li>
               {% endif %}
               <li><a href="{% url 'account-logout' %}">Logout</a></li>
             </ul>
@@ -113,7 +113,6 @@
 </div> <!-- /container -->
 {% endblock body %}
 {% block base.scripts %}
-{% load js %}
 {% if user.is_authenticated %}
 <script type="text/javascript">
 function getInvites(){

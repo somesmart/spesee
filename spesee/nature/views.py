@@ -336,7 +336,7 @@ class OrgIdentReview(UpdateView):
                 org_ident.identification=review.identification
                 org_ident.save()
             review.save()
-            return HttpResponseRedirect(reverse('review-list'))
+            return HttpResponseRedirect(reverse('review-organism-list'))
 
     def get_context_data(self, **kwargs):
         context = super(OrgIdentReview, self).get_context_data(**kwargs)

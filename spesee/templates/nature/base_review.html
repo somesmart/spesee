@@ -3,7 +3,7 @@
 {% block content %}
 {% if perms.nature.add_orgidentificationreview %}
 	{% if organism_count %}
-		<p><span class="badge badge-info">{{ organism_count.total_pending }}</span> Organisms with <a href="{% url 'review-list' %}">pending changes.</a></p>
+		<p><span class="badge badge-info">{{ organism_count.total_pending }}</span> Organisms with <a href="{% url 'review-organism-list' %}">pending changes.</a></p>
 	{% endif %}
 	{% if image_count %}
 		<p><span class="badge badge-info">{{ image_count.total_pending }}</span> new images <a href="{% url 'review-image-list' %}">pending review.</a></p>
