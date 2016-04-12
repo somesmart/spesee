@@ -1,9 +1,9 @@
 {% extends "nature/base.html" %}
-
+{% load staticfiles %}
 {% block title %}Edit your Location{% endblock title %}
 {% block app.scripts %}
 <!-- Load TinyMCE -->
-<script type="text/javascript" src="{{ MEDIA_URL }}js/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="{% static 'js/tiny_mce/tiny_mce.js' %}"></script>
 <script type="text/javascript">
 tinyMCE.init({
   mode: "textareas",

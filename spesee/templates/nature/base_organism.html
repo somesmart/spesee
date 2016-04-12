@@ -1,8 +1,9 @@
 {% extends "nature/base.html" %}
+{% load staticfiles %}
 {% load tagging_tags %}
 {% block app.css %}
-<link rel="stylesheet" href="{{ STATIC_URL }}nature/css/colorbox/colorbox.css">
-<link rel="stylesheet" href="{{ STATIC_URL }}nature/css/tagmanager/bootstrap-tagmanager.css">
+<link rel="stylesheet" href="{% static 'nature/css/colorbox/colorbox.css' %}">
+<link rel="stylesheet" href="{% static 'nature/css/tagmanager/bootstrap-tagmanager.css' %}">
 {% endblock %}
 {% block title %}{{ organism.common_name }}{% endblock %}
 {% block content %}
@@ -82,7 +83,7 @@
             <td>{{ observation.comments}}</td>
             <td>{{ observation.location_descr }}</td>
             <td>{{ observation.quantity }}</td>
-            <td><a href="{{ observation.get_absolute_url }}">Details</td>
+            <td><a href="{% url 'observation-detail' observation.id %}">Details</td>
           </tr>
         {% else %}
           {% if observation.user.id == user.id and observation.parent_observation %}
@@ -93,7 +94,7 @@
               <td>{{ observation.comments}}</td>
               <td>{{ observation.location_descr }}</td>
               <td>{{ observation.quantity }}</td>
-              <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}<a href="{{ observation.get_absolute_url }}">Details</td>
+              <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}<a href="{% url 'observation-detail' observation.id %}">Details</td>
             </tr>
           {% endif %}
         {% endif %}
@@ -112,11 +113,11 @@
   <div id="map_canvas" class="span12"></div>
   {% endblock right-content %}
 {% block app.scripts %}
-<script src="{{ MEDIA_URL }}jquery.formset.js"></script>
-<script type="text/javascript" src="{{ MEDIA_URL }}js/tagmanager/bootstrap-tagmanager.js"></script>
+<script src="{% static 'jquery.formset.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/tagmanager/bootstrap-tagmanager.js' %}"></script>
   <!-- Source -->
-  <script type="text/javascript" src="{{ MEDIA_URL }}js/tiny_mce/tiny_mce.js"></script>
-  <script type="text/javascript" src="{{ MEDIA_URL }}js/colorbox/jquery.colorbox.js"></script>
+  <script type="text/javascript" src="{% static 'js/tiny_mce/tiny_mce.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/colorbox/jquery.colorbox.js' %}"></script>
   <script>
   function setup() {
   tinyMCE.init({

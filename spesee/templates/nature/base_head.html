@@ -35,6 +35,8 @@
 <!-- Placed at the end of the document so the pages load faster -->
     <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
+    {% load js %}
+    {% django_js jquery=false i18n=false csrf=false %}
     {% block app.scripts %}{% endblock %}
     {% block base.scripts %}{% endblock %}
     {% block map.scripts %}{% endblock %}

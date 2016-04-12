@@ -1,10 +1,11 @@
 {% extends "nature/base.html" %}
+{% load staticfiles %}
 {% block app.css %}
-<link rel="stylesheet" href="{{ STATIC_URL }}nature/css/colorbox/colorbox.css">
+<link rel="stylesheet" href="{% static 'nature/css/colorbox/colorbox.css' %}">
 {% endblock %}
 {% block title %}Edit Your List {% endblock title %}
 {% block app.scripts %}
-<script type="text/javascript" src="{{ MEDIA_URL }}js/colorbox/jquery.colorbox-min.js"></script>
+<script type="text/javascript" src="{% static 'js/colorbox/jquery.colorbox-min.js' %}"></script>
 <script type ="text/javascript">
 function deleteItem(item_id){
   $.ajax({
@@ -37,7 +38,7 @@ $(function() {
   $("#add_group").hide();
   {% endif %}
   $("#selector").autocomplete({
-      source: "{% url 'autocomplete' %}?search=organism",
+      source: "{% url 'nature-autocomplete' %}?search=organism",
       minLength: 3,
       select: function(event, ui) {
         $('#organism_id').val(ui.item.id);
@@ -77,7 +78,7 @@ $(function() {
 {% block content %}
   {% if course.user.id == user.id %} 
     {% if perms.nature.add_course %}
-        <h3>Edit your custom list</h3><a href="{{ course.get_absolute_url }}">Back to the list</a>
+        <h3>Edit your custom list</h3><a href="{% url 'course-view' course.id %}">Back to the list</a>
         <form action="" method="post" class="form-horizontal">
           <div class="form-row">
             {{ form.title.label_tag }}
@@ -88,7 +89,7 @@ $(function() {
           {{ form.as_table }}
            <tr id="current_group">
             <th><label for "current_group">Current Group:</label></th>
-            <td><a href="{{ course.group.get_absolute_url }}{{ course.group|slugify }}">{{ course.group }}</a></td>
+            <td><a href="{% url 'group-view' course.group.id %}{{ course.group|slugify }}">{{ course.group }}</a></td>
           </tr>
            <tr >
             <th><label for="id_group">Change Group:</label></th>

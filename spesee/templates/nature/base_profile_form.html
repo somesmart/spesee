@@ -5,7 +5,7 @@
 <script type="text/javascript">
      $(function() {
           $("#zip_code").autocomplete({
-            source: "{% url 'autocomplete' %}?search=zip",
+            source: "{% url 'nature-autocomplete' %}?search=zip",
             minLength: 3,
             select: function(event, ui) {
               $('#id_zipcode').val(ui.item.id);

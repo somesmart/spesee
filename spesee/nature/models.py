@@ -22,8 +22,6 @@ class OrganismType(models.Model):
 	description = models.CharField(max_length=200)
 	def __unicode__(self):
 		return self.description
-	def get_absolute_url(self):
-		return "/type/%i/" % self.id 	
 
 class TypeTag(models.Model):
 	tag = models.ForeignKey(Tag)
@@ -137,17 +135,6 @@ class Organism(models.Model):
 	#habitat_descr = models.TextField('habitat description', blank=True) no longer needed
 	#image = models.ImageField(upload_to='photos/%Y/%m/%d', blank=True) no longer needed
 
-	def get_absolute_url(self):
-		return "/organism/%i/" % self.id 
-	def get_edit_url(self):
-		return	"/edit/organism/%i/" % self.id 
-	def get_map_url(self):
-		return "/map/organism/%i/" % self.id
-	def get_add_ident(self):
-		return "/add/organism/ident/%i/" % self.id
-	def get_edit_ident(self):
-		return "/edit/organism/ident/%i/" % self.id
-
 	def __unicode__(self):
 		return u"%s (%s)" % (self.common_name, self.latin_name)
 
@@ -163,8 +150,6 @@ class OrgIdentification(models.Model):
 	organism = models.OneToOneField(Organism, related_name='org_ident')
 	identification = models.TextField(blank=True)
 	#may want to add "last edit date, last edit user, etc"?
-	def get_absolute_url(self):
-		return "/organism/%i/" % self.organism.id
 	def __unicode__(self):
 		return self.identification
 
@@ -217,13 +202,6 @@ class Location(models.Model):
 	def __unicode__(self):
 		return self.name
 
-	def get_absolute_url(self):
-		return "/location/%i/" % self.id
-	def get_edit_url(self):
-		return "/edit/location/%i/" % self.id
-	def get_map_url(self):
-		return "/map/location/%i/" % self.id
-
 #need to add a model/way to subscribe or follow other people's locations
 
 #store the regions where an organism can be found
@@ -262,14 +240,6 @@ class Observation(models.Model):
 		return self.location_descr
 	def __unicode__(self):
 		return self.comments	
-	def get_absolute_url(self):
-		return "/observation/%i/" % self.id 	
-	def get_edit_url(self):
-		return "/edit/observation/%i/" % self.id
-	def get_map_url(self):
-		return "/map/observation/%i/" % self.id
-	# def get_add_specific_url(self):
-	# 	return "/observation/?org=%i/" % self.id
 
 #stores the unknown observation so others can review it later
 class ObservationUnknown(models.Model):
@@ -344,10 +314,6 @@ class Group(models.Model):
 	owner = models.ForeignKey(User, related_name='+')
 	def __unicode__(self):
 		return self.name
-	def get_add_url(self):
-		return "/add/group/"
-	def get_absolute_url(self):
-		return "/group/%i/" % self.id 
 
 class GroupUsers(models.Model):
 	user = models.ForeignKey(User, related_name='+')
@@ -371,16 +337,6 @@ class Course(models.Model):
 		return self.course_name
 	def __unicode__(self):
 		return self.course_descr
-	def get_absolute_url(self):
-		return "/list/%i/" % self.id 	
-	def get_edit_url(self):
-		return "/edit/list/%i/" % self.id
-	def get_delete_url(self):
-		return "/delete/list/%i/" % self.id	
-	def get_add_url(self):
-		return "/add/list/"
-	def get_map_url(self):
-		return "/map/list/%i/" % self.id
 #may want to add something to the course set to record status, where status could be "Active", "Inactive" or "Complete"		
 
 #stores the course detail (organisms in a course)
@@ -404,7 +360,3 @@ class UserSettings(models.Model):
 	private = models.BooleanField()
 	class Meta:
 		verbose_name_plural = "user settings"
-	def get_absolute_url(self):
-		return "/accounts/profile/%i/" % self.id
-	def get_edit_url(self):
-		return "/accounts/profile/%i/edit/" % self.id

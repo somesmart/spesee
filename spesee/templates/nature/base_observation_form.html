@@ -1,8 +1,8 @@
 {% extends "nature/base.html" %}
-
+{% load staticfiles %}
 {% block title %}Add an Observation{% endblock title %}
 {% block app.scripts %}
-<script src="{{ MEDIA_URL }}js/jquery-ui-timepicker-addon.js"></script>
+<script src="{% static 'js/jquery-ui-timepicker-addon.js' %}"></script>
 <script type="text/javascript">
 function check_existing(organism, lat, lng){
   $.ajax({
@@ -32,7 +32,7 @@ function check_existing(organism, lat, lng){
   }
 $(function() {
     $("#common_name").autocomplete({
-      source: "{% url 'autocomplete' %}?search=organism",
+      source: "{% url 'nature-autocomplete' %}?search=organism",
       minLength: 3,
       select: function(event, ui) {
         $('#id_organism').val(ui.item.id);

@@ -12,12 +12,13 @@ import nature.signals
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    url(r'^djangojs/', include('djangojs.urls')),
     #home page
     url(r'^$', IndexListView.as_view(), name='home-page'),
     #about page
     url(r'^about/$', TemplateView.as_view(template_name = 'nature/base_about.html'), name='about-page'),
     #organism type details
-    url(r'^type/(?P<pk>\d+)/',DetailView.as_view(model=OrganismType, template_name='nature/type.html')),
+    url(r'^type/(?P<pk>\d+)/',DetailView.as_view(model=OrganismType, template_name='nature/type.html'), name='type-view'),
     #list of types
     url(r'^type/', ListView.as_view(model=OrganismType, context_object_name='type_list', template_name='nature/base_type.html')),
     #org tag types
@@ -111,13 +112,13 @@ urlpatterns = patterns('',
     url(r'^list/(?P<pk>\d+)/', login_required(CourseView.as_view()), name='course-view'),
     url(r'^list/$', login_required(CourseList.as_view()), name='course-list'),
     #add/list/ is to create a new list
-    url(r'^add/list/$', login_required(CourseCreateView.as_view(template_name='nature/base_course_create.html')), name='list-add'),
+    url(r'^add/list/$', login_required(CourseCreateView.as_view(template_name='nature/base_course_create.html')), name='course-add'),
     #add a single item to an existing list
-    url(r'^add/list/(?P<course>\d+)/item/(?P<organism>\d+)/$', 'nature.views.add_list_item'),
+    url(r'^add/list/(?P<course>\d+)/item/(?P<organism>\d+)/$', 'nature.views.add_list_item', name='course-add-item'),
     #copy someone else's list to your userid
-    url(r'^copy/list/(?P<course>\d+)/$', 'nature.views.copy_list', name='list-copy'),
+    url(r'^copy/list/(?P<course>\d+)/$', 'nature.views.copy_list', name='course-copy'),
     #edit the list
-    url(r'^edit/list/(?P<pk>\d+)/$', login_required(CourseUpdate.as_view(template_name='nature/base_course_update.html')), name='location-edit'),
+    url(r'^edit/list/(?P<pk>\d+)/$', login_required(CourseUpdate.as_view(template_name='nature/base_course_update.html')), name='course-edit'),
     #this will delete a single organism from a list
     url(r'^delete/list/item/(?P<pk>\d+)/$', 'nature.views.delete_list_item'),
     #this will delete an entire list
@@ -132,18 +133,18 @@ urlpatterns = patterns('',
     #edit the group
     url(r'^edit/group/(?P<pk>\d+)/$', login_required(GroupUpdate.as_view(template_name='nature/base_group_update_head.html')), name='group-edit'),
     #this will delete a single organism from a group
-    url(r'^delete/group/user/(?P<pk>\d+)/$', 'nature.views.delete_group_user'),
+    url(r'^delete/group/user/(?P<pk>\d+)/$', 'nature.views.delete_group_user', name='group-delete-user'),
     #this will delete an entire group
-    url(r'^delete/group/(?P<pk>\d+)/$', 'nature.views.delete_group'),
+    url(r'^delete/group/(?P<pk>\d+)/$', 'nature.views.delete_group', name='group-delete'),
     #this gets a list of groups for the user
-    url(r'^group/user/(?P<user>\d+)/$', 'nature.views.get_user_groups'),
+    url(r'^group/user/(?P<user>\d+)/$', 'nature.views.get_user_groups', name='group-user-list'),
     #this is how we could do passing the type of map (zip code) then the search value (zip pk)
     url(r'^map/(?P<maptype>\w+)/(?P<pk>\d+)/$', MapView.as_view(), name='map-data'),
     #location/ is for locations
     url(r'^location/(?P<pk>\d+)/', LocationView.as_view(), name='location-view'),  
     url(r'^location/$', LocationList.as_view(template_name='nature/base_location_list.html'), name='location-home'),
     url(r'^add/location/$', login_required(LocationCreate.as_view(template_name='nature/base_location_form.html')), name='location-add'),
-    url(r'^edit/location/(?P<pk>\d+)/$', login_required(LocationUpdate.as_view(template_name='nature/base_location_update.html'))),
+    url(r'^edit/location/(?P<pk>\d+)/$', login_required(LocationUpdate.as_view(template_name='nature/base_location_update.html')), name='location-edit'),
     #this will delete an entire location
     url(r'^delete/location/(?P<pk>\d+)/$', 'nature.views.delete_location', name='location-delete'),
     #automplete all pass to the same view

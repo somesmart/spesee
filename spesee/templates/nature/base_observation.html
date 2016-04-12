@@ -1,6 +1,7 @@
 {% extends "nature/base.html" %}
+{% load staticfiles %}
 {% block app.css %}
-<link rel="stylesheet" href="{{ STATIC_URL }}nature/css/colorbox/colorbox.css">
+<link rel="stylesheet" href="{% static 'nature/css/colorbox/colorbox.css' %}">
 {% endblock %}
 {% block title %}{{ observation.organism.common_name }}{% endblock %}
 {% block content %}
@@ -9,7 +10,7 @@
 			<a href="https://twitter.com/share" class="twitter-share-button" data-related="jasoncosta" data-lang="en" data-size="large" data-count="horizontal" data-text="I found a {{ observation.organism.common_name }}:">Tweet</a>
 			<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 		</span>
-	<h1><a href="{{ observation.organism.get_absolute_url }}{{ observation.organism.common_name|slugify}}/">{{ observation.organism.common_name }}</a></h1>
+	<h1><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify}}/">{{ observation.organism.common_name }}</a></h1>
     </div>
 	<table class="table">
 		<tr>
@@ -50,7 +51,7 @@
 	{% endif %}
 	{% if observation.user.id == user.id %} 
     	{% if perms.observation.can_change %}
-			<p><a class="btn pull-right" href="{{ observation.get_edit_url }}"><i class="icon-wrench"></i> Edit Observation</a></p>
+			<p><a class="btn pull-right" href="{% url 'edit-observation' observation.id %}"><i class="icon-wrench"></i> Edit Observation</a></p>
 		{% endif %}
 	{% endif %}
 {% endblock content %}
@@ -64,7 +65,7 @@
     {% endwith %}
 {% endblock right-content %}
 {% block app.scripts %}
-<script type="text/javascript" src="{{ MEDIA_URL }}js/colorbox/jquery.colorbox.js"></script>
+<script type="text/javascript" src="{% static 'js/colorbox/jquery.colorbox.js' %}"></script>
 <script>
 $(function() {
 	jQuery(".cboxPicture").colorbox({maxwidth:"60%", maxHeight:"80%"});

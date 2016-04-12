@@ -27,7 +27,7 @@
             <ul class="dropdown-menu">
               <li><a href="{% url 'course-list' %}">My Lists</a></li>
               <li><a href="{% url 'group-list' %}">My Groups</a></li>
-              <li><a href="{% url 'list-add' %}"><i class="icon-plus"></i> List</a></li>
+              <li><a href="{% url 'course-add' %}"><i class="icon-plus"></i> List</a></li>
             </ul>
           </li>
           <li {% if request.path == '/location/' %} class="active" {% endif %}><a href="{% url 'location-home' %}">Locations</a></li>
@@ -113,6 +113,7 @@
 </div> <!-- /container -->
 {% endblock body %}
 {% block base.scripts %}
+{% load js %}
 {% if user.is_authenticated %}
 <script type="text/javascript">
 function getInvites(){
@@ -143,13 +144,9 @@ function getInviteList(){
     });
   }
 function respondInvite(item_id, response){
-  var django_url = "{% url 'group-invite-response' 1 2 %}";
-  django_url = django_url.replace('1', item_id);
-  django_url = django_url.replace('2', response);
-  alert(django_url);
   $.ajax({
       type: "GET",
-      url: django_url,
+      url: Django.url('group-invite-response', item_id, response),
       success: function(data){
             //empty and reload the invite list
             var count = $("#invites").html();
@@ -218,9 +215,7 @@ $(function() {
       select: function(event, ui) {
         // $('#search_url').val(ui.item.id);
         // $('#search').val(ui.item.label);
-        var django_url = "{% url 'organism-view' 1 %}";
-        django_url = django_url.replace('1', ui.item.id);
-        window.location.href = django_url;
+        window.location.href = Django.url('organism-view', ui.item.id);
       }
     });
 })

@@ -37,7 +37,7 @@ $(function() {
    </tr>
    {% for inv in group_invites %}
    <tr class="{{ inv.group.id }}">
-     <td><a href="{{ inv.group.get_absolute_url }}">{{ inv.group }}</a></td>
+     <td><a href="{{% url 'group-view' inv.group.id %}}">{{ inv.group }}</a></td>
      <td><a id="{{ inv.group.id }}" class="accept btn btn-primary btn-small" href=""><i class="icon-ok icon-white"></i> Accept</a><a id="{{ inv.group.id }}" class="reject btn btn-danger btn-small" href=""><i class="icon-remove icon-white"></i> Reject</a></td>
    </tr>
    {% endfor %}

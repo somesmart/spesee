@@ -5,7 +5,7 @@
 function deleteItem(item_id){
   $.ajax({
       type: "GET",
-      url: "/delete/list/"+ item_id +"/",
+      url: Django.url('delete-list', item_id),
       success: function(data){
             $("." + item_id).remove();
           }
@@ -30,7 +30,7 @@ $('.note_copy').tooltip({ title: 'Copy List', placement: 'right' });
 {% if course_list %}
     <ul>
     {% for course in course_list %}
-        <li class="{{ course.id }}"><a href="{{ course.get_absolute_url }}">{{ course.course_name }}</a> - {{ course.course_descr }} <a class="btn btn-mini note_edit" href="{{ course.get_edit_url }}"><i class="icon-edit"></i></a> <a class="btn btn-mini btn-danger note_delete" href="#"><i id="{{ course.id }}" class="delete icon-remove icon-white"></i></a> <a class="btn btn-mini note_copy" href="{% url 'list-copy' course.id %}"><i class="icon-share"></i></a></li>
+        <li class="{{ course.id }}"><a href="{% url 'course-view' course.id %}">{{ course.course_name }}</a> - {{ course.course_descr }} <a class="btn btn-mini note_edit" href="{% url 'course-edit' course.id %}"><i class="icon-edit"></i></a> <a class="btn btn-mini btn-danger note_delete" href="#"><i id="{{ course.id }}" class="delete icon-remove icon-white"></i></a> <a class="btn btn-mini note_copy" href="{% url 'list-copy' course.id %}"><i class="icon-share"></i></a></li>
         {% comment %}
         need to add a way to get the percent complete for the course at a later date
         <div class="completion thin">
@@ -48,7 +48,7 @@ $('.note_copy').tooltip({ title: 'Copy List', placement: 'right' });
 {% if member_of %}
     <ul>
     {% for course in member_of %}
-        <li class="{{ course.id }}"><a href="{{ course.get_absolute_url }}">{{ course.course_name }}</a> - {{ course.course_descr }}</li>
+        <li class="{{ course.id }}"><a href="{% url 'course-view' course.id %}">{{ course.course_name }}</a> - {{ course.course_descr }}</li>
     {% endfor %}
     </ul>
 {% else %}

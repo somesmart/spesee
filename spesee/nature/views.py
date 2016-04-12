@@ -691,7 +691,7 @@ class CourseCreateView(CreateView):
             self.object = form.save()
             coursedetail_form.instance = self.object
             coursedetail_form.save()
-            return HttpResponseRedirect(reverse('list-summary'))
+            return HttpResponseRedirect(reverse('course-list'))
         else:
             return self.render_to_response(self.get_context_data(form=form))
 
@@ -727,7 +727,7 @@ class CourseUpdate(UpdateView):
             obj = form.save(commit=False)
             obj.group = Group.objects.get(id=form.data['group'])
             obj.save()
-            return HttpResponseRedirect(reverse('list-summary'))
+            return HttpResponseRedirect(reverse('course-list'))
 
     def get_context_data(self, **kwargs):
         context = super(CourseUpdate, self).get_context_data(**kwargs)
@@ -765,7 +765,7 @@ def copy_list(request, course):
         for detail in course_detail:
             new_course_detail = CourseDetail(course=new_course, organism=detail.organism)
             new_course_detail.save()
-    return HttpResponseRedirect(reverse('list-summary'))
+    return HttpResponseRedirect(reverse('course-list'))
 
 # ****************************************************************** #
 # ********************* groups related views *********************** #
@@ -788,7 +788,7 @@ class GroupList(ListView):
     def get_queryset(self):
         return Group.objects.select_related().filter(owner = self.request.user)  
     def get_context_data(self, **kwargs):
-        context = super(GroupList, self).get_context_data(**kwargs)  
+        context = super(GroupList, self).get_context_data(**kwargs)
         context['joined_groups'] = Group.objects.select_related().filter(group_users__user = self.request.user)
         return context
 

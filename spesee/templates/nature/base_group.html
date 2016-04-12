@@ -1,10 +1,11 @@
 {% extends "nature/base.html" %}
+{% load staticfiles %}
 {% block app.css %}
-<link rel="stylesheet" href="{{ STATIC_URL }}nature/css/colorbox/colorbox.css">
+<link rel="stylesheet" href="{% static 'nature/css/colorbox/colorbox.css' %}">
 {% endblock %}
 {% block title %}Group Details{% endblock title %}
 {% block app.scripts %}
-<script type="text/javascript" src="{{ MEDIA_URL }}js/colorbox/jquery.colorbox.js"></script>
+<script type="text/javascript" src="{% static 'js/colorbox/jquery.colorbox.js' %}"></script>
 <script type ="text/javascript">
 function addUser(group, user){
   $.ajax({
@@ -55,7 +56,7 @@ $(function() {
     <h1>Group lists:</h1>
       <ul>
       {% for course in group_lists %}
-        <li><a href="{{ course.get_absolute_url }}">{{ course.course_name }}</a></li>
+        <li><a href="{% url 'course-view' course.id %}">{{ course.course_name }}</a></li>
       {% endfor %}
   {% endif %}
 {% endif %}

@@ -2,7 +2,7 @@
 {% block title %}{{ location.name }} Location Details{% endblock title %}
 {% block content-span%}<div class="span4 offset1">{% endblock %}
 {% block content %}
-<h3>{{ location.name }} - <a class="btn" href="{{ location.get_edit_url }}"><i class="icon-wrench"></i></a></h3>
+<h3>{{ location.name }} - <a class="btn" href="{{% url 'location-edit' location.id %}}"><i class="icon-wrench"></i></a></h3>
 {{ location.description|safe }}
     <div id="org_list">
     	<h3>Location Finds:</h3>

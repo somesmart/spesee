@@ -15,8 +15,8 @@ $(function() {
     {% if observation_list %}
         <dl class="dl-horizontal">
         {% for observation in observation_list %}
-            <dt><a href="{{ observation.get_absolute_url }}">{{ observation.organism }}</a></dt>
-            <dd>{{ observation.observation_date}} - Type: {{ observation.organism.type }} <a class="btn btn-mini note" href="{{ observation.get_edit_url }}"><i class="icon-wrench"></i></a></dd>
+            <dt><a href="{% url 'observation-detail' observation.id %}">{{ observation.organism }}</a></dt>
+            <dd>{{ observation.observation_date}} - Type: {{ observation.organism.type }} <a class="btn btn-mini note" href="{% url 'edit-observation' observation.id %}"><i class="icon-wrench"></i></a></dd>
         {% endfor %}
         </dl>
     {% else %}

@@ -1,4 +1,5 @@
 {% extends "nature/base.html" %}
+{% load staticfiles %}
 {% load zinnia %}
 {% block title %} Welcome to SpeSee {% endblock title %}
 {% block top-content %}
@@ -23,17 +24,17 @@
   <p class="marketing-byline">Need help identifying an organism? Or have tips for others?</p>
   <div class="row-fluid">
     <div class="span4">
-      <img class="marketing-img" src="{{ MEDIA_URL }}simple_tips.jpg">
+      <img class="marketing-img" src="{% static 'simple_tips.jpg' %}">
       <h2>Straightforward Tips</h2>
       <p>Check out other users tips on identifying organisms, structured to help any naturalist with even the toughest identifications, no matter their technical knowledge.</p>
     </div>
     <div class="span4">
-      <img class="marketing-img" src="{{ MEDIA_URL }}list_example.PNG">
+      <img class="marketing-img" src="{% static 'list_example.PNG' %}">
       <h2>Observe together</h2>
       <p>Create lists to share with others, or to help track down those tough to find organisms that others might have seen already.</p>
     </div>
     <div class="span4">
-      <img class="marketing-img" src="{{ MEDIA_URL }}download.png">
+      <img class="marketing-img" src="{% static 'download.png' %}">
       <h2>Liberate your data</h2>
       <p>Your data is yours, so head to your <a href="{% url 'observation-home' %}">observation page</a> and download every observation you've entered in an easy to use and portable format.</p>
     </div>
@@ -47,7 +48,7 @@
             <ul class="unstyled">
             {% for organism in first_ogranisms %}
                 {% if organism.observed > 0 %}
-                <li><a href="{{ organism.get_absolute_url }}{{ organism.common_name|slugify }}">{{ organism.common_name }} ({{ organism.latin_name }}) - {{ organism.observed }}</a> </li>
+                <li><a href="{% url 'organism-view' organism.id %}{{ organism.common_name|slugify }}">{{ organism.common_name }} ({{ organism.latin_name }}) - {{ organism.observed }}</a> </li>
                 {% endif %}
             {% endfor %}
             </ul>

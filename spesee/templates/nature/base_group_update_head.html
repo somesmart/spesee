@@ -5,7 +5,7 @@
 function deleteUser(item_id){
   $.ajax({
       type: "GET",
-      url: "/delete/group/user/"+ item_id +"/",
+      url: Django.url('group-delete-user', item_id),
       success: function(){
             $("." + item_id).remove();
           }
@@ -14,7 +14,7 @@ function deleteUser(item_id){
 function addUser(group, user, username){
   $.ajax({
     type: "GET",
-    url: "/add/group/" + group + "/user/" + user + "/2/",
+    url: Django.url('group-invite', group, user, 2),
     success: function(data){
       var new_user_id = data;
       var htmlData = "<tr class='" + new_user_id + "'><td>" + username + "</td><td>Invited</td><td><a href='#' class='btn btn-mini btn-danger'><i id='" + new_user_id + "' class='delete icon-remove icon-white'></i></a></td></tr>";

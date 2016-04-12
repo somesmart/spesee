@@ -14,7 +14,7 @@ $(function() {
 </script>
 {% endblock %}
 {% block content %}
-	<h2>{{ course.course_name }}: <a class="btn btn-small note_copy pull-right" href="{% url 'list-copy' course.id %}">Copy this List <i class="icon-share"></i></a></h1>
+	<h2>{{ course.course_name }}: <a class="btn btn-small note_copy pull-right" href="{% url 'course-copy' course.id %}">Copy this List <i class="icon-share"></i></a></h1>
 	<h3>{{ course.course_descr }}</h3>
 	<div id="org_list">
 		{% if completion %}
@@ -26,15 +26,15 @@ $(function() {
 		<h3>What you've found:</h3>
 		    <ul class="large_list">
 		    	{% for observation in user_found %}
-		    		<li><a href="{{ observation.organism.get_absolute_url }}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
+		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
 		    	{% endfor %}
 		    </ul>
 	    {% endif %}
 	    {% if group_found %}
-		    <h3>Found by group <a href="{{ course.group.get_absolute_url }}{{ course.group|slugify }}">{{ course.group }}</a>:</h3>
+		    <h3>Found by group <a href="{% url 'group-view' course.group.id %}{{ course.group|slugify }}">{{ course.group }}</a>:</h3>
 	    	<ul class="large_list">
 		    	{% for observation in group_found %}
-		    		<li><a href="{{ observation.organism.get_absolute_url }}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
+		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
 		    	{% endfor %}
 		    </ul>
 	    {% endif %}
@@ -42,7 +42,7 @@ $(function() {
 	    <h3>Found by Others:</h3>
 	    	<ul class="large_list">
 		    	{% for observation in others_found %}
-		    		<li><a href="{{ observation.organism.get_absolute_url }}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
+		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
 		    	{% endfor %}
 		    </ul>
 	    {% endif %}
@@ -50,7 +50,7 @@ $(function() {
 	    <h3>No reported sightings:</h3>
 	    	<ul class="large_list">
 		    	{% for observation in never_found %}
-		    		<li><a href="{{ observation.organism.get_absolute_url }}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
+		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
 		    	{% endfor %}
 		    </ul>
 	    {% endif %}
@@ -64,7 +64,7 @@ $(function() {
 	    {% endif %}
 	</div>
 	{% if course.user.id == user.id %} 
-	<a class="btn pull-right" href="{{ course.get_edit_url }}"><i class="icon-wrench"></i> Edit List</a>
+	<a class="btn pull-right" href="{% url 'course-edit' course.id %}"><i class="icon-wrench"></i> Edit List</a>
 	{% endif %}
 {% endblock content %}
 {% block right-content %}

@@ -3,7 +3,7 @@
     {% if forloop.counter0|divisibleby:"3" %}<div class="row-fluid">{% endif %}  #}{# This opens the new row when the counter is 0 and after every 3rd result #}
    {#  <div class="span4">
       <h5>{{ observation.organism }}</h5>
-      <p>{{ observation.observation_date}} - Type: {{ observation.organism.type }} <a class="btn btn-mini" href="{{ observation.get_edit_url }}">Edit</a></p>
+      <p>{{ observation.observation_date}} - Type: {{ observation.organism.type }} <a class="btn btn-mini" href="{% url 'edit-observation' observation.id %}">Edit</a></p>
       <p><a class="btn btn-mini" href="#">View details »</a></p>
     </div><!--/span-->
     {% if forloop.last or forloop.counter|divisibleby:"3" %}</div>{% endif %} #} {# This closes the row when it is the last result or after every 3rd result #}
