@@ -233,9 +233,9 @@ class Observation(models.Model):
 	quantity = models.IntegerField()
 	observation_image = models.ImageField(upload_to='photos/%Y/%m/%d', blank=True)
 	parent_observation = models.ForeignKey('self', blank=True, default=None, null=True, help_text='The first observation of a static organism', related_name='child_observation')
-	thumbnail = ImageSpecField([Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(50, 50)], source='observation_image', format='JPEG', options={'quality': 90})
-	large_image = ImageSpecField([Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(500, 400)], source='observation_image', format='JPEG', options={'quality': 90})
-	wide_thumb = ImageSpecField([Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(200, 100)], source='observation_image', format='JPEG', options={'quality': 90})
+	thumbnail = ImageSpecField(source='observation_image', processors=[ResizeToFill(50, 50)], format='JPEG', options={'quality': 90})
+	large_image = ImageSpecField(source='observation_image', processors=[ResizeToFill(500, 400)], format='JPEG', options={'quality': 90})
+	wide_thumb = ImageSpecField(source='observation_image', processors=[ResizeToFill(200, 100)], format='JPEG', options={'quality': 90})
 	def __unicode__(self):
 		return self.location_descr
 	def __unicode__(self):
@@ -274,9 +274,9 @@ class Images(models.Model):
         (3, 'Rejected'),
     )
 	org_image = models.ImageField(upload_to=get_image_path, blank=True)
-	thumbnail = ImageSpecField([Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(50, 50)], source='org_image', format='JPEG', options={'quality': 90})
-	large_image = ImageSpecField([Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(500, 400)], source='org_image', format='JPEG', options={'quality': 90})
-	wide_thumb = ImageSpecField([Adjust(contrast=1.2, sharpness=1.1), ResizeToFill(200, 100)], source='org_image', format='JPEG', options={'quality': 90})
+	thumbnail = ImageSpecField(source='org_image', processors=[ResizeToFill(50, 50)], format='JPEG', options={'quality': 90})
+	large_image = ImageSpecField(source='org_image', processors=[ResizeToFill(500, 400)], format='JPEG', options={'quality': 90})
+	wide_thumb = ImageSpecField(source='org_image', processors=[ResizeToFill(200, 100)], format='JPEG', options={'quality': 90})
 	upload_date = models.DateTimeField()
 	upload_user = models.ForeignKey(User, related_name="+")
 	organism = models.ForeignKey(Organism)

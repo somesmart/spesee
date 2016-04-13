@@ -142,7 +142,7 @@
   function get_valid_tags(org_type){
     $.ajax({
       type: "GET",
-      url: '{% url "type-tags" organism.type.id %}',
+      url: '{% url "nature-type-tags" organism.type.id %}',
       success: function(data) {
         var valid_tags = [];
         $(data).each(function(i,val){
@@ -225,7 +225,7 @@
         prefilled: [{% tags_for_object organism as prefilled_tags %}{% for tag in prefilled_tags %}"{{ tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
         preventSubmitOnEnter: true,
         typeahead: true,
-        typeaheadAjaxSource: '{% url "type-tags" organism.type.id %}', 
+        typeaheadAjaxSource: '{% url "nature-type-tags" organism.type.id %}', 
         typeaheadAjaxPolling: false,
         blinkBGColor_1: '#BCE8F1',
         blinkBGColor_2: '#D9EDF7',
@@ -240,7 +240,7 @@
       $('.save-tags').click(function() {
         var new_tags = $('input[name=hidden-tagsjax]').val();
         $.ajax({
-          url: '{% url "save-tags" organism.id %}',
+          url: '{% url "nature-save-tags" organism.id %}',
           type: 'POST',
           data: {
             new_tags: new_tags,

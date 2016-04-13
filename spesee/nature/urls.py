@@ -22,13 +22,13 @@ urlpatterns = patterns('',
     #list of types
     url(r'^type/', ListView.as_view(model=OrganismType, context_object_name='type_list', template_name='nature/base_type.html')),
     #org tag types
-    url(r'^tags/type/(?P<org_type>\d+)/$', 'nature.views.type_tags', name='type-tags'),
+    url(r'^tags/type/(?P<org_type>\d+)/$', 'nature.views.type_tags', name='nature-type-tags'),
     #organism tagging
     url(r'^tags/organism/(?P<organism>\d+)/$', 'nature.views.organism_tags', name='organism-tags'),
     #search tags
-    url(r'^tags/search/(?P<type>[\w]+)/(?P<tag>[\s\w]+)/$',TagListView.as_view(), name='search-tags'),
+    url(r'^tags/search/(?P<type>[\w]+)/(?P<tag>[\s\w]+)/$',TagListView.as_view(), name='nature-search-tags'),
     #save tags
-    url(r'^save/tags/organism/(?P<organism>\d+)/$', 'nature.views.save_tags', name='save-tags'),
+    url(r'^save/tags/organism/(?P<organism>\d+)/$', 'nature.views.save_tags', name='nature-save-tags'),
     #save org ident
     url(r'^save/organism/ident/', 'nature.views.save_org_ident', name='save-org-ident'),
     #/organism/
@@ -71,7 +71,7 @@ urlpatterns = patterns('',
 
     ###################################################
     ################ re-enable ########################
-    #(r'^search/', include('haystack.urls')),
+    # (r'^search/', include('haystack.urls')),
     ###################################################
     ###################################################
 
