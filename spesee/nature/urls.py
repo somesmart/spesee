@@ -71,7 +71,7 @@ urlpatterns = patterns('',
 
     ###################################################
     ################ re-enable ########################
-    # (r'^search/', include('haystack.urls')),
+    (r'^search/', include('haystack.urls')),
     ###################################################
     ###################################################
 
@@ -152,7 +152,7 @@ urlpatterns = patterns('',
     
     ###################################################
     ################ re-enable ########################
-    # url(r'autocomplete/haystack/$', 'nature.views.autocomplete', name='haystack-autocomplete'),
+    url(r'autocomplete/haystack/$', 'nature.views.autocomplete', name='haystack-autocomplete'),
     ###################################################
     ###################################################
 

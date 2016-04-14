@@ -85,7 +85,7 @@
                   <h5>{{ organism.object.organism.common_name }}</h5>
                   <p><em>{{ organism.object.organism.latin_name }}</em></p>
                   <p>Type: {{ organism.object.organism.type }}</p>
-                  <p><a class="btn btn-mini" href="{% url 'observation-detail' organism.object.id %}">View details »</a></p>
+                  <p><a class="btn btn-mini" href="{% url 'organism-view' organism.object.organism.id %}">View details »</a></p>
                 </div>
               </div>
             </li>
