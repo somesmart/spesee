@@ -1,0 +1,276 @@
+{% extends "nature/base.html" %}
+{% load staticfiles %}
+{% load tagging_tags %}
+{% block app.css %}
+<link rel="stylesheet" href="{% static 'nature/css/colorbox/colorbox.css' %}">
+<link rel="stylesheet" href="{% static 'nature/css/tagmanager/bootstrap-tagmanager.css' %}">
+{% endblock %}
+{% block title %}{{ organism.common_name }}{% endblock %}
+{% block content %}
+  <div>
+    <span class="pull-right inline"><a href="https://twitter.com/share" class="twitter-share-button pull-right" data-related="jasoncosta" data-lang="en" data-size="large" data-count="horizontal" data-text="{{ organism.common_name }} identification tips: ">Tweet</a>
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+    </span>
+    <h2>{{ organism.common_name }}</h2>
+  </div>
+  {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+  <!--the csrf_token prevents Cross Site Request Forgeries -->
+  {% csrf_token %}
+  <p>{{ organism.latin_name }} - {{ organism.type }}</p>
+  <div class="tool-box">
+    {% if perms.nature.add_orgidentification %}
+      <div class="well well-small">The content below is entirely editable.</div>
+      <div id="status"></div>
+      <div class="pull-right">
+          <a class="edit btn" href="javascript:setup();"><i class="icon-wrench"></i> Edit</a>
+          <a class="save btn btn-success" style="display:none">Save</a>
+          <a class="cancel btn btn-danger" style="display:none">Cancel</a>
+      </div>
+    {% else %}
+      <span>Please <a href="{% url 'account-login' %}">login</a> to edit the content below</a></span>
+    {% endif %}
+  </div>
+  <div class="row"></div>
+  <div id="tools"></div>
+  <div id="identification" class="content">
+    {% if org_ident %}
+      {{ org_ident.identification|safe }}
+    {% else %}
+      Enter new identification information here.
+    {% endif %}
+  </div>
+  <div class="pull-right">
+    {% if perms.nature.add_images %}
+      {% if new_ident %}
+      <a id="uploader" class="ajax cboxElement upload btn btn-primary" style="display:none" href="{% url 'image-upload' new_ident.org %}">Upload an Image</a>
+      {% else %}
+      <a id="uploader" class="ajax cboxElement upload btn btn-primary" style="display:none" href="{% url 'image-upload' organism.id %}">Upload an Image</a>
+      {% endif %}
+    {% endif %}
+  </div>
+  <div id="image-gallery"></div>
+  <div class="tags span12">
+  <div id="tags-status"></div>
+  <form class="form-inline">
+    <input type="text" autocomplete="off" data-items="6" data-provide="typeahead" name="tagsjax" placeholder="Tags" style="width:9em;" class="input-medium tagManager" data-original-title="">
+    <a class="save-tags btn btn-mini">Save Tags</a>
+  </form>
+  <p class="well well-small"><small>Only valid tags for {{ organism.type }} will be accepted. If you think we are missing a tag, please contact us.</small></p>
+  </div>
+  <hr>
+  <h3>Observations</h3>
+  <small>
+    <table class="table table-hover table-condensed table-striped">
+      <tr>
+        <th></th>
+        <th>Seen by</th>
+        <th>On Date</th>
+        <th>Comments</th>
+        <th>Habitat</th>
+        <th>Qty</th>
+        <th>Link</th>
+      </tr>
+      {% for observation in map_observations %}
+        {% comment %}
+          This only shows a child observation if it is YOUR observation and only shows yoru private observations. Otherwise we just see the master observation for simplicicty's sake
+        {% endcomment %}
+        {% if not observation.parent_observation and not observation.private %}
+            <tr>
+              <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" class="obs-small" >{% endif %}</td>
+              <td>{{ observation.user }}</td>
+              <td>{{ observation.observation_date }}</td>
+              <td>{{ observation.comments}}</td>
+              <td>{{ observation.location_descr }}</td>
+              <td>{{ observation.quantity }}</td>
+              <td><a href="{% url 'observation-detail' observation.id %}">Details</td>
+            </tr>
+        {% else %}
+          {% if observation.user.id == user.id %}
+            {% if observation.private or observation.parent_observation %}
+              <tr>
+                <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}</td>
+                <td>{{ observation.user }}</td>
+                <td>{{ observation.observation_date }}</td>
+                <td>{{ observation.comments}}</td>
+                <td>{{ observation.location_descr }}</td>
+                <td>{{ observation.quantity }}</td>
+                <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}<a href="{% url 'observation-detail' observation.id %}">Details</td>
+              </tr>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </table>
+  </small>
+  <div class="pull-right">
+    <a class="observation btn btn-primary" href="{% url 'add-observation' %}?org={{ organism.id }}"><i class="icon-plus icon-white"></i> Observation</a>
+  </div>
+{% endblock content %}
+{% block right-content %}
+  <div class="span10 offset2">
+    <p class="alert alert-info">Observation Map</p>
+  </div>
+  {% include "nature/include_map.html" %}
+  <div id="map_canvas" class="span12"></div>
+  {% endblock right-content %}
+{% block app.scripts %}
+<script src="{% static 'jquery.formset.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/tagmanager/bootstrap-tagmanager.js' %}"></script>
+  <!-- Source -->
+  <script type="text/javascript" src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+  <script type="text/javascript" src="{% static 'colorbox/jquery.colorbox-min.js' %}"></script>
+  <script>
+  function setup() {
+  tinymce.init({
+    selector: "div#identification",
+    theme: "modern",
+    plugins: [ "link,image,media " ],
+    toolbar: 'undo redo | alignleft aligncenter alignright alignjustify | link image', 
+    extended_valid_elements : "p,h1,h2,h3,h4,h5,ol,ul,li,a[name|href|target|title|alt|class],strong,b,em,i,img[class|src|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name|style],iframe[width|height|src|frameborder|allowfullscreen|align]"
+  });
+}
+  function get_image_list(organism){
+  $.ajax({
+      type: "GET",
+      url: Django.url('image-list', organism),
+      success: function(data){
+            $('#image-gallery').empty();
+            $('#image-gallery').append("<h3>Uploaded Images</h3>");
+            $('#image-gallery').show();
+            $('#image-gallery').append(data);
+          }
+      });
+  }
+  function get_valid_tags(org_type){
+    $.ajax({
+      type: "GET",
+      url: '{% url "nature-type-tags" organism.type.id %}',
+      success: function(data) {
+        var valid_tags = [];
+        $(data).each(function(i,val){
+          $.each(val, function(key,vl){
+            $.each(vl, function(k,v){
+              valid_tags.push(v.tag);
+            });
+          });
+        });
+        return valid_tags;
+      }
+    });
+  }
+    $(function() {
+      $("#image-gallery").on("click", '.image', function() {
+        var image = $(this).attr("rel");
+        $('#image').hide();
+        $('#image').fadeIn('slow');
+        $('#image').html('<img src="' + image + '"/>');
+        return false;
+      });
+
+      {% if user.is_authenticated %}
+      $('.edit').click(function() {
+        $('.edit').hide();
+        $('.save').show();
+        $('.cancel').show();
+        $('.upload').show();
+        get_image_list({% if new_ident %}{{ new_ident.org }}{% else %}{{ organism.id }}{% endif %});
+      });
+      
+      $('.save').click(function() {
+        var ed = tinymce.get('identification');
+        var identification = ed.getContent();
+        var org = '{{ organism.id }}';
+        $.ajax({
+          url: '{% url "save-org-ident" %}',
+          type: 'POST',
+          data: {
+            org: org,
+            identification: identification,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success:function (data) {
+            if (data == '1')
+            {
+              $("#status")
+              .addClass("success")
+              .html("<div class='alert alert-success'>Thank you! Your changes will not be visible until they have been approved by a moderator. <a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
+            }
+            else if (data == '2')
+            {
+              $("#status")
+              .addClass("success")
+              .html("<div class='alert alert-success'>Thank you! Your changes have been applied!<a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
+            }
+            else
+            {
+              $("#status").addClass("error").html("Error, data could not be saved <a href='#'' class='close' data-dismiss='alert'>×</a>").fadeIn('slow');
+            }
+          }
+        });
+        tinymce.EditorManager.execCommand('mceRemoveEditor',true,'identification');
+        $('.edit').show();
+        $('.save').hide();
+        $('.cancel').hide();
+        $('.upload').hide();
+        $('#image-gallery').hide();
+      });
+      $('.cancel').click(function() {
+        tinymce.EditorManager.execCommand('mceRemoveEditor',true,'identification');
+        $('.edit').show();
+        $('.save').hide();
+        $('.cancel').hide();
+        $('.upload').hide();
+        $('#image-gallery').hide();
+      });
+      {% endif %}
+      jQuery(".tagManager").tagsManager({
+        prefilled: [{% tags_for_object organism as prefilled_tags %}{% for tag in prefilled_tags %}"{{ tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+        preventSubmitOnEnter: true,
+        typeahead: true,
+        typeaheadAjaxSource: '{% url "nature-type-tags" organism.type.id %}', 
+        typeaheadAjaxPolling: false,
+        blinkBGColor_1: '#BCE8F1',
+        blinkBGColor_2: '#D9EDF7',
+        org_type: '{{ organism.type }}',
+        validator: function(tag) {
+          valid_tags = [{% for tagtype in organism.type.typetag_set.all %}"{{ tagtype.tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+          if (jQuery.inArray(tag, valid_tags) > "-1"){
+            return true;
+          }
+        }
+      });
+      $('.save-tags').click(function() {
+        var new_tags = $('input[name=hidden-tagsjax]').val();
+        $.ajax({
+          url: '{% url "nature-save-tags" organism.id %}',
+          type: 'POST',
+          data: {
+            new_tags: new_tags,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success:function (data) {
+            if (data == '1')
+            {
+              $("#tags-status")
+              .addClass("success")
+              .html("<div class='alert alert-success'>Your tags have been saved. <a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
+            }
+            else
+            {
+              $("#tags-status").addClass("error").html("Error, data could not be saved. Invalid tags: " + data + " <a href='#'' class='close' data-dismiss='alert'>×</a>").fadeIn('slow');
+            }
+          }
+        });
+      });
+      jQuery(".ajax").colorbox({
+          height:"370px",
+          width:"400px",
+          iframe:true,
+          onClosed:function(){
+            get_image_list({% if new_ident %}{{ new_ident.org }}{% else %}{{ organism.id }}{% endif %}); 
+          } 
+        });
+      jQuery(".cboxPicture").colorbox({maxwidth:"60%", maxHeight:"80%"});
+    });
+  </script>
+{% endblock app.scripts %}  

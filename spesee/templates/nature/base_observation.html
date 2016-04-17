@@ -1,0 +1,74 @@
+{% extends "nature/base.html" %}
+{% load staticfiles %}
+{% block app.css %}
+<link rel="stylesheet" href="{% static 'nature/css/colorbox/colorbox.css' %}">
+{% endblock %}
+{% block title %}{{ observation.organism.common_name }}{% endblock %}
+{% block content %}
+	<div>
+		<span class="pull-right">
+			<a href="https://twitter.com/share" class="twitter-share-button" data-related="jasoncosta" data-lang="en" data-size="large" data-count="horizontal" data-text="I found a {{ observation.organism.common_name }}:">Tweet</a>
+			<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+		</span>
+	<h1><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify}}/">{{ observation.organism.common_name }}</a></h1>
+    </div>
+	<table class="table">
+		<tr>
+			<td>Seen by:</td>
+			<td>{{ observation.user }}</td>
+		</tr>
+		<tr>
+			<td>On:</td>
+			<td>{{ observation.observation_date }}</td>
+		</tr>
+		<tr>
+			<td>Temperature:</td>
+			<td>{{ observation.temperature }}</td>
+		</tr>
+		<tr>
+			<td>Latitude:</td>
+			<td>{{ observation.latitude }}</td>
+		</tr>
+		<tr>
+			<td>Longitude:</td>
+			<td>{{ observation.longitude }}</td>
+		</tr>
+		<tr>
+			<td>Comments:</td>
+			<td>{{ observation.comments }}</td>
+		</tr>
+		<tr>
+			<td>Location Description:</td>
+			<td>{{ observation.location_descr }}</td>
+		</tr>
+		<tr>
+			<td>Quantity:</td>
+			<td>{{ observation.quantity }}</td>
+		</tr>
+	</table>
+	{% if observation.observation_image %}
+		<a href="{{ observation.observation_image.url }}" class="cboxPicture cboxElement"><img src="{{ observation.large_image.url }}" id="observation" class="obs-image"></a>
+	{% endif %}
+	{% if observation.user.id == user.id %} 
+    	{% if perms.observation.can_change %}
+			<p><a class="btn pull-right" href="{% url 'edit-observation' observation.id %}"><i class="icon-wrench"></i> Edit Observation</a></p>
+		{% endif %}
+	{% endif %}
+{% endblock content %}
+{% block right-content %}
+    <div class="span10 offset1">
+        <p class="alert alert-info">Observation Map</p>
+    </div>
+    <div id="map_canvas" class="span11" ></div>
+    {% with observation as single_observation %}
+    {% include "nature/include_map.html" %}
+    {% endwith %}
+{% endblock right-content %}
+{% block app.scripts %}
+<script type="text/javascript" src="{% static 'colorbox/jquery.colorbox.js' %}"></script>
+<script>
+$(function() {
+	jQuery(".cboxPicture").colorbox({maxwidth:"60%", maxHeight:"80%"});
+});
+  </script>
+{% endblock app.scripts %}  

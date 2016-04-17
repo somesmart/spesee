@@ -1,0 +1,11 @@
+{% extends "nature/base.html" %}
+{% block title %}Organism Types{% endblock %}
+{% block content %}
+<h1>Select an Organism Type below</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+<!--the csrf_token prevents Cross Site Request Forgeries -->
+{% for organismtype in type_list %}
+    <p><a href="{% url 'type-view' organismtype.id %}">{{ organismtype.description }}</a></p>
+{% endfor %}
+{% endblock content %}

@@ -1,0 +1,49 @@
+{% extends "nature/base.html" %}
+{% block title %}Invitations{% endblock title %}
+{% block app.scripts %}
+<script type ="text/javascript">
+function respondInvite(item_id, response){
+  $.ajax({
+      type: "GET",
+      url: "/accounts/invites/" + item_id + "/" + response + "/",
+      success: function(data){
+            //the line gets removed either way becuase you responded and the invite is gone.
+            $("." + item_id).remove();
+          }
+      });
+  }
+$(function() {
+  $('.reject').click(function(event){ 
+    //alert(event.target.id);
+    var item_id = event.target.id;
+    respondInvite(item_id, 3);
+    event.preventDefault();
+  });
+  $('.accept').click(function(event){ 
+    //alert(event.target.id);
+    var item_id = event.target.id;
+    respondInvite(item_id, 1);
+    event.preventDefault();
+  });
+});
+</script>
+{% endblock %}
+{% block content %}
+{% if group_invites %}
+ <table class="table table-condensed">
+   <tr>
+     <th>Group</th>
+     <th>Respond</th>
+   </tr>
+   {% for inv in group_invites %}
+   <tr class="{{ inv.group.id }}">
+     <td><a href="{{% url 'group-view' inv.group.id %}}">{{ inv.group }}</a></td>
+     <td><a id="{{ inv.group.id }}" class="accept btn btn-primary btn-small" href=""><i class="icon-ok icon-white"></i> Accept</a><a id="{{ inv.group.id }}" class="reject btn btn-danger btn-small" href=""><i class="icon-remove icon-white"></i> Reject</a></td>
+   </tr>
+   {% endfor %}
+ </table>
+{% else %}
+  <p>You do not have any pending invitations</p>
+{% endif %}
+<p><a href="{% url 'group-list' %}">See your groups</a></p>
+{% endblock content %}

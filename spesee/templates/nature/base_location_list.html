@@ -1,0 +1,38 @@
+{% extends "nature/base.html" %}
+{% block title %}Locations{% endblock %}
+{% block app.scripts %}
+<script type ="text/javascript">
+function deleteItem(item_id){
+  $.ajax({
+      type: "GET",
+      url: Django.url('location-delete', item_id),
+      success: function(data){
+            $("." + item_id).remove();
+          }
+      });
+  }
+$(function() {
+  $('.delete').click(function(event){ 
+    //alert(event.target.id);
+    var location_id = event.target.id;
+    if (confirm('Are you sure you want to delete this location? This cannot be undone.')) {
+      deleteItem(location_id);
+    }
+  });
+});
+</script>
+{% endblock %}
+{% block content %}
+  <h2>Location List:</h2>
+  {% if location_list %}
+      <dl>
+      {% for location in location_list %}
+          <dt class="{{ location.id }}"><a href="{% url 'location-view' location.id %}">{{ location.name }}</a> <a class="btn btn-mini" href="{% url 'location-edit' location.id %}"><i class="icon-wrench icon"></i></a> <a class="btn btn-mini btn-danger" href="#"><i id="{{ location.id }}" class="icon-remove icon-white delete"></i></a></dt>
+          <dd class="{{ location.id }}">{{ location.description|safe }}</dd>
+      {% endfor %}
+      </dl>
+  {% else %}
+      <p>No locations are available.</p>
+  {% endif %}
+  <p><a class="btn btn-primary" href="{% url 'location-add' %}"><i class="icon-plus icon-white"></i> Location</a></p>
+{% endblock content %}

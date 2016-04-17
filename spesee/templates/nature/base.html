@@ -1,0 +1,235 @@
+{% extends "nature/base_head.html" %}
+{% load staticfiles %}
+{% block body %}
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="{% url 'home-page'%}"><img src="{% static 'tree_deciduous.png' %}"> SpeSee</a>
+      <div class="nav-collapse collapse">
+        <ul class="nav">
+          <li class="dropdown {% if 'observation' in request.path and not 'discover' in request.path %} active {% endif %}">
+            <a href="{% url 'observation-home' %}" class="dropdown-toggle" data-toggle="dropdown">Observations <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'discover' 'observation' %}">Browse Observations</a></li>
+              <li class="divider"></li>
+              {# <li class="nav-header">Nav header</li> #}
+              <li><a href="{% url 'observation-home' %}">My Observations</a></li>
+              <li><a href="{% url 'add-observation' %}"><i class="icon-plus"></i> New Observation</a></li>
+            </ul>
+          </li>
+          <li class="dropdown {% if 'list' in request.path %} active {% endif %}">
+            <a href="{% url 'course-list' %}" class="dropdown-toggle" data-toggle="dropdown">Lists <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'course-list' %}">My Lists</a></li>
+              <li><a href="{% url 'group-list' %}">My Groups</a></li>
+              <li><a href="{% url 'course-add' %}"><i class="icon-plus"></i> List</a></li>
+            </ul>
+          </li>
+          <li {% if request.path == '/location/' %} class="active" {% endif %}><a href="{% url 'location-home' %}">Locations</a></li>
+          <li class="dropdown {% if 'discover' in request.path %} active {% endif %}">
+            <a href="/discover/" class="dropdown-toggle" data-toggle="dropdown">Discover <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'discover' 'organism' %}">Browse Organisms</a></li>
+              <li><a href="{% url 'discover' 'observation' %}">Browse Observations</a></li>
+            </ul>
+          </li>
+        </ul>
+        <form class="navbar-search pull-left">
+          <div class="input-prepend">
+            <input id="search_url" type="hidden" name="search_url">
+            <span class="add-on"><i class="icon-search"></i></span>
+            <input id="search" type="text" class="span3" placeholder="Enter common or latin name">
+          </div>
+        </form>
+        <div id="user-bar">
+        {% if user.is_authenticated %}
+          <ul class="nav pull-right">
+            <li class="dropdown {% if 'accounts' in request.path %} active {% endif %}">
+            <a href="/accounts/" class="dropdown-toggle" data-toggle="dropdown">{{ user.username }} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'user-profile' user.username %}">Profile</a></li>
+              {% if perms.nature.add_orgidentificationreview %}
+              <li><a href="{% url 'nature-review-home' %}">Review</a></li>
+              {% endif %}
+              <li><a href="{% url 'account-logout' %}">Logout</a></li>
+            </ul>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle invites" data-toggle="dropdown"><i class="icon-inbox invites"></i><span id="invites">0</span> <strong class="caret"></strong></a>
+              <div id="invite-list" class="dropdown-menu" style="padding: 15px; padding-bottom: 10px;">
+              </div>
+            </li>
+          </ul>
+        </div>
+        {% else %} 
+        </div>
+        <ul id="login-form" class="nav pull-right">
+          <li><a href="{% url 'registration_register' %}">Sign Up</a></li>
+          <li class="divider-vertical"></li>
+          <li class="dropdown">
+            <a class="dropdown-toggle" href="#" data-toggle="dropdown">Sign In <strong class="caret"></strong></a>
+            <div class="dropdown-menu" style="padding: 15px; padding-bottom: 5px;">
+              <form class="navbar-form pull-right">
+                <input class="span2" type="text" id="username" placeholder="Username">
+                <input class="span2" type="password" id="password" placeholder="Password">
+                <button type="submit" id="login" class="btn">Sign in</button>
+              </form>
+            </div>
+          </li>
+        </ul>
+        {% endif %}
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+<div id="message" class="span3 offset9"></div>{% block top-content %}{% endblock top-content %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    {% block content-span%}<div class="span6 offset1">{% endblock %}
+    {% block content %}{% endblock %}
+    </div>
+    {% block right-span%}<div class="span5">{% endblock %}
+      <div class="row-fluid">
+        {% block right-content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+  {% block aside_image %}{% endblock aside_image%}
+
+  <hr>
+  <footer>
+    <div class="container">
+      <ul class="nav nav-pills">
+        <li class="disabled"><a href="">&copy; SpeSee 2012</a></li>
+        <li><a href="{% url 'about-page' %}">About</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+</div> <!-- /container -->
+{% endblock body %}
+{% block base.scripts %}
+{% if user.is_authenticated %}
+<script type="text/javascript">
+function getInvites(){
+  $.ajax({
+      type: "GET",
+      url: "{% url 'invite-count' user.id %}",
+      success: function(data){
+        var count = data.total_invites;
+        if (count > 0){
+            $("#invites").empty().append(count);
+        }
+      }
+    });
+  }
+function getInviteList(){
+  $.ajax({
+      type: "GET",
+      url: "{% url 'invite-list' user.id %}",
+      success: function(data){
+        $(data).each(function(i,val){
+           $.each(val,function(k,v){
+            html=val.group__name + "<p class='" + val.group__id + "'><a href='' id='" + val.group__id + "' class='btn btn-mini btn-link accept'><i class='icon-ok'></i> Accept</a> <a href='' id='" + val.group__id + "' class='btn btn-mini btn-link reject'><i class='icon-remove'></i> Ignore</a></p>"; 
+           });
+        });
+        $("#invite-list").empty();
+        $("#invite-list").append("<p class='nav-header'>Group Invitations</p>" + html);
+      }
+    });
+  }
+function respondInvite(item_id, response){
+  $.ajax({
+      type: "GET",
+      url: Django.url('group-invite-response', item_id, response),
+      success: function(data){
+            //empty and reload the invite list
+            var count = $("#invites").html();
+            alert(count);
+            if(count>0){
+              count = count-1;
+              $("#invites").empty().append(count);
+            }
+          }
+      });
+  }  
+</script>
+{% endif %}
+<script type="text/javascript">
+$(function() {
+  {% if user.is_authenticated %}
+  getInvites();
+  {% endif %}
+  $('#user-bar').on("click", ".invites", function(event){
+    getInviteList();
+  });
+  $("#login").click(function(e){
+      e.preventDefault();
+      var username = $('#username').val();
+      var password = $('#password').val();
+      $.ajax({
+          url: '{% url "login-simple" %}',
+          type: 'POST',
+          data: {
+            username: username,
+            password: password,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success:function (data) {
+            if (data == '1')
+            {
+              $("#message")
+              .addClass("success")
+              .html("<div class='alert alert-success'>Thank you for logging in! <a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
+              $("#login-form").hide();
+              html = "<p class='navbar-text pull-right'>Welcome <a class='navbar-link' href='/accounts/profile/" + username + "/'>" + username + "</a><a class='navbar-link' href='{% url 'account-logout' %}''> Logout</a></p><ul class='nav pull-right'><li class='dropdown'><a href='#' class='dropdown-toggle invites' data-toggle='dropdown'><i class='icon-inbox invites'></i><span id='invites'>0</span> <strong class='caret'></strong></a><div id='invite-list' class='dropdown-menu' style='padding: 15px; padding-bottom: 10px;'></div></li></ul>";
+              $("#user-bar").append(html);
+            }
+            else
+            {
+              $("#message").addClass("error").html("<div class='alert alert-error'>I'm sorry, your username and password did not match. Please try again. <a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
+            }
+          }
+        });
+    });
+  $("#user-bar").on("click", ".reject",function(event){ 
+    //alert(event.target.id);
+    var item_id = event.target.id;
+    respondInvite(item_id, 3);
+    event.preventDefault();
+  });
+  $("#user-bar").on("click", ".accept",function(event){ 
+    //alert(event.target.id);
+    var item_id = event.target.id;
+    respondInvite(item_id, 1);
+    event.preventDefault();
+  });
+  $("#search").autocomplete({
+      source: "{% url 'nature-autocomplete' %}?search=organism",
+      minLength: 3,
+      select: function(event, ui) {
+        // $('#search_url').val(ui.item.id);
+        // $('#search').val(ui.item.label);
+        window.location.href = Django.url('organism-view', ui.item.id);
+      }
+    });
+})
+</script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-37889324-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+{% endblock %}

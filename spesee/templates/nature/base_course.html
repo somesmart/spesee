@@ -1,0 +1,108 @@
+{% extends "nature/base.html" %}
+{% block title %}{{ course.course_name }}{% endblock title %}
+{% block app.scripts %}
+<script>
+$(function() {
+	$('.completion').each(function(index) {
+		$(this).children('p').before('<div></div>');
+		$(this).children('p').addClass('loaded');
+		var completed = '{% widthratio completion.total_user completion.total 100 %}%';
+		$(this).children('div').animate({ width: completed }, 1000);
+	}); 
+	$('.note').tooltip({ title: 'Click to add an Observation', placement: 'right' });
+});
+</script>
+{% endblock %}
+{% block content %}
+	<h2>{{ course.course_name }}: <a class="btn btn-small note_copy pull-right" href="{% url 'course-copy' course.id %}">Copy this List <i class="icon-share"></i></a></h1>
+	<h3>{{ course.course_descr }}</h3>
+	<div id="org_list">
+		{% if completion %}
+			<div class="completion progress">			
+				<div class="bar" style="{% widthratio completion.total_user completion.total 100 %}%;">{% widthratio completion.total_user completion.total 100 %}% complete</div>
+			</div>
+		{% endif %}
+		{% if user_found %}
+		<h3>What you've found:</h3>
+		    <ul class="large_list">
+		    	{% for observation in user_found %}
+		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
+		    	{% endfor %}
+		    </ul>
+	    {% endif %}
+	    {% if group_found %}
+		    <h3>Found by group <a href="{% url 'group-view' course.group.id %}{{ course.group|slugify }}">{{ course.group }}</a>:</h3>
+	    	<ul class="large_list">
+		    	{% for observation in group_found %}
+		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
+		    	{% endfor %}
+		    </ul>
+	    {% endif %}
+	    {% if others_found %}
+	    <h3>Found by Others:</h3>
+	    	<ul class="large_list">
+		    	{% for observation in others_found %}
+		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
+		    	{% endfor %}
+		    </ul>
+	    {% endif %}
+	    {% if never_found %}
+	    <h3>No reported sightings:</h3>
+	    	<ul class="large_list">
+		    	{% for observation in never_found %}
+		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
+		    	{% endfor %}
+		    </ul>
+	    {% endif %}
+	    {% if group_members %}
+	    <h3>No reported sightings:</h3>
+	    	<ul class="large_list">
+		    	{% for x in group_members %}
+		    		<li>{{ x.user }}</li>
+		    	{% endfor %}
+		    </ul>
+	    {% endif %}
+	</div>
+	{% if course.user.id == user.id %} 
+	<a class="btn pull-right" href="{% url 'course-edit' course.id %}"><i class="icon-wrench"></i> Edit List</a>
+	{% endif %}
+{% endblock content %}
+{% block right-content %}
+    <div class="span10 offset1">
+      <p class="alert alert-info">Map items in blue are those you have already found. Red icons have been sighted by others, offering quick access to those items on your list that you are still missing!</p>
+    </div>
+	{% include "nature/include_map.html" %}
+	<div id="map_canvas" class="span12"></div>
+{% endblock right-content %}
+{% comment %}
+{% if debug %}
+<div id="debug">
+  <h2>Queries</h2>
+  <p>
+    {{ sql_queries|length }} Quer{{ sql_queries|pluralize:"y,ies" }}
+    {% ifnotequal sql_queries|length 0 %}
+    (<span style="cursor: pointer;" onclick="var s=document.getElementById('debugQueryTable').style;s.display=s.display=='none'?'':'none';this.innerHTML=this.innerHTML=='Show'?'Hide':'Show';">Show</span>)
+    {% endifnotequal %}
+  </p>
+  <table id="debugQueryTable" style="display: none;">
+    <col width="1"></col>
+    <col></col>
+    <col width="1"></col>
+    <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">SQL</th>
+      <th scope="col">Time</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for query in sql_queries %}<tr class="{% cycle odd,even %}">
+      <td>{{ forloop.counter }}</td>
+      <td>{{ query.sql|escape }}</td>
+      <td>{{ query.time }}</td>
+    </tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endcomment %}
