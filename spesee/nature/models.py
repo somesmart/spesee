@@ -233,6 +233,7 @@ class Observation(models.Model):
 	quantity = models.IntegerField()
 	observation_image = models.ImageField(upload_to='photos/%Y/%m/%d', blank=True)
 	parent_observation = models.ForeignKey('self', blank=True, default=None, null=True, help_text='The first observation of a static organism', related_name='child_observation')
+	private = models.BooleanField()
 	thumbnail = ImageSpecField(source='observation_image', processors=[ResizeToFill(50, 50)], format='JPEG', options={'quality': 90})
 	large_image = ImageSpecField(source='observation_image', processors=[ResizeToFill(500, 400)], format='JPEG', options={'quality': 90})
 	wide_thumb = ImageSpecField(source='observation_image', processors=[ResizeToFill(200, 100)], format='JPEG', options={'quality': 90})
@@ -264,6 +265,7 @@ class ObservationUnknown(models.Model):
 	reason = models.TextField(blank=True)
 	moderated_by = models.ForeignKey(User, related_name='+', null=True, default=None, blank=True)
 	moderated_date = models.DateTimeField(null=True, default=None, blank=True)
+	private = models.BooleanField()
 	def __unicode__(self):
 		return self.comments
 

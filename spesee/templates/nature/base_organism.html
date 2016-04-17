@@ -70,31 +70,33 @@
         <th>Qty</th>
         <th>Link</th>
       </tr>
-      {% for observation in organism.observation_set.all %}
+      {% for observation in map_observations %}
         {% comment %}
-          This only shows a child observation if it is YOUR observation. Otherwise we just see the master observation for simplicicty's sake
+          This only shows a child observation if it is YOUR observation and only shows yoru private observations. Otherwise we just see the master observation for simplicicty's sake
         {% endcomment %}
-        {% if not observation.parent_observation %}
-          <tr>
-            <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" class="obs-small" >{% endif %}</td>
-            <td>{{ observation.user }}</td>
-            <td>{{ observation.observation_date }}</td>
-            <td>{{ observation.comments}}</td>
-            <td>{{ observation.location_descr }}</td>
-            <td>{{ observation.quantity }}</td>
-            <td><a href="{% url 'observation-detail' observation.id %}">Details</td>
-          </tr>
-        {% else %}
-          {% if observation.user.id == user.id and observation.parent_observation %}
+        {% if not observation.parent_observation and not observation.private %}
             <tr>
-              <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}</td>
+              <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" class="obs-small" >{% endif %}</td>
               <td>{{ observation.user }}</td>
               <td>{{ observation.observation_date }}</td>
               <td>{{ observation.comments}}</td>
               <td>{{ observation.location_descr }}</td>
               <td>{{ observation.quantity }}</td>
-              <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}<a href="{% url 'observation-detail' observation.id %}">Details</td>
+              <td><a href="{% url 'observation-detail' observation.id %}">Details</td>
             </tr>
+        {% else %}
+          {% if observation.user.id == user.id %}
+            {% if observation.private or observation.parent_observation %}
+              <tr>
+                <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}</td>
+                <td>{{ observation.user }}</td>
+                <td>{{ observation.observation_date }}</td>
+                <td>{{ observation.comments}}</td>
+                <td>{{ observation.location_descr }}</td>
+                <td>{{ observation.quantity }}</td>
+                <td>{% if observation.observation_image %}<img src="{{ observation.thumbnail.url }}" id="observation" >{% endif %}<a href="{% url 'observation-detail' observation.id %}">Details</td>
+              </tr>
+            {% endif %}
           {% endif %}
         {% endif %}
       {% endfor %}

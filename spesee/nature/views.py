@@ -21,7 +21,7 @@ def thanks(request):
     return HttpResponse("<p>Thank you for your submission. It will be reviewed shortly.</p>")
 
 class IndexListView(ListView):
-    queryset=Organism.objects.select_related().annotate(observed=Count('observation__id')).order_by('-observation__observation_date')[:10]
+    queryset=Organism.objects.select_related().exclude(observation__private=True).annotate(observed=Count('observation__id')).order_by('-observation__observation_date')[:10]
     context_object_name='first_ogranisms'
     template_name='nature/index.html'
 
@@ -111,52 +111,6 @@ def haystack_autocomplete(request):
 
     json_results = json.dumps(results)
     return HttpResponse(json_results, content_type='application/json')
-
-# ****************************************************************** #
-# *********************** the big map views ************************ #
-# ****************************************************************** #
-
-class MapView(ListView):
-    #may want to return the template based on the map type, if that makes sense!
-    template_name='nature/map_data.html'
-    context_object_name='map_data'
-
-    def get_queryset(self):
-        self.maptype = self.kwargs['maptype']
-        self.search_value = self.kwargs['pk']
-        #only map by zip and location should exclude the hidden types. If you are on your list, a type list
-        #or a specific organism list, you will want to see all values (otherwise why would you be there?)
-        self.hide_types = get_hide_list(self.request.user)
-        if self.maptype == 'type':
-            return Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism__type = self.search_value)
-        elif self.maptype == 'organism':
-            return Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism = self.search_value)
-        elif self.maptype == 'observation':
-            return Observation.objects.select_related().filter(id = self.search_value)
-        elif self.maptype == 'user':
-            #this should not exclude children because we want all that user's results regardless if it's a child or not
-            return Observation.objects.select_related().filter(user = self.search_value)
-        elif self.maptype == 'list':
-            #first selecting a list of organisms that are in the course, and then getting the map of those organisms
-            #the template for this one should display different color markers if the user has seen it or not already
-            self.org_ids = CourseDetail.objects.select_related().filter(course=self.search_value).values('organism')
-            return Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism__in=self.org_ids)
-        elif self.maptype == 'zip':
-            #build out the horizontal and vertical box in which to search for observations
-            self.zip_box = get_zip_box(self.search_value)
-            return Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(latitude__range=(self.zip_box['zip_lat_left'], self.zip_box['zip_lat_right']), longitude__range=(self.zip_box['zip_lng_bottom'], self.zip_box['zip_lng_top']))
-        elif self.maptype == 'location':
-            self.location = Location.objects.get(id=self.search_value)
-            self.add_width = (Decimal(str(.014)) * self.location.miles_wide)/2 #.014 is 1 mile times the width / 2 to cut it in half
-            self.add_height = (Decimal(str(.014)) * self.location.miles_tall)/2
-            self.lat_left = self.location.latitude - self.add_width
-            self.lat_right = self.location.latitude + self.add_width
-            self.lng_bottom = self.location.longitude - self.add_height
-            self.lng_top = self.location.longitude + self.add_height
-            return Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top))
-
-    def render_to_response(self, context, **kwargs):
-        return super(MapView, self).render_to_response(context, content_type='application/xhtml+xml', **kwargs)         
 
 # ****************************************************************** #
 # ********************* organism related vws *********************** #

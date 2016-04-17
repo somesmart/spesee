@@ -68,13 +68,7 @@ urlpatterns = patterns('',
     # url(r'^ident/(\w+)/([\s\w]+)/([\s\w]+)/$',    
     #     IdentDetailListView.as_view(), name='search-ident'),
     #haystack search urls
-
-    ###################################################
-    ################ re-enable ########################
     (r'^search/', include('haystack.urls')),
-    ###################################################
-    ###################################################
-
     #observations by user, zip, etc
     url(r'^observation/(?P<search>\w+)/(?P<pk>\d+)/$', login_required(ObservationList.as_view()), name='observation-list'),
     #observation/$ shows all observations for the user logged in
@@ -138,8 +132,6 @@ urlpatterns = patterns('',
     url(r'^delete/group/(?P<pk>\d+)/$', 'nature.views.delete_group', name='group-delete'),
     #this gets a list of groups for the user
     url(r'^group/user/(?P<user>\d+)/$', 'nature.views.get_user_groups', name='group-user-list'),
-    #this is how we could do passing the type of map (zip code) then the search value (zip pk)
-    url(r'^map/(?P<maptype>\w+)/(?P<pk>\d+)/$', MapView.as_view(), name='map-data'),
     #location/ is for locations
     url(r'^location/(?P<pk>\d+)/', LocationView.as_view(), name='location-view'),  
     url(r'^location/$', LocationList.as_view(template_name='nature/base_location_list.html'), name='location-home'),
@@ -149,13 +141,7 @@ urlpatterns = patterns('',
     url(r'^delete/location/(?P<pk>\d+)/$', 'nature.views.delete_location', name='location-delete'),
     #automplete all pass to the same view
     url(r'^autocomplete/$','nature.views.autocomplete', name='nature-autocomplete'),
-    
-    ###################################################
-    ################ re-enable ########################
     url(r'autocomplete/haystack/$', 'nature.views.autocomplete', name='haystack-autocomplete'),
-    ###################################################
-    ###################################################
-
     #stats/
     url(r'stats/$', StatsView.as_view(template_name='nature/base_stats.html')),
     #this is currently where you end up after submitting any forms....

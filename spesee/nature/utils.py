@@ -1,4 +1,5 @@
 from nature.models import UserSettings, ZipCode, Observation, CourseDetail
+from django.db.models import Q
 from decimal import *
  
 # ****************************************************************** #
@@ -52,24 +53,31 @@ def get_map_queryset(maptype, search_value, user):
     #only map by zip and location should exclude the hidden types. If you are on your list, a type list
     #or a specific organism list, you will want to see all values (otherwise why would you be there?)
     hide_types = get_hide_list(user)
+    private_obs = []
+    public_obs = []
     if maptype == 'type':
-        map_queryset = Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism__type = search_value)
+        public_obs = Observation.objects.select_related().exclude(Q(private=True) | Q(parent_observation__isnull=False)).filter(organism__type = search_value)
+        private_obs = Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism__type = search_value, user = user, private=True)
     elif maptype == 'organism':
-        map_queryset = Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism = search_value)
+        public_obs = Observation.objects.select_related().exclude(Q(private=True) | Q(parent_observation__isnull=False)).filter(organism = search_value)
+        private_obs = Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism = search_value, user = user, private=True)
     elif maptype == 'observation':
-        map_queryset = Observation.objects.select_related().filter(id = search_value)
+        public_obs = Observation.objects.select_related().filter(id = search_value, private=False)
+        private_obs = Observation.objects.select_related().filter(id = search_value, private=True, user=user)
     elif maptype == 'user':
         #this should not exclude children because we want all that user's results regardless if it's a child or not
-        map_queryset = Observation.objects.select_related().filter(user = search_value)
+        private_obs = Observation.objects.select_related().filter(user = search_value)
     elif maptype == 'list':
         #first selecting a list of organisms that are in the course, and then getting the map of those organisms
         #the template for this one should display different color markers if the user has seen it or not already
         org_ids = CourseDetail.objects.select_related().filter(course=search_value).values('organism')
-        map_queryset = Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism__in=org_ids)
+        public_obs = Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism__in=org_ids, private=False)
+        private_obs = Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism__in=org_ids, private=True, user = user)
     elif maptype == 'zip':
         #build out the horizontal and vertical box in which to search for observations
         zip_box = get_zip_box(search_value)
-        map_queryset = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=hide_types).filter(latitude__range=(zip_box['zip_lat_left'], zip_box['zip_lat_right']), longitude__range=(zip_box['zip_lng_bottom'], zip_box['zip_lng_top']))
+        public_obs = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=hide_types).filter(latitude__range=(zip_box['zip_lat_left'], zip_box['zip_lat_right']), longitude__range=(zip_box['zip_lng_bottom'], zip_box['zip_lng_top']), private=False)
+        private_obs = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=hide_types).filter(latitude__range=(zip_box['zip_lat_left'], zip_box['zip_lat_right']), longitude__range=(zip_box['zip_lng_bottom'], zip_box['zip_lng_top']), private=True, user=user)
     elif maptype == 'location':
         location = Location.objects.get(id=search_value)
         add_width = (Decimal(str(.014)) * location.miles_wide)/2 #.014 is 1 mile times the width / 2 to cut it in half
@@ -78,5 +86,7 @@ def get_map_queryset(maptype, search_value, user):
         lat_right = location.latitude + add_width
         lng_bottom = location.longitude - add_height
         lng_top = location.longitude + add_height
-        map_queryset = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=hide_types).filter(latitude__range=(lat_left, lat_right), longitude__range=(lng_bottom, lng_top))
+        public_obs = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=hide_types).filter(latitude__range=(lat_left, lat_right), longitude__range=(lng_bottom, lng_top), private=False)
+        private_obs = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=hide_types).filter(latitude__range=(lat_left, lat_right), longitude__range=(lng_bottom, lng_top), private=True, user=user)
+    map_queryset = public_obs | private_obs
     return map_queryset
