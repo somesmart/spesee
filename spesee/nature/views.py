@@ -4,7 +4,7 @@ import json
 from django.db.models import Q, Count
 from django.views.generic import DetailView, ListView, UpdateView, CreateView, FormView
 from django.contrib.auth import authenticate, login as auth_login
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.template import RequestContext, loader, Context as TemplContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
@@ -414,6 +414,7 @@ class ObservationCreateView(CreateView):
 class ObservationUpdateView(UpdateView):
     form_class = ObservationForm
     model = Observation
+    success_url = reverse_lazy('observation-home')
 
     def get_context_data(self, **kwargs):
         context = super(ObservationUpdateView, self).get_context_data(**kwargs)
@@ -429,13 +430,21 @@ class ObservationList(ListView):
         self.search = self.kwargs['search']
         self.value = self.kwargs['pk']
         self.hide_types = get_hide_list(self.request.user.id)
+        self.observations = []
+        self.private_obs = []
         if self.search == 'user':
-            return Observation.objects.select_related().exclude(organism__type__in=self.hide_types).filter(user = self.value).order_by('-observation_date')
+            self.public_obs = Observation.objects.select_related().exclude(organism__type__in=self.hide_types).filter(user = self.value, private=False).order_by('-observation_date')
+            if self.value == self.request.user:
+                self.private_obs = Observation.objects.select_related().exclude(organism__type__in=self.hide_types).filter(user = self.value, private=True).order_by('-observation_date')
         elif self.search == 'zip':
             self.zip_box = get_zip_box(self.value)
-            return Observation.objects.select_related().exclude(organism__type__in=self.hide_types).exclude(parent_observation__isnull=False).filter(latitude__range=(self.zip_box['zip_lat_left'], self.zip_box['zip_lat_right']), longitude__range=(self.zip_box['zip_lng_bottom'], self.zip_box['zip_lng_top']))
+            self.public_obs = Observation.objects.select_related().exclude(organism__type__in=self.hide_types).exclude(parent_observation__isnull=False).filter(latitude__range=(self.zip_box['zip_lat_left'], self.zip_box['zip_lat_right']), longitude__range=(self.zip_box['zip_lng_bottom'], self.zip_box['zip_lng_top']), private=False)
+            self.private_obs = Observation.objects.select_related().exclude(organism__type__in=self.hide_types).exclude(parent_observation__isnull=False).filter(latitude__range=(self.zip_box['zip_lat_left'], self.zip_box['zip_lat_right']), longitude__range=(self.zip_box['zip_lng_bottom'], self.zip_box['zip_lng_top']), private=True, user = self.request.user)
         elif self.search == 'browse':
             return None
+        self.observations = self.public_obs | self.private_obs
+        return self.observations
+
     def get_context_data(self, **kwargs):
         context = super(ObservationList, self).get_context_data(**kwargs)
         context['search_by'] = {'search_by': self.search, 'value': self.value}
@@ -525,6 +534,7 @@ class LocationCreate(CreateView):
 class LocationUpdate(UpdateView):
     form_class = LocationForm
     model = Location
+    success_url = reverse_lazy('location-home')
 
 class LocationList(ListView):
     template_name='nature/base_location_list.html'
@@ -772,7 +782,7 @@ class GroupUpdate(UpdateView):
     form_class = GroupForm
 
     def get_success_url(self, **kwargs):
-        return '/edit/group/' + self.kwargs['pk'] + '/'
+        return reverse('group-edit', args=(self.kwargs['pk'],))
 
     def get_context_data(self, **kwargs):
         context = super(GroupUpdate, self).get_context_data(**kwargs)

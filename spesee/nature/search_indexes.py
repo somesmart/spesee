@@ -18,5 +18,3 @@ class OrganismIndex(indexes.SearchIndex, indexes.Indexable):
 
 	def get_model(self):
 		return Organism
-
-		
