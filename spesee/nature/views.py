@@ -42,7 +42,7 @@ def autocomplete(request):
             results = []
             if search == "organism":
                 #this is only needed for by organism autocomplete because type doesn't impact zip.
-                user = request.user
+                user = request.user.id
                 hide_types = get_hide_list(user)
                 # Ignore queries shorter than length 3
                 if len(value) > 2:
@@ -62,9 +62,9 @@ def autocomplete(request):
                     data = None
                     for organism in model_results:
                         try:
-                            data = {'id': '/organism/' + str(organism.object.organism.id) + '/', 'label': organism.object.organism.common_name + ' (' + organism.object.organism.latin_name + ')'}
+                            data = {'id': reverse('organism-view', args=(organism.object.organism.id,)), 'label': organism.object.organism.common_name + ' (' + organism.object.organism.latin_name + ')'}
                         except:
-                            data = {'id': '/organism/' + str(organism.object.id) + '/', 'label': organism.object.common_name + ' (' + organism.object.latin_name + ')' }                             
+                            data = {'id': reverse('organism-view', args=(organism.object.id,)), 'label': organism.object.common_name + ' (' + organism.object.latin_name + ')' }                             
                         results.append(data)
                     json_results = json.dumps(results)
                     return HttpResponse(json_results, content_type='application/json')
@@ -106,7 +106,7 @@ def haystack_autocomplete(request):
 
     results = []
     for organism in model_results:
-        data = {'id': '/organism/' + str(organism.id) + '/', 'label': organism.common_name + ' (' + organism.latin_name + ')'}
+        data = {'id': reverse('organism-view', args=(organism.id,)), 'label': organism.common_name + ' (' + organism.latin_name + ')'}
         results.append(data)
 
     json_results = json.dumps(results)
@@ -136,7 +136,7 @@ class OrganismView(DetailView):
             context['org_ident'] = OrgIdentification.objects.get(organism=self.org_id)
         except OrgIdentification.DoesNotExist:
             context['new_ident'] = {'org': self.org_id}
-        context['map_observations'] = get_map_queryset('organism', self.org_id, self.request.user)
+        context['map_observations'] = get_map_queryset('organism', self.org_id, self.request.user.id)
         return context
 
 class OrganismViewTest(DetailView):
@@ -428,7 +428,7 @@ class ObservationList(ListView):
     def get_queryset(self):
         self.search = self.kwargs['search']
         self.value = self.kwargs['pk']
-        self.hide_types = get_hide_list(self.request.user)
+        self.hide_types = get_hide_list(self.request.user.id)
         if self.search == 'user':
             return Observation.objects.select_related().exclude(organism__type__in=self.hide_types).filter(user = self.value).order_by('-observation_date')
         elif self.search == 'zip':
@@ -446,7 +446,7 @@ class DiscoverList(ListView):
     context_object_name = 'discover_list'
     def get_queryset(self):
         self.search = self.kwargs['search']
-        self.hide_types = get_hide_list(self.request.user)
+        self.hide_types = get_hide_list(self.request.user.id)
         if self.request.method == "GET":
             if self.search == 'observation':
                 try:
@@ -548,7 +548,7 @@ class LocationView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(LocationView, self).get_context_data(**kwargs)
         self.search_value = self.kwargs['pk']
-        self.hide_types = get_hide_list(self.request.user)
+        self.hide_types = get_hide_list(self.request.user.id)
         self.location = Location.objects.get(id=self.search_value)
         self.add_width = ((Decimal(str(.014)) * self.location.miles_wide)/2) #.014 is 1 mile times the width / 2 to cut it in half
         self.add_height = ((Decimal(str(.014)) * self.location.miles_tall)/2)
