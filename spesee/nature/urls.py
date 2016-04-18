@@ -7,6 +7,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from nature.models import *
 from nature.views import *
 from nature.signals import *
+from nature.forms import *
+from registration.backends.default.views import RegistrationView
 import nature.signals
 
 admin.autodiscover()
@@ -101,6 +103,7 @@ urlpatterns = patterns('',
     #accept/reject the invitation
     url(r'^accounts/invites/(?P<group>\d+)/(?P<response>\d+)/$', 'nature.views.group_invite_response', name='group-invite-response'),
     #all other accounts/ url functions go to the registration module
+    url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm), name='registration_register'),
     url(r'^accounts/', include('registration.backends.hmac.urls')),
     #list/ is for lists/courses
     url(r'^list/(?P<pk>\d+)/', login_required(CourseView.as_view()), name='course-view'),
