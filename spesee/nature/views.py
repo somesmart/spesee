@@ -463,7 +463,7 @@ class DiscoverList(ListView):
                 except:
                     lat_lng_box = None
                 if lat_lng_box:
-                    return Observation.objects.select_related().filter(latitude__range=(lat_lng_box['lat_left'], lat_lng_box['lat_right']), longitude__range=(lat_lng_box['lng_bottom'], lat_lng_box['lng_top'])).exclude(parent_observation__isnull=False, organism__type__in=self.hide_types).order_by('organism__type')
+                    return Observation.objects.select_related().filter(private=False,latitude__range=(lat_lng_box['lat_left'], lat_lng_box['lat_right']), longitude__range=(lat_lng_box['lng_bottom'], lat_lng_box['lng_top'])).exclude(parent_observation__isnull=False, organism__type__in=self.hide_types).order_by('organism__type')
             elif self.search == 'organism':
                 try:
                     user_query = self.request.GET['q']
@@ -502,7 +502,7 @@ def check_existing(request, search_type, search_value):
     results=[]
     if search_type == 'existing':
         #only works for trees atm
-        observations = Observation.objects.select_related().filter(organism__type=1,organism__id=search_value, latitude__range=(lat_lng_box['lat_left'], lat_lng_box['lat_right']), longitude__range=(lat_lng_box['lng_bottom'], lat_lng_box['lng_top'])).exclude(parent_observation__isnull=False)
+        observations = Observation.objects.select_related().filter(private=False,organism__type=1,organism__id=search_value, latitude__range=(lat_lng_box['lat_left'], lat_lng_box['lat_right']), longitude__range=(lat_lng_box['lng_bottom'], lat_lng_box['lng_top'])).exclude(parent_observation__isnull=False)
         for obs in observations:
             if not obs.observation_image:
                 data = {'obs_id': obs.id, 'location_descr': obs.location_descr, 'comments': obs.comments, 'image' : '' }#'lat_check': str(obs.latitude), 'lng_check': str(obs.longitude)}    
@@ -566,8 +566,12 @@ class LocationView(DetailView):
         self.lat_right = self.location.latitude + self.add_width
         self.lng_bottom = self.location.longitude - self.add_height
         self.lng_top = self.location.longitude + self.add_height
-        context['location_details'] = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top)).values('organism', 'organism__id', 'organism__common_name', 'organism__latin_name').annotate(Count('id')).order_by('organism__common_name')
-        context['map_observations'] = Observation.objects.exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top))
+        self.lcn_public = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(private=False,latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top)).values('organism', 'organism__id', 'organism__common_name', 'organism__latin_name').annotate(Count('id')).order_by('organism__common_name')
+        self.lcn_private = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(private=True, user=self.request.user, latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top)).values('organism', 'organism__id', 'organism__common_name', 'organism__latin_name').annotate(Count('id')).order_by('organism__common_name')
+        context['location_details'] = self.lcn_public | self.lcn_private
+        self.public_obs = Observation.objects.exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(private=False,latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top))
+        self.private_obs = Observation.objects.exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(private=True, user=self.request.user, latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top))
+        context['map_observations'] = self.public_obs | self.private_obs
         return context
 
 def delete_location(request, pk):
@@ -593,7 +597,7 @@ class CourseView(DetailView):
         #all the orgs in the list
         self.org_ids = CourseDetail.objects.select_related().filter(course=self.course_id).values('organism')
         #all the orgs in the list that have been seen
-        self.observed_ids = Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(organism__in=self.org_ids).values('organism')
+        self.observed_ids = Observation.objects.select_related().exclude(parent_observation__isnull=False).filter(private=False,organism__in=self.org_ids).values('organism')
         #all the orgs that have been seen by the current user
         self.user_observed_ids = Observation.objects.filter(organism__in=self.org_ids, user=self.request.user).values('organism')
         #group memebers
@@ -601,9 +605,9 @@ class CourseView(DetailView):
         self.group_finds = []
         if self.course.is_group:
             self.group_owner = Group.objects.filter(id=self.course.group.id).values('owner')
-            self.group_finds = Observation.objects.filter(Q(organism__in=self.org_ids), Q(user__in=self.group_members) | Q(user=self.group_owner)).exclude(organism__in=self.user_observed_ids).values('organism')
+            self.group_finds = Observation.objects.filter(Q(organism__in=self.org_ids, private=False), Q(user__in=self.group_members) | Q(user=self.group_owner)).exclude(organism__in=self.user_observed_ids).values('organism')
         #all the orgs that OTHERS have seen, but not those the user has seen
-        self.others_observed_ids = Observation.objects.filter(organism__in=self.org_ids).exclude(Q(organism__in=self.group_finds) | Q(organism__in=self.user_observed_ids)).values('organism')
+        self.others_observed_ids = Observation.objects.filter(organism__in=self.org_ids, private=False).exclude(Q(organism__in=self.group_finds) | Q(organism__in=self.user_observed_ids)).values('organism')
         #distinct orgs from the course the current user has seen
         self.distinct_user_found = CourseDetail.objects.select_related().filter(organism__in=self.user_observed_ids, course=self.course_id).order_by('organism__common_name')
         #amount found by the user
@@ -621,7 +625,7 @@ class CourseView(DetailView):
         #percent complete stats
         getcontext().prec = 2
         context['completion'] = {'total': self.course_total, 'total_user': self.total_found_user}
-        context['map_observations'] = get_map_queryset('list', self.course_id, self.request.user)
+        context['map_observations'] = get_map_queryset('list', self.course_id, self.request.user.id)
         return context
 
 class CourseList(ListView):
@@ -632,7 +636,7 @@ class CourseList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(CourseList, self).get_context_data(**kwargs)
-        self.groups = GroupUsers.objects.select_related().filter(user=self.request.user, status=1).values('group').distinct()
+        self.groups = GroupUsers.objects.select_related().filter(user=self.request.user.id, status=1).values('group').distinct()
         context['member_of'] = Course.objects.filter(group__in=self.groups)
         return context
 
