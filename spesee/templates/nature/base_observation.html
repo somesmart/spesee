@@ -5,6 +5,9 @@
 {% endblock %}
 {% block title %}{{ observation.organism.common_name }}{% endblock %}
 {% block content %}
+{% if observation.private == True and request.user.id != observation.user.id %}
+<p>Observation not available</p>
+{% else %}
 	<div>
 		<span class="pull-right">
 			<a href="https://twitter.com/share" class="twitter-share-button" data-related="jasoncosta" data-lang="en" data-size="large" data-count="horizontal" data-text="I found a {{ observation.organism.common_name }}:">Tweet</a>
@@ -54,8 +57,12 @@
 			<p><a class="btn pull-right" href="{% url 'edit-observation' observation.id %}"><i class="icon-wrench"></i> Edit Observation</a></p>
 		{% endif %}
 	{% endif %}
+{% endif %}
 {% endblock content %}
 {% block right-content %}
+{% if observation.private == True and request.user.id != observation.user.id %}
+<p>Observation Map not available</p>
+{% else %}
     <div class="span10 offset1">
         <p class="alert alert-info">Observation Map</p>
     </div>
@@ -63,6 +70,7 @@
     {% with observation as single_observation %}
     {% include "nature/include_map.html" %}
     {% endwith %}
+{% endif %}
 {% endblock right-content %}
 {% block app.scripts %}
 <script type="text/javascript" src="{% static 'colorbox/jquery.colorbox.js' %}"></script>
