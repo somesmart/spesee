@@ -150,9 +150,6 @@ urlpatterns = patterns('',
     #this is currently where you end up after submitting any forms....
     url(r'thanks/', 'nature.views.thanks', name='thanks'),
     url(r'noresults/', TemplateView.as_view(template_name = 'nature/base_noresults.html'), name='no-results'),
-    #zinnia
-    url(r'^blog/', include('zinnia.urls', namespace='zinnia')),
-    url(r'^comments/', include('django_comments.urls')),
     #discover
     #url(r'^discover/organism/', include('haystack.urls')),
     url(r'^discover/(?P<search>\w+)/$', DiscoverList.as_view(), name='discover'),

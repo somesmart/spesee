@@ -30,7 +30,7 @@ $('.note_copy').tooltip({ title: 'Copy List', placement: 'right' });
 {% if course_list %}
     <ul>
     {% for course in course_list %}
-        <li class="{{ course.id }}"><a href="{% url 'course-view' course.id %}">{{ course.course_name }}</a> - {{ course.course_descr }} <a class="btn btn-mini note_edit" href="{% url 'course-edit' course.id %}"><i class="icon-edit"></i></a> <a class="btn btn-mini btn-danger note_delete" href="#"><i id="{{ course.id }}" class="delete icon-remove icon-white"></i></a> <a class="btn btn-mini note_copy" href="{% url 'list-copy' course.id %}"><i class="icon-share"></i></a></li>
+        <li class="{{ course.id }}"><a href="{% url 'course-view' course.id %}">{{ course.course_name }}</a> - {{ course.course_descr }} <a class="btn btn-mini note_edit" href="{% url 'course-edit' course.id %}"><i class="icon-edit"></i></a> <a class="btn btn-mini btn-danger note_delete" href="#"><i id="{{ course.id }}" class="delete icon-remove icon-white"></i></a> <a class="btn btn-mini note_copy" href="{% url 'course-copy' course.id %}"><i class="icon-share"></i></a></li>
         {% comment %}
         need to add a way to get the percent complete for the course at a later date
         <div class="completion thin">
@@ -43,7 +43,7 @@ $('.note_copy').tooltip({ title: 'Copy List', placement: 'right' });
 {% else %}
     <p>You have not created any custom lists yet. Click the link below to create your first list!</p>
 {% endif %}
- <p><a class="btn btn-primary" href="{% url 'list-add' %}"><i class="icon-plus icon-white"></i> New List</a></p>
+ <p><a class="btn btn-primary" href="{% url 'course-add' %}"><i class="icon-plus icon-white"></i> New List</a></p>
  <h2>My Group Lists:</h2>
 {% if member_of %}
     <ul>

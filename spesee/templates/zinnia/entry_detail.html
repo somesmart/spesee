@@ -1,5 +1,5 @@
 {% extends "zinnia/base.html" %}
-{% load i18n comments zinnia_tags %}
+{% load i18n comments zinnia %}
 {% load url from future %}
 
 {% block title %}{{ object.title }}{% endblock %}
@@ -59,7 +59,9 @@
             <abbr class="comment-published" title="{{ comment.submit_date|date:"c" }}Z">
               {{ comment.submit_date|date:"SHORT_DATETIME_FORMAT" }}
             </abbr>
+            {% block comment-content %}
             {{ comment.comment|linebreaks }}
+            {% endblock comment-content %}
           </div>
         </div>
       {% endfor %}
