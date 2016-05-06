@@ -488,7 +488,7 @@ class DiscoverList(ListView):
 class ObservationListSelf(ListView):
     template_name='nature/base_observation_list.html'
     context_object_name = 'observation_list'
-    paginate_by = 30
+    paginate_by = 15
     def get_queryset(self):
         return Observation.objects.select_related().filter(user = self.request.user).order_by('-observation_date')
     def get_context_data(self, **kwargs):
