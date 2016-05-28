@@ -89,7 +89,7 @@ $(function() {
           {{ form.as_table }}
            <tr id="current_group">
             <th><label for "current_group">Current Group:</label></th>
-            <td><a href="{% url 'group-view' course.group.id %}{{ course.group|slugify }}">{{ course.group }}</a></td>
+            <td><a href="{% if course.is_group %}{% url 'group-view' course.group.id %}{{ course.group|slugify }}{% endif %}">{{ course.group }}</a></td>
           </tr>
            <tr >
             <th><label for="id_group">Change Group:</label></th>

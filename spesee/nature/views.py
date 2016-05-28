@@ -84,7 +84,7 @@ def autocomplete(request):
             elif search == "user":
                 # Ignore queries shorter than length 3
                 if len(value) > 2:
-                    model_results = UserSettings.objects.select_related().filter(user__username__startswith=value, private=False)
+                    model_results = UserSettings.objects.select_related().filter(user__username__startswith=value)
                     # Default return list
                     for user in model_results:
                         data = {'id': user.user.id, 'label': user.user.username}
@@ -621,7 +621,7 @@ class CourseView(DetailView):
         #those found by other users
         context['others_found'] = CourseDetail.objects.select_related().filter(organism__in=self.others_observed_ids, course=self.course_id).order_by('organism__common_name').distinct()
         #those orgs not ever found
-        context['never_found'] = CourseDetail.objects.select_related().filter(course=self.course_id).exclude(organism__in=self.observed_ids).distinct().order_by('organism__common_name').distinct()
+        context['never_found'] = CourseDetail.objects.select_related().filter(course=self.course_id).exclude(organism__in=self.observed_ids).exclude(organism__in=self.user_observed_ids).distinct().order_by('organism__common_name').distinct()
         #percent complete stats
         getcontext().prec = 2
         context['completion'] = {'total': self.course_total, 'total_user': self.total_found_user}

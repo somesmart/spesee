@@ -1,13 +1,21 @@
 {% extends "nature/base.html" %}
 {% load staticfiles %}
 {% block title %}Observations{% endblock %}
+{% block app.css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/4.0.1/ekko-lightbox.min.css">
+{% endblock app.css %}
 {% block app.scripts %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/4.0.1/ekko-lightbox.min.js"></script>
 <script src="{% static 'js/holder/holder.js' %}"></script>
 <script>
 $(function() {
     $('.note').tooltip({ title: 'Edit this observation', placement: 'right' });
     $('.note2').tooltip({ title: 'Click to download all your observations', placement: 'right' });
 });
+$(document).delegate('*[data-toggle="lightbox"]', 'click', function(event) {
+    event.preventDefault();
+    $(this).ekkoLightbox();
+}); 
 </script>
 {% endblock %}
 {% block content-span%}<div class="span5 offset1">{% endblock %}
@@ -17,19 +25,7 @@ $(function() {
     {% if observation_list %}
         <dl class="dl-horizontal">
         {% for observation in observation_list %}
-          {% if forloop.counter0|divisibleby:"3" %}<div class="row-fluid"><ul class="thumbnails">{% endif %}
-            <li class="span4">
-              <div class="thumbnail organism {{ observation.organism.type|lower }} well well-small">
-                {% if observation.observation_image %}<img src="{{ observation.wide_thumb.url }}" class="obs-image">{% else %}<img src="holder.js/179x89" class= "obs-image">{% endif %}
-                <div class="caption">
-                  <h5>{{ observation.organism.common_name }}</h5>
-                  <p><em>{{ observation.organism.latin_name }}</em></p>
-                  <p>{{ observation.observation_date }}</p>
-                  <p><a class="btn btn-mini" href="{% url 'observation-detail' observation.id %}">View details »</a></p>
-                </div>
-              </div>
-            </li>
-          {% if forloop.last or forloop.counter|divisibleby:"3" %}</ul></div>{% endif %} 
+          {% include "nature/include_observation_list.html" %}
         {% endfor %}
         </dl>
         {% include "nature/include_pagination.html" %}
