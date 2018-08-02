@@ -20,23 +20,23 @@
     {% block app.css %}{% endblock %}
     <!-- this is the custom jquery ui bootstrap theme --> 
     <link rel="stylesheet" href="{% static 'nature/css/jquery-ui/jquery-ui-1.9.2.custom.css' %}">
-    <!--<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">-->
+    <!--<link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">-->
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
     <!-- Fav and touch icons -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 </head>
 <html>
 <body>
 {% block body %}{% endblock %}
 <!-- Placed at the end of the document so the pages load faster -->
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
     <script type="text/javascript" src="{% static 'js/bootstrap/bootstrap.min.js' %}"></script>
     {% load js %}
-    {% django_js jquery=false i18n=false csrf=false %}
+    <script type="text/javascript" src="{% static 'js/djangojs/django.min.js' %}"></script>  
     {% block app.scripts %}{% endblock %}
     {% block base.scripts %}{% endblock %}
     {% block map.scripts %}{% endblock %}

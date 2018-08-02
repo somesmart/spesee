@@ -18,9 +18,9 @@ class OrganismTypeAdmin(admin.ModelAdmin):
     # choices when we change the OrganismType in an OrganismAdmin page.
     def get_urls(self, **kwargs):
         urls = super(OrganismTypeAdmin, self).get_urls(**kwargs)
-        urls = patterns('', 
+        urls = [
             url(r'^(.*)/fields/$', self.get_fields, name='organisms_organismtype_fields'),
-        ) + urls
+        ] + urls
         return urls
     urls = property(get_urls)
     

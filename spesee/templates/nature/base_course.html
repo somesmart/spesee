@@ -23,7 +23,7 @@ $(function() {
 			</div>
 		{% endif %}
 		{% if user_found %}
-		<h3>What you've found:</h3>
+		<h3>What you've found ({{ user_found|length }} found!):</h3>
 		    <ul class="large_list">
 		    	{% for observation in user_found %}
 		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
@@ -31,7 +31,7 @@ $(function() {
 		    </ul>
 	    {% endif %}
 	    {% if group_found %}
-		    <h3>Found by group <a href="{% url 'group-view' course.group.id %}{{ course.group|slugify }}">{{ course.group }}</a>:</h3>
+		    <h3>Found by group <a href="{% url 'group-view' course.group.id %}{{ course.group|slugify }}">{{ course.group }}</a> ({{ group_found|length }} found!):</h3>
 	    	<ul class="large_list">
 		    	{% for observation in group_found %}
 		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
@@ -39,7 +39,7 @@ $(function() {
 		    </ul>
 	    {% endif %}
 	    {% if others_found %}
-	    <h3>Found by Others:</h3>
+	    <h3>Found by Others ({{ others_found|length }} found!):</h3>
 	    	<ul class="large_list">
 		    	{% for observation in others_found %}
 		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>
@@ -47,7 +47,7 @@ $(function() {
 		    </ul>
 	    {% endif %}
 	    {% if never_found %}
-	    <h3>No reported sightings:</h3>
+	    <h3>No reported sightings ({{ never_found|length }} still go go):</h3>
 	    	<ul class="large_list">
 		    	{% for observation in never_found %}
 		    		<li><a href="{% url 'organism-view' observation.organism.id %}{{ observation.organism.common_name|slugify }}">{{ observation.organism }}</a> - <a class="btn btn-mini note" href="{% url 'add-observation' %}?org={{ observation.organism.id }}"><i class="icon-plus"></i></a></li>

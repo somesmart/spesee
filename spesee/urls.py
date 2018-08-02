@@ -6,7 +6,7 @@ from mysite.nature.views import *
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = [
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'^', include('mysite.nature.urls')),
-)
+]
