@@ -1,4 +1,4 @@
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6b-LfSPC4oIvgGh2OyVvabLrgd9HSCRc&sensor=true"></script>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6b-LfSPC4oIvgGh2OyVvabLrgd9HSCRc"></script>
 <script type="text/javascript">
 var map;
 var infowindow = null;
@@ -15,11 +15,13 @@ $(document).ready(function () { initialize();  });
 
 function initialize() {
     {% if lat_lng %}
-    var lat_center = {{ lat_lng.latitude }}
-    var lng_center = {{ lat_lng.longitude }}
+    //user defined lat_lng
+    var lat_center = {% for zip in lat_lng %}{{ zip.latitude }}{% endfor %};
+    var lng_center = {% for zip in lat_lng %}{{ zip.longitude }}{% endfor %};
     {% else %}
-    var lat_center = 29.725188000
-    var lng_center = -95.763112000
+    //default lat_lng
+    var lat_center = 29.725188000;
+    var lng_center = -95.763112000;
     {% endif %}
     var centerMap = new google.maps.LatLng(lat_center, lng_center);
 

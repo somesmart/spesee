@@ -68,7 +68,7 @@
         {% else %} 
         </div>
         <ul id="login-form" class="nav pull-right">
-          <li><a href="{% url 'registration_register' %}">Sign Up</a></li>
+          <li><a href="{% url 'django_registration_register' %}">Sign Up</a></li>
           <li class="divider-vertical"></li>
           <li class="dropdown">
             <a class="dropdown-toggle" href="#" data-toggle="dropdown">Sign In <strong class="caret"></strong></a>
@@ -104,7 +104,7 @@
   <footer>
     <div class="container">
       <ul class="nav nav-pills">
-        <li class="disabled"><a href="">&copy; SpeSee 2012</a></li>
+        <li class="disabled"><a href="">&copy; SpeSee 2012 - 2020</a></li>
         <li><a href="{% url 'about-page' %}">About</a></li>
         <li><a href="/contact/">Contact</a></li>
       </ul>
@@ -113,6 +113,7 @@
 </div> <!-- /container -->
 {% endblock body %}
 {% block base.scripts %}
+
 {% if user.is_authenticated %}
 <script type="text/javascript">
 function getInvites(){
@@ -212,9 +213,8 @@ $(function() {
       source: "{% url 'nature-autocomplete' %}?search=organism",
       minLength: 3,
       select: function(event, ui) {
-        // $('#search_url').val(ui.item.id);
-        // $('#search').val(ui.item.label);
-        window.location.href = Django.url('organism-view', ui.item.id);
+        // window.location.href = Django.url('organism-view', ui.item.id);
+        window.location.href = "/organism/" + ui.item.id;
       }
     });
 });

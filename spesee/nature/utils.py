@@ -10,7 +10,7 @@ def get_hide_list(user):
     hide_types = [0] #sets it to hide nothing by default for anonymous users
     if user:
         user = User.objects.get(id=user)
-        if user.is_authenticated():
+        if user.is_authenticated:
             user_hides = UserSettings.objects.get(user = user)
             if user_hides.hide_trees == True:
                 hide_types.append(1)

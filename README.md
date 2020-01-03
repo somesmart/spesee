@@ -2,7 +2,7 @@
 
 ## Spesee is a community centered web app for recording observations and identification tips.
 
-## Django v 1.8.12
+## Django v 2.2.4
 
 ## Current Installed Apps:
   - django.contrib.auth

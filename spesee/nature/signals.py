@@ -1,4 +1,4 @@
-from registration.signals import user_registered #user_activated
+from django_registration.signals import user_registered #user_activated
 from nature.models import UserSettings
 from nature.forms import UserRegistrationForm
 from django.contrib.auth.models import Group

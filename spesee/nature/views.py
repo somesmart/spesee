@@ -4,7 +4,7 @@ import json
 from django.db.models import Q, Count
 from django.views.generic import DetailView, ListView, UpdateView, CreateView, FormView
 from django.contrib.auth import authenticate, login as auth_login
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.template import RequestContext, loader, Context as TemplContext
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
@@ -16,6 +16,10 @@ from nature.utils import *
 from decimal import *
 from datetime import datetime
 import csv
+
+# from django.template import add_to_builtins
+
+# add_to_builtins('djangojs.templatetags.js')
 
 def thanks(request):
     return HttpResponse("<p>Thank you for your submission. It will be reviewed shortly.</p>")
@@ -36,9 +40,9 @@ class IndexListView(ListView):
 
 def autocomplete(request):
     if request.method == "GET":
-        if request.GET.has_key(u'term'):
-            value = request.GET[u'term']
-            search = request.GET[u'search']
+        if 'term' in request.GET:
+            value = request.GET['term']
+            search = request.GET['search']
             results = []
             if search == "organism":
                 #this is only needed for by organism autocomplete because type doesn't impact zip.
@@ -121,7 +125,7 @@ def get_fields(self, request, *args, **kwargs):
         if args[0]:
             data += "".join([
                 "<option value='%(id)s'>%(name)s</option>" % x 
-                for x in OrganismType.objects.get(pk=args[0]).id_fields.values()
+                for x in list(OrganismType.objects.get(pk=args[0]).id_fields.values())
             ])
         return HttpResponse(data)   
 
@@ -152,9 +156,9 @@ class OrganismViewTest(DetailView):
         return context        
 
 def save_org_ident(request):
-    org_id = request.POST[u'org']
+    org_id = request.POST['org']
     organism = Organism.objects.get(id=org_id)
-    identification = request.POST[u'identification']
+    identification = request.POST['identification']
     modified_date = datetime.now()
     #if the user is a moderator their change is auto-approved
     if is_moderator(request.user):
@@ -246,7 +250,7 @@ def save_tags(request, organism):
     #add save tags code here
     organism = Organism.objects.get(id=organism)
     try:
-        Tag.objects.update_tags(organism, request.POST[u'new_tags'])
+        Tag.objects.update_tags(organism, request.POST['new_tags'])
         return HttpResponse('1')
     except:
         return HttpResponse('0')
@@ -404,10 +408,11 @@ class ObservationCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(ObservationCreateView, self).get_context_data(**kwargs)
-        self.zipcode = UserSettings.objects.select_related().filter(user = self.request.user).values('zipcode')
-        context['lat_lng'] = ZipCode.objects.get(id = self.zipcode)
-        if self.request.GET.has_key(u'org'):
-            self.org_id = self.request.GET[u'org']
+        self.usersettings = UserSettings.objects.select_related().filter(user = self.request.user)
+        context['usersettings'] = self.usersettings
+        context['lat_lng'] = ZipCode.objects.select_related().filter(usersettings__user = self.request.user)
+        if 'org' in self.request.GET:
+            self.org_id = self.request.GET['org']
             context['add_org'] = Organism.objects.get(id=self.org_id)
         return context
 
@@ -498,7 +503,7 @@ class ObservationListSelf(ListView):
         return context
 
 def check_existing(request, search_type, search_value):
-    lat_lng_box = get_lat_lng_box(request.GET[u'lat'], request.GET[u'lng'], 100) #100 is saying 100 feet * 100 feet
+    lat_lng_box = get_lat_lng_box(request.GET['lat'], request.GET['lng'], 100) #100 is saying 100 feet * 100 feet
     results=[]
     if search_type == 'existing':
         #only works for trees atm
@@ -540,7 +545,7 @@ class LocationList(ListView):
     template_name='nature/base_location_list.html'
     context_object_name = 'location_list'
     def get_queryset(self):
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             return Location.objects.select_related().filter(created_by = self.request.user).order_by('description')
         else:
             return Location.objects.select_related().order_by('description')[:10]
@@ -567,10 +572,14 @@ class LocationView(DetailView):
         self.lng_bottom = self.location.longitude - self.add_height
         self.lng_top = self.location.longitude + self.add_height
         self.lcn_public = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(private=False,latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top)).values('organism', 'organism__id', 'organism__common_name', 'organism__latin_name').annotate(Count('id')).order_by('organism__common_name')
-        self.lcn_private = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(private=True, user=self.request.user, latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top)).values('organism', 'organism__id', 'organism__common_name', 'organism__latin_name').annotate(Count('id')).order_by('organism__common_name')
+        self.lcn_private = Observation.objects.select_related().values('organism', 'organism__id', 'organism__common_name', 'organism__latin_name').annotate(Count('id')).none()
+        self.private_obs = Observation.objects.none()
+        if self.request.user.is_authenticated:
+            self.lcn_private = Observation.objects.select_related().exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(private=True, user=self.request.user, latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top)).values('organism', 'organism__id', 'organism__common_name', 'organism__latin_name').annotate(Count('id')).order_by('organism__common_name')
+            self.private_obs = Observation.objects.exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(private=True, user=self.request.user, latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top))
         context['location_details'] = self.lcn_public | self.lcn_private
         self.public_obs = Observation.objects.exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(private=False,latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top))
-        self.private_obs = Observation.objects.exclude(parent_observation__isnull=False).exclude(organism__type__in=self.hide_types).filter(private=True, user=self.request.user, latitude__range=(self.lat_left, self.lat_right), longitude__range=(self.lng_bottom, self.lng_top))
+        
         context['map_observations'] = self.public_obs | self.private_obs
         return context
 
@@ -604,8 +613,8 @@ class CourseView(DetailView):
         self.group_members = GroupUsers.objects.filter(group=self.course.group).values('user')
         self.group_finds = []
         if self.course.is_group:
-            self.group_owner = Group.objects.filter(id=self.course.group.id).values('owner')
-            self.group_finds = Observation.objects.filter(Q(organism__in=self.org_ids, private=False), Q(user__in=self.group_members) | Q(user=self.group_owner)).exclude(organism__in=self.user_observed_ids).values('organism')
+            self.group_owner = Group.objects.get(id=self.course.group.id)
+            self.group_finds = Observation.objects.filter(Q(organism__in=self.org_ids, private=False), Q(user__in=self.group_members) | Q(user=self.group_owner.owner)).exclude(organism__in=self.user_observed_ids).values('organism')
         #all the orgs that OTHERS have seen, but not those the user has seen
         self.others_observed_ids = Observation.objects.filter(organism__in=self.org_ids, private=False).exclude(Q(organism__in=self.group_finds) | Q(organism__in=self.user_observed_ids)).values('organism')
         #distinct orgs from the course the current user has seen
@@ -882,7 +891,7 @@ class UserSettingsView(UpdateView):
 class UserDetailView(DetailView):
     template_name='nature/base_profile.html'
     def get_queryset(self):
-        return UserSettings.objects.filter(user = self.kwargs['pk'])
+        return UserSettings.objects.filter(user = self.pk)
 
 #this works, but the editing by username doesn't so I will leave both in there
 def user_profile(request, username):

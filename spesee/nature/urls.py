@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^djangojs/', include('djangojs.urls')),
     #home page
     url(r'^$', nature_views.IndexListView.as_view(), name='home-page'),
+    url(r'^$', nature_views.IndexListView.as_view(), name='my-books'),
     #about page
     url(r'^about/$', TemplateView.as_view(template_name = 'nature/base_about.html'), name='about-page'),
     #organism type details
@@ -85,15 +86,15 @@ urlpatterns = [
     #export my observations
     url(r'observation/export/$', nature_views.export_obs, name='export-observations'),
     #shows the login screen
-    url(r'^accounts/login/$', auth_views.login, {'template_name': 'nature/base_login.html'}, name='account-login'),
+    url(r'^accounts/login/$', auth_views.LoginView, {'template_name': 'nature/base_login.html'}, name='account-login'),
     url(r'^accounts/login/simple/$', nature_views.login, name='login-simple'),
     #logout the user
-    url(r'^accounts/logout/$', auth_views.logout, {'template_name': 'nature/base_logged_out.html'}, name='account-logout'),
+    url(r'^accounts/logout/$', auth_views.LogoutView, {'template_name': 'nature/base_logged_out.html'}, name='account-logout'),
     #shows the user profile page
     url(r'^accounts/profile/(?P<pk>\d+)/edit/$', login_required(nature_views.UserSettingsView.as_view(template_name='nature/base_profile_form.html')), name='profile-edit'),
     #view the profile to actually be useful
-    url(r'^accounts/profile/(?P<pk>\d+)/', login_required(nature_views.UserDetailView.as_view(template_name='nature/base_profile.html'))),
     url(r'^accounts/profile/(?P<username>\w+)/$', nature_views.user_profile, name='user-profile'),
+    url(r'^accounts/profile/(?P<pk>\d+)/', login_required(nature_views.UserDetailView.as_view(template_name='nature/base_profile.html'))),
     #view the profile to actually be useful
     url(r'^accounts/profile/$', login_required(nature_views.UserDetailView.as_view(template_name='nature/base_profile.html'))),
     #check for invites
@@ -105,7 +106,7 @@ urlpatterns = [
     url(r'^accounts/invites/(?P<group>\d+)/(?P<response>\d+)/$', nature_views.group_invite_response, name='group-invite-response'),
     #all other accounts/ url functions go to the registration module
     # url(r'^accounts/register/$', RegistrationView.as_view(form_class=UserRegistrationForm), name='registration_register'),
-    url(r'^accounts/', include('registration.backends.hmac.urls')),
+    url(r'^accounts/', include('django_registration.backends.activation.urls')),
     #list/ is for lists/courses
     url(r'^list/(?P<pk>\d+)/', login_required(nature_views.CourseView.as_view()), name='course-view'),
     url(r'^list/$', login_required(nature_views.CourseList.as_view()), name='course-list'),

@@ -31,7 +31,7 @@ class OrganismTypeAdmin(admin.ModelAdmin):
         if args[0]:
             data += "".join([
                 "<option value='%(id)s'>%(name)s</option>" % x 
-                for x in OrganismType.objects.get(pk=args[0]).id_fields.values()
+                for x in list(OrganismType.objects.get(pk=args[0]).id_fields.values())
             ])
         return HttpResponse(data)
 
@@ -48,7 +48,7 @@ class IdentificationDetailInline(admin.TabularInline):
         return instance
 
 def latin_name(obj):
-    return u"<i>%s</i>" % obj.latin_name
+    return "<i>%s</i>" % obj.latin_name
 latin_name.allow_tags = True
 latin_name.admin_order_field = 'latin_name'
 
