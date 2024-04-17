@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.conf.urls import *
+from django.urls import include, re_path
 from django.http import HttpResponse
 
 from nature.models import *
@@ -19,7 +20,7 @@ class OrganismTypeAdmin(admin.ModelAdmin):
     def get_urls(self, **kwargs):
         urls = super(OrganismTypeAdmin, self).get_urls(**kwargs)
         urls = [
-            url(r'^(.*)/fields/$', self.get_fields, name='organisms_organismtype_fields'),
+            re_path(r'^(.*)/fields/$', self.get_fields, name='organisms_organismtype_fields'),
         ] + urls
         return urls
     urls = property(get_urls)
